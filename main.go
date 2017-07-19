@@ -29,7 +29,7 @@ func idx(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, string(idx))
 }
 
-func keys(w http.ResponseWriter, r *http.Request) {
+func states(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	result, err := svc.ListObjects(&s3.ListObjectsInput{
 		Bucket: aws.String(bucket),
@@ -55,16 +55,16 @@ func keys(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, string(j))
 }
 
-func project(w http.ResponseWriter, r *http.Request) {
+func state(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	proj := strings.TrimPrefix(r.URL.Path, "/api/project")
+	st := strings.TrimPrefix(r.URL.Path, "/api/state")
 	result, err := svc.GetObjectWithContext(context.Background(), &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
-		Key:    aws.String(proj),
+		Key:    aws.String(st),
 	})
 	if err != nil {
 		errObj := make(map[string]string)
-		errObj["error"] = fmt.Sprintf("State not found: %v", proj)
+		errObj["error"] = fmt.Sprintf("State file not found: %v", st)
 		errObj["details"] = fmt.Sprintf("%v", err)
 		j, _ := json.Marshal(errObj)
 		io.WriteString(w, string(j))
@@ -80,7 +80,7 @@ func main() {
 	http.HandleFunc("/", idx)
 	staticFs := http.FileServer(http.Dir("static"))
 	http.Handle("/static/", http.StripPrefix("/static", staticFs))
-	http.HandleFunc("/api/keys", keys)
-	http.HandleFunc("/api/project/", project)
+	http.HandleFunc("/api/states", states)
+	http.HandleFunc("/api/state/", state)
 	http.ListenAndServe(":80", nil)
 }

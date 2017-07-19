@@ -42,7 +42,7 @@
                             <span class="caret"></span>
                         </a>
                         <ul id="reports-list" class="dropdown-menu">
-                            <li ng-repeat="k in keys"><a href="/project/{{k}}" target="_self">{{k}}</a></li>
+                            <li ng-repeat="k in keys"><a href="/state/{{k}}" target="_self">{{k}}</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -115,7 +115,7 @@ app.controller("tbBreadCtrl", ['$scope', '$location', function($scope, $location
 }]);
 
 app.controller("tbListCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
-    $http.get('/api/keys').then(function(response){
+    $http.get('/api/states').then(function(response){
         $scope.keys = response.data;
     });
 }]);
