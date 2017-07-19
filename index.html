@@ -1,29 +1,103 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Terraboard</title>
+
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+
+        <link rel="stylesheet" href="css/terraboard.css" rel="stylesheet" type="text/css">
+        <script src="//code.jquery.com/jquery-1.11.3.min.js" type="text/javascript"></script>
+        <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js" type="text/javascript"></script>
+
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+        <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-2.5.0.js"></script>
         <base href="/" />
     </head>
 
-    <body>
-        <div ng-app="terraboard" ng-controller="tbCtrl">
-            <ul>
-                <li>Path: {{path}}</li>
-                <li>Terraform version: {{details.terraform_version}}</li>
-                <li>Key: {{details.remote.config.key}}</li>
-                <li>Modules:</li>
-                  <ul ng-repeat="mod in details.modules">
-                      <li>{{mod.path[1]}}</li>
-                  </ul>
-                <li>Details: {{details}}</li>
-            </ul>
+    <body ng-app="terraboard">
+        <div class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+
+                <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-menu">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="http://www.camptocamp.com">
+                        <img alt="Camptocamp" src="c2c-logo.png">
+                    </a>
+                </div>
+
+                <li class="dropdown" ng-controller="tbListCtrl">
+                    <a id="reports-list-button" class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+                        Choose a statefile
+                        <span class="caret"></span>
+                    </a>
+                    <ul id="reports-list" class="dropdown-menu">
+                        <li ng-repeat="k in keys">{{k}}</li>
+                    </ul>
+                </li>
+
+                <ul id="breadcrumb" class="nav navbar-nav navbar-right breadcrumb">
+                    <li class="navbar-text" id="crumb-report"></li>
+                    <li class="navbar-text" id="crumb-label" style="display:none"></li>
+                    <li class="navbar-text" id="crumb-node" style="display:none"></li>
+                </ul>
+            </div>
+        </div>
+        <div class="container">
+            <div id="mainrow" class="row">
+                <div id="leftcol" class="col-md-4">
+                </div>
+                <div id="node" class="col-md-8" ng-controller="tbStateCtrl">
+                    <h2 class="node-title">{{details.remote.config.key}}</h2>
+                    <div class="panel-group">
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                              <h4>General Information</h4>
+                            </div>
+                            <ul class="list-group">
+                                <li class="list-group-item">Terraform version: {{details.terraform_version}}</li>
+                                <li class="list-group-item">Serial: {{details.serial}}</li>
+                            </ul>
+                        </div>
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                                <h4>Modules</h4>
+                            </div>
+                            <ul class="list-group">
+                                <li class="list-group-item" ng-repeat="mod in details.modules" ng-if="mod.path[1]">{{mod.path[1]}}</li>
+                            </ul>
+                        </div>
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                                <h4>Details</h4>
+                            </div>
+                            <code>{{details}}</code>
+                        </div>
+                    </div>
+                </div>
         </div>
 
         <script>
 var app = angular.module("terraboard", [], function($locationProvider){
     $locationProvider.html5Mode(true);
 });
-app.controller("tbCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
+
+app.controller("tbListCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
+    $http.get('http://'+$location.host()+':8080/keys').then(function(response){
+        $scope.keys = response.data;
+    });
+}]);
+
+app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
     $http.get('http://'+$location.host()+':8080'+$location.url()).then(function(response){
         $scope.path = $location.url();
         $scope.details = response.data;

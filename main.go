@@ -28,6 +28,32 @@ func stats(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "Stats!")
 }
 
+func keys(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	result, err := svc.ListObjects(&s3.ListObjectsInput{
+		Bucket: aws.String(bucket),
+	})
+	if err != nil {
+		errObj := make(map[string]string)
+		errObj["error"] = "Failed to list states"
+		errObj["details"] = fmt.Sprintf("%v", err)
+		j, _ := json.Marshal(errObj)
+		io.WriteString(w, string(j))
+		return
+	}
+
+	var keys []string
+
+	for _, obj := range result.Contents {
+		if strings.HasSuffix(*obj.Key, ".tfstate") {
+			keys = append(keys, *obj.Key)
+		}
+	}
+
+	j, _ := json.Marshal(keys)
+	io.WriteString(w, string(j))
+}
+
 func project(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	proj := strings.TrimPrefix(r.URL.Path, "/project")
@@ -51,6 +77,7 @@ func project(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/", stats)
+	http.HandleFunc("/keys", keys)
 	http.HandleFunc("/project/", project)
 	http.ListenAndServe(":80", nil)
 }
