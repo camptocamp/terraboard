@@ -1,4 +1,4 @@
-FROM golang:1.7.3 as builder
+FROM golang:1.7.3
 WORKDIR /go/src/github.com/camptocamp/terraboard
 RUN go get github.com/aws/aws-sdk-go
 COPY . .
