@@ -2,6 +2,8 @@
 
 Web Dashboard to inspect Terraform States
 
+![Screenshot](screenshot.png)
+
 
 ## Using with Docker
 
