@@ -21,7 +21,7 @@ var bucket string
 func init() {
 	sess := session.Must(session.NewSession())
 	svc = s3.New(sess, &aws.Config{})
-	bucket = os.GetEnv("AWS_BUCKET")
+	bucket = os.Getenv("AWS_BUCKET")
 }
 
 func stats(w http.ResponseWriter, r *http.Request) {
