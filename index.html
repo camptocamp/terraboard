@@ -13,8 +13,9 @@
         <script src="//code.jquery.com/jquery-1.11.3.min.js" type="text/javascript"></script>
         <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js" type="text/javascript"></script>
 
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.5/angular.min.js"></script>
-        <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-2.5.0.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.5/angular.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.5/angular-route.js"></script>
+
         <base href="/" />
     </head>
 
@@ -63,6 +64,7 @@
                             <ul class="list-group">
                                 <li class="list-group-item">Terraform version: {{details.terraform_version}}</li>
                                 <li class="list-group-item">Serial: {{details.serial}}</li>
+                                <li class="list-group-item">Version: <select ng-model="selectedVersion" ng-options="version as date for (version, date) in versions"></select></li>
                             </ul>
                         </div>
                         <div id="nodes" class="panel panel-info">
@@ -111,8 +113,9 @@
         </div>
 
         <script>
-var app = angular.module("terraboard", [], function($locationProvider){
+var app = angular.module("terraboard", ['ngRoute'], function($locationProvider, $routeProvider){
     $locationProvider.html5Mode(true);
+    $routeProvider.when('/state/:stateFile', {reloadOnSearch: false});
 });
 
 app.controller("tbBreadCtrl", ['$scope', '$location', function($scope, $location) {
@@ -128,13 +131,29 @@ app.controller("tbListCtrl", ['$scope', '$http', '$location', function($scope, $
 app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
     $scope.Utils = { keys : Object.keys };
     $scope.display = {};
+
+    var key = $location.url().replace('/state/', '');
+
+    $http.get('/api/history/'+key).then(function(response){
+        $scope.history = response.data;
+        $scope.versions = {};
+        for (i=0; i<response.data.length; i++) {
+            $scope.versions[response.data[i].VersionId] = response.data[i].LastModified;
+        }
+        $scope.$watch('selectedVersion', function(ver) {
+            $location.search('versionid', ver);
+        });
+    });
+
+    $scope.$on('$locationChangeSuccess', function() {
     $http.get('/api'+$location.url()).then(function(response){
         $scope.path = $location.path();
         $scope.details = response.data;
-        $scope.setSelected = function(mod, res){
+        $scope.setSelected = function(mod, res) {
             $scope.selectedmod = mod;
             $scope.selectedres = res;
         };
+    });
     });
 }]);
         </script>
