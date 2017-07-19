@@ -58,10 +58,14 @@ func states(w http.ResponseWriter, r *http.Request) {
 func state(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	st := strings.TrimPrefix(r.URL.Path, "/api/state")
-	result, err := svc.GetObjectWithContext(context.Background(), &s3.GetObjectInput{
+	input := &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(st),
-	})
+	}
+	if versionId := r.URL.Query().Get("versionid"); versionId != "" {
+		input.VersionId = &versionId
+	}
+	result, err := svc.GetObjectWithContext(context.Background(), input)
 	if err != nil {
 		errObj := make(map[string]string)
 		errObj["error"] = fmt.Sprintf("State file not found: %v", st)
