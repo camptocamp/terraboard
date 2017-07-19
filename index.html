@@ -1,14 +1,25 @@
-<!doctype html>
-<html ng-app>
-  <head>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
-  </head>
-  <body>
-    <div>
-      <label>Name:</label>
-      <input type="text" ng-model="yourName" placeholder="Enter a name here">
-      <hr>
-      <h1>Hello {{yourName}}!</h1>
-    </div>
-  </body>
+<!DOCTYPE html>
+<html>
+<body>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+
+<div ng-app="terraboard" ng-controller="tbCtrl">
+    <ul>
+    <li>Path: {{path}}</li>
+    <li>Terraform version: {{details.terraform_version}}</li>
+    <li>Key: {{details.remote.config.key}}</li>
+    </ul>
+</div>
+
+<script>
+var app = angular.module("terraboard", []);
+app.controller("tbCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
+    $http.get("http://localhost:8080/project/c2c_mgmtsrv/rancher-env/infra/terraform.tfstate").then(function(response){
+        $scope.path = $location.url();
+        $scope.details = response.data;
+    });
+}]);
+</script>
+
+</body>
 </html>

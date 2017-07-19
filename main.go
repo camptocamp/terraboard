@@ -29,6 +29,7 @@ func stats(w http.ResponseWriter, r *http.Request) {
 }
 
 func project(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	proj := strings.TrimPrefix(r.URL.Path, "/project")
 	result, err := svc.GetObjectWithContext(context.Background(), &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
