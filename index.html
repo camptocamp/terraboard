@@ -11,6 +11,11 @@
                 <li>Path: {{path}}</li>
                 <li>Terraform version: {{details.terraform_version}}</li>
                 <li>Key: {{details.remote.config.key}}</li>
+                <li>Modules:</li>
+                  <ul ng-repeat="mod in details.modules">
+                      <li>{{mod.path[1]}}</li>
+                  </ul>
+                <li>Details: {{details}}</li>
             </ul>
         </div>
 
@@ -19,7 +24,7 @@ var app = angular.module("terraboard", [], function($locationProvider){
     $locationProvider.html5Mode(true);
 });
 app.controller("tbCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
-    $http.get('http://localhost:8080'+$location.url()).then(function(response){
+    $http.get('http://'+$location.host()+':8080'+$location.url()).then(function(response){
         $scope.path = $location.url();
         $scope.details = response.data;
     });
