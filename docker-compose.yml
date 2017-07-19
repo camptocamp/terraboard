@@ -1,0 +1,14 @@
+---
+version: '3'
+services:
+  tb-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - 8080:80
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_DEFAULT_REGION}
+      AWS_BUCKET: ${AWS_BUCKET}
