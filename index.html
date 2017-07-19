@@ -13,7 +13,7 @@
         <script src="//code.jquery.com/jquery-1.11.3.min.js" type="text/javascript"></script>
         <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js" type="text/javascript"></script>
 
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.5/angular.min.js"></script>
         <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-2.5.0.js"></script>
         <base href="/" />
     </head>
@@ -42,7 +42,7 @@
                             <span class="caret"></span>
                         </a>
                         <ul id="reports-list" class="dropdown-menu">
-                            <li ng-repeat="k in keys"><a href="/project/{{k}}">{{k}}</a></li>
+                            <li ng-repeat="k in keys"><a href="/project/{{k}}" target="_self">{{k}}</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -101,7 +101,6 @@ app.controller("tbListCtrl", ['$scope', '$http', '$location', function($scope, $
 
 app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
     $http.get('http://'+$location.host()+':8080'+$location.url()).then(function(response){
-        $scope.path = $location.url();
         $scope.details = response.data;
     });
 }]);
