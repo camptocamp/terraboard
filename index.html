@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
 
-        <link rel="stylesheet" href="/css/terraboard.css" type="text/css">
+        <link rel="stylesheet" href="/static/terraboard.css" type="text/css">
         <script src="//code.jquery.com/jquery-1.11.3.min.js" type="text/javascript"></script>
         <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js" type="text/javascript"></script>
 
@@ -31,7 +31,7 @@
                         <span class="icon-bar"></span>
                     </button>
                     <a class="navbar-brand" href="http://www.camptocamp.com">
-                        <img alt="Camptocamp" src="c2c-logo.png">
+                        <img alt="Camptocamp" src="/static/c2c-logo.png">
                     </a>
                 </div>
 
@@ -115,7 +115,7 @@ app.controller("tbBreadCtrl", ['$scope', '$location', function($scope, $location
 }]);
 
 app.controller("tbListCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
-    $http.get('http://'+$location.host()+':8080/keys').then(function(response){
+    $http.get('/api/keys').then(function(response){
         $scope.keys = response.data;
     });
 }]);
@@ -123,7 +123,7 @@ app.controller("tbListCtrl", ['$scope', '$http', '$location', function($scope, $
 app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
     $scope.Utils = { keys : Object.keys };
     $scope.display = {};
-    $http.get('http://'+$location.host()+':8080'+$location.url()).then(function(response){
+    $http.get('/api'+$location.url()).then(function(response){
         $scope.path = $location.path();
         $scope.details = response.data;
         $scope.setSelected = function(mod, res){

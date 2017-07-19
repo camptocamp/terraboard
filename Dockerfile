@@ -6,5 +6,6 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o terraboard-server
 
 FROM scratch
 COPY --from=builder /go/src/github.com/camptocamp/terraboard/terraboard-server /
+COPY static /
 ENTRYPOINT ["/terraboard-server"]
 CMD [""]

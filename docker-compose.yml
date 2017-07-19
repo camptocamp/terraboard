@@ -6,16 +6,9 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     ports:
-      - 8080:80
+      - 80:80
     environment:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_REGION: ${AWS_DEFAULT_REGION}
       AWS_BUCKET: ${AWS_BUCKET}
-  terraboard:
-    image: nginx
-    ports:
-      - 80:80
-    volumes:
-      - .:/usr/share/nginx/html:ro
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro

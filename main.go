@@ -24,8 +24,9 @@ func init() {
 	bucket = os.Getenv("AWS_BUCKET")
 }
 
-func stats(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, "Stats!")
+func idx(w http.ResponseWriter, r *http.Request) {
+	idx, _ := ioutil.ReadFile("index.html")
+	io.WriteString(w, string(idx))
 }
 
 func keys(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +57,7 @@ func keys(w http.ResponseWriter, r *http.Request) {
 
 func project(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	proj := strings.TrimPrefix(r.URL.Path, "/project")
+	proj := strings.TrimPrefix(r.URL.Path, "/api/project")
 	result, err := svc.GetObjectWithContext(context.Background(), &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(proj),
@@ -76,8 +77,10 @@ func project(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/", stats)
-	http.HandleFunc("/keys", keys)
-	http.HandleFunc("/project/", project)
+	http.HandleFunc("/", idx)
+	staticFs := http.FileServer(http.Dir("static"))
+	http.Handle("/static/", http.StripPrefix("/static", staticFs))
+	http.HandleFunc("/api/keys", keys)
+	http.HandleFunc("/api/project/", project)
 	http.ListenAndServe(":80", nil)
 }
