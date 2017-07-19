@@ -54,12 +54,9 @@
                 </ul>
             </div>
         </div>
-        <div class="container">
+        <div class="container" ng-controller="tbStateCtrl">
             <div id="mainrow" class="row">
                 <div id="leftcol" class="col-md-4">
-                </div>
-                <div id="node" class="col-md-8" ng-controller="tbStateCtrl">
-                    <h2 class="node-title">{{path}}</h2>
                     <div class="panel-group">
                         <div class="panel panel-info">
                             <div class="panel-heading">
@@ -78,6 +75,11 @@
                                 <li class="list-group-item" ng-repeat="mod in details.modules" ng-if="mod.path[1]">{{mod.path[1]}}</li>
                             </ul>
                         </div>
+                    </div>
+                </div>
+                <div id="node" class="col-md-8">
+                    <h2 class="node-title">{{path}}</h2>
+                    <div class="panel-group">
                         <div class="panel panel-info">
                             <div class="panel-heading">
                                 <h4 class="panel-title">Details</h4>
