@@ -14,7 +14,6 @@
         <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js" type="text/javascript"></script>
 
         <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.5/angular.min.js"></script>
-        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.5/angular-route.js"></script>
 
         <base href="/" />
     </head>
@@ -113,9 +112,8 @@
         </div>
 
         <script>
-var app = angular.module("terraboard", ['ngRoute'], function($locationProvider, $routeProvider){
+var app = angular.module("terraboard", [], function($locationProvider){
     $locationProvider.html5Mode(true);
-    $routeProvider.when('/state/:stateFile', {reloadOnSearch: false});
 });
 
 app.controller("tbBreadCtrl", ['$scope', '$location', function($scope, $location) {
