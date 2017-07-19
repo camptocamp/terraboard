@@ -130,8 +130,10 @@ app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, 
     $scope.Utils = { keys : Object.keys };
     $scope.display = {};
 
-    var key = $location.url().replace('/state/', '');
+    // Init
+    $scope.selectedVersion = $location.search().versionid;
 
+    var key = $location.url().replace('/state/', '');
     $http.get('/api/history/'+key).then(function(response){
         $scope.history = response.data;
         $scope.versions = {};
