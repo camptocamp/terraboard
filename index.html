@@ -35,15 +35,17 @@
                     </a>
                 </div>
 
-                <li class="dropdown" ng-controller="tbListCtrl">
-                    <a id="reports-list-button" class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
-                        Choose a statefile
-                        <span class="caret"></span>
-                    </a>
-                    <ul id="reports-list" class="dropdown-menu">
-                        <li ng-repeat="k in keys"><a href="/project/{{k}}">{{k}}</a></li>
-                    </ul>
-                </li>
+                <ul class="nav navbar-nav navbar-collapse collapse" id="navbar-collapse-menu">
+                    <li class="dropdown" ng-controller="tbListCtrl">
+                        <a id="reports-list-button" class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+                            Choose a statefile
+                            <span class="caret"></span>
+                        </a>
+                        <ul id="reports-list" class="dropdown-menu">
+                            <li ng-repeat="k in keys"><a href="/project/{{k}}">{{k}}</a></li>
+                        </ul>
+                    </li>
+                </ul>
 
                 <ul id="breadcrumb" class="nav navbar-nav navbar-right breadcrumb">
                     <li class="navbar-text" id="crumb-report"></li>
