@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
 
-        <link rel="stylesheet" href="css/terraboard.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="/css/terraboard.css" type="text/css">
         <script src="//code.jquery.com/jquery-1.11.3.min.js" type="text/javascript"></script>
         <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js" type="text/javascript"></script>
 
@@ -59,11 +59,11 @@
                 <div id="leftcol" class="col-md-4">
                 </div>
                 <div id="node" class="col-md-8" ng-controller="tbStateCtrl">
-                    <h2 class="node-title">{{details.remote.config.key}}</h2>
+                    <h2 class="node-title">{{path}}</h2>
                     <div class="panel-group">
                         <div class="panel panel-info">
                             <div class="panel-heading">
-                              <h4>General Information</h4>
+                              <h4 class="panel-title">General Information</h4>
                             </div>
                             <ul class="list-group">
                                 <li class="list-group-item">Terraform version: {{details.terraform_version}}</li>
@@ -72,7 +72,7 @@
                         </div>
                         <div class="panel panel-info">
                             <div class="panel-heading">
-                                <h4>Modules</h4>
+                                <h4 class="panel-title">Modules</h4>
                             </div>
                             <ul class="list-group">
                                 <li class="list-group-item" ng-repeat="mod in details.modules" ng-if="mod.path[1]">{{mod.path[1]}}</li>
@@ -80,7 +80,7 @@
                         </div>
                         <div class="panel panel-info">
                             <div class="panel-heading">
-                                <h4>Details</h4>
+                                <h4 class="panel-title">Details</h4>
                             </div>
                             <code>{{details}}</code>
                         </div>
@@ -101,6 +101,7 @@ app.controller("tbListCtrl", ['$scope', '$http', '$location', function($scope, $
 
 app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
     $http.get('http://'+$location.host()+':8080'+$location.url()).then(function(response){
+        $scope.path = $location.path();
         $scope.details = response.data;
     });
 }]);
