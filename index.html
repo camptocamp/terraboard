@@ -47,10 +47,8 @@
                     </li>
                 </ul>
 
-                <ul id="breadcrumb" class="nav navbar-nav navbar-right breadcrumb">
-                    <li class="navbar-text" id="crumb-report"></li>
-                    <li class="navbar-text" id="crumb-label" style="display:none"></li>
-                    <li class="navbar-text" id="crumb-node" style="display:none"></li>
+                <ul id="breadcrumb" class="nav navbar-nav navbar-right breadcrumb" ng-controller="tbBreadCtrl">
+                    <li class="navbar-text" id="crumb-node">{{path}}</li>
                 </ul>
             </div>
         </div>
@@ -71,20 +69,37 @@
                             <div class="panel-heading">
                                 <h4 class="panel-title">Modules</h4>
                             </div>
-                            <ul class="list-group">
-                                <li class="list-group-item" ng-repeat="mod in details.modules" ng-if="mod.path[1]">{{mod.path[1]}}</li>
+                            <ul class="list-group" ng-init="display.mod=0">
+                                <li class="list-group-item" ng-repeat="mod in details.modules track by $index" ng-init="modname = mod.path[1] ? mod.path[1] : 'root'" ng-class="{selected: mod == selectedmod}">
+                                    <div ng-click="display.mod=$index">{{modname}} <span class="badge pull-right" ng-cloak>{{Utils.keys(details.modules[$index].resources).length}}</span></div>
+                                    <ul ng-show="display.mod==$index" class="list-group" ng-init="indexmod=$index">
+                                        <li ng-repeat="(n, m) in details.modules[$index].resources" ng-click="setSelected(indexmod, n)" class="list-group-item">{{n}}</li>
+                                    </ul>
+                                </li>
                             </ul>
                         </div>
+                        <!--
+                        <div class="panel-group">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">Details</h4>
+                                </div>
+                                <code>{{details}}</code>
+                            </div>
+                        </div>
+                        !-->
                     </div>
                 </div>
                 <div id="node" class="col-md-8">
-                    <h2 class="node-title">{{path}}</h2>
+                    <h2 class="node-title">{{details.modules[selectedmod].path[1]}} / {{selectedres}}</h2>
                     <div class="panel-group">
                         <div class="panel panel-info">
                             <div class="panel-heading">
-                                <h4 class="panel-title">Details</h4>
+                                <h4 class="panel-title">Attributes</h4>
                             </div>
-                            <code>{{details}}</code>
+                            <ul class="list-group">
+                                <li class="list-group-item" ng-repeat="(attr, val) in details.modules[selectedmod].resources[selectedres].primary.attributes">{{attr}}: {{val}}</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -95,6 +110,10 @@ var app = angular.module("terraboard", [], function($locationProvider){
     $locationProvider.html5Mode(true);
 });
 
+app.controller("tbBreadCtrl", ['$scope', '$location', function($scope, $location) {
+   $scope.path = $location.path();
+}]);
+
 app.controller("tbListCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
     $http.get('http://'+$location.host()+':8080/keys').then(function(response){
         $scope.keys = response.data;
@@ -102,9 +121,15 @@ app.controller("tbListCtrl", ['$scope', '$http', '$location', function($scope, $
 }]);
 
 app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
+    $scope.Utils = { keys : Object.keys };
+    $scope.display = {};
     $http.get('http://'+$location.host()+':8080'+$location.url()).then(function(response){
         $scope.path = $location.path();
         $scope.details = response.data;
+        $scope.setSelected = function(mod, res){
+            $scope.selectedmod = mod;
+            $scope.selectedres = res;
+        };
     });
 }]);
         </script>
