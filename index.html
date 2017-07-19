@@ -97,9 +97,14 @@
                             <div class="panel-heading">
                                 <h4 class="panel-title">Attributes</h4>
                             </div>
-                            <ul class="list-group">
-                                <li class="list-group-item" ng-repeat="(attr, val) in details.modules[selectedmod].resources[selectedres].primary.attributes">{{attr}}: {{val}}</li>
-                            </ul>
+                            <table class="table">
+                                <thead><th>Attribute</th><th>Value</th></thead>
+                                <tbody>
+                                    <tr ng-repeat="(attr, val) in details.modules[selectedmod].resources[selectedres].primary.attributes">
+                                        <td>{{attr}}</td><td>{{val}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
