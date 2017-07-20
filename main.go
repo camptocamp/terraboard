@@ -102,7 +102,7 @@ func state(w http.ResponseWriter, r *http.Request) {
 
 func history(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	st := trimBase(r, "api/history")
+	st := trimBase(r, "api/history/")
 	result, err := svc.ListObjectVersions(&s3.ListObjectVersionsInput{
 		Bucket: aws.String(bucket),
 		Prefix: aws.String(st),
