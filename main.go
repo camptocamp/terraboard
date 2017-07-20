@@ -33,6 +33,10 @@ func addBase(path string) string {
 	return fmt.Sprintf("%s%s", baseUrl, path)
 }
 
+func trimBase(r *http.Request, prefix string) string {
+	return strings.TrimPrefix(r.URL.Path, addBase(prefix))
+}
+
 func idx(w http.ResponseWriter, r *http.Request) {
 	idx, _ := ioutil.ReadFile("index.html")
 	idxStr := string(idx)
@@ -68,7 +72,7 @@ func states(w http.ResponseWriter, r *http.Request) {
 
 func state(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	st := strings.TrimPrefix(r.URL.Path, addBase("api/state"))
+	st := trimBase(r, "api/state")
 	input := &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(st),
@@ -93,7 +97,7 @@ func state(w http.ResponseWriter, r *http.Request) {
 
 func history(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	st := strings.TrimPrefix(r.URL.Path, addBase("api/history/"))
+	st := trimBase(r, "api/history")
 	result, err := svc.ListObjectVersions(&s3.ListObjectVersionsInput{
 		Bucket: aws.String(bucket),
 		Prefix: aws.String(st),
