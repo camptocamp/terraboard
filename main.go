@@ -24,14 +24,15 @@ func init() {
 	svc = s3.New(sess, &aws.Config{})
 	bucket = os.Getenv("AWS_BUCKET")
 	baseUrl = os.Getenv("BASE_URL")
+	if baseUrl == "" {
+		baseUrl = "/"
+	}
 }
 
 func idx(w http.ResponseWriter, r *http.Request) {
 	idx, _ := ioutil.ReadFile("index.html")
 	idxStr := string(idx)
-	if baseUrl != "" {
-		idxStr = strings.Replace(idxStr, "base href=\"/\"", fmt.Sprintf("base href=\"%s\"", baseUrl), 1)
-	}
+	idxStr = strings.Replace(idxStr, "base href=\"/\"", fmt.Sprintf("base href=\"%s\"", baseUrl), 1)
 	io.WriteString(w, idxStr)
 }
 
@@ -63,7 +64,7 @@ func states(w http.ResponseWriter, r *http.Request) {
 
 func state(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	st := strings.TrimPrefix(r.URL.Path, "/api/state")
+	st := strings.TrimPrefix(r.URL.Path, fmt.Sprintf("%sapi/state", baseUrl))
 	input := &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(st),
@@ -88,7 +89,7 @@ func state(w http.ResponseWriter, r *http.Request) {
 
 func history(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	st := strings.TrimPrefix(r.URL.Path, "/api/history/")
+	st := strings.TrimPrefix(r.URL.Path, fmt.Sprintf("%sapi/history/", baseUrl))
 	result, err := svc.ListObjectVersions(&s3.ListObjectVersionsInput{
 		Bucket: aws.String(bucket),
 		Prefix: aws.String(st),
@@ -107,11 +108,11 @@ func history(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/", idx)
+	http.HandleFunc(baseUrl, idx)
 	staticFs := http.FileServer(http.Dir("static"))
-	http.Handle("/static/", http.StripPrefix("/static", staticFs))
-	http.HandleFunc("/api/states", states)
-	http.HandleFunc("/api/state/", state)
-	http.HandleFunc("/api/history/", history)
+	http.Handle(fmt.Sprintf("%sstatic/", baseUrl), http.StripPrefix(fmt.Sprintf("%sstatic", baseUrl), staticFs))
+	http.HandleFunc(fmt.Sprintf("%sapi/states", baseUrl), states)
+	http.HandleFunc(fmt.Sprintf("%sapi/state/", baseUrl), state)
+	http.HandleFunc(fmt.Sprintf("%sapi/history/", baseUrl), history)
 	http.ListenAndServe(":80", nil)
 }
