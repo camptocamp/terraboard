@@ -17,16 +17,22 @@ import (
 
 var svc *s3.S3
 var bucket string
+var baseUrl string
 
 func init() {
 	sess := session.Must(session.NewSession())
 	svc = s3.New(sess, &aws.Config{})
 	bucket = os.Getenv("AWS_BUCKET")
+	baseUrl = os.Getenv("BASE_URL")
 }
 
 func idx(w http.ResponseWriter, r *http.Request) {
 	idx, _ := ioutil.ReadFile("index.html")
-	io.WriteString(w, string(idx))
+	idxStr := string(idx)
+	if baseUrl != "" {
+		idxStr = strings.Replace(idxStr, "base href=\"/\"", fmt.Sprintf("base href=\"%s\"", baseUrl), 1)
+	}
+	io.WriteString(w, idxStr)
 }
 
 func states(w http.ResponseWriter, r *http.Request) {
