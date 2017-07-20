@@ -53,6 +53,9 @@ app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, 
                         break;
                     }
                 }
+
+                // Init display.mod
+                $scope.display.mod = $scope.selectedmod;
             }
 
             $scope.setSelected = function(mod, res) {
