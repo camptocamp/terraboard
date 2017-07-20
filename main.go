@@ -22,11 +22,18 @@ func idx(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	// Index is a wildcard for all paths
 	http.HandleFunc(util.AddBase(""), idx)
+
+	// Serve static files (CSS, JS, images) from dir
 	staticFs := http.FileServer(http.Dir("static"))
 	http.Handle(util.AddBase("static/"), http.StripPrefix(util.AddBase("static"), staticFs))
+
+	// Handle API points
 	http.HandleFunc(util.AddBase("api/states"), api.States)
 	http.HandleFunc(util.AddBase("api/state/"), api.State)
 	http.HandleFunc(util.AddBase("api/history/"), api.History)
+
+	// Start server
 	http.ListenAndServe(":80", nil)
 }
