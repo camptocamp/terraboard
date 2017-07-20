@@ -140,7 +140,7 @@ app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, 
         $scope.history = response.data;
         $scope.versions = {};
         for (i=0; i<response.data.length; i++) {
-            $scope.versions[response.data[i].VersionId] = response.data[i].LastModified;
+            $scope.versions[response.data[i].VersionId] = new Date(response.data[i].LastModified).toLocaleString();
         }
         $scope.$watch('selectedVersion', function(ver) {
             $location.search('versionid', ver);
