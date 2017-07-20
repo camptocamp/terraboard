@@ -4,7 +4,7 @@ var app = angular.module("terraboard", [], function($locationProvider){
 
 app.controller("tbBreadCtrl", ['$scope', '$location', function($scope, $location) {
     $scope.$on('$locationChangeSuccess', function() {
-        $scope.path = $location.path();
+        $scope.path = $location.path().replace('/state/', '');
     });
 }]);
 
