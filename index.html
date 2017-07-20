@@ -60,7 +60,7 @@
                     </div>
                 </div>
                 <div id="node" class="col-md-8">
-                    <h2 class="node-title">{{details.modules[selectedmod].path[1]}} / {{selectedres}}</h2>
+                    <h2 class="node-title">{{details.modules[selectedmod].path[1] ? details.modules[selectedmod].path[1] + "." : ""}}{{selectedres}}</h2>
                     <div class="panel-group">
                         <div class="panel panel-info">
                             <div class="panel-heading">
