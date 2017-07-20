@@ -10,12 +10,12 @@
 
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
-
         <link rel="stylesheet" href="static/terraboard.css" type="text/css">
+
         <script src="//code.jquery.com/jquery-1.11.3.min.js" type="text/javascript"></script>
         <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js" type="text/javascript"></script>
-
-        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.5/angular.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.5/angular.min.js" type="text/javascript"></script>
+        <script src="static/terraboard.js" type="text/javascript"></script>
     </head>
 
     <body ng-app="terraboard">
@@ -110,55 +110,5 @@
                     </div>
                 </div>
         </div>
-
-        <script>
-var app = angular.module("terraboard", [], function($locationProvider){
-    $locationProvider.html5Mode(true);
-});
-
-app.controller("tbBreadCtrl", ['$scope', '$location', function($scope, $location) {
-    $scope.$on('$locationChangeSuccess', function() {
-        $scope.path = $location.path();
-    });
-}]);
-
-app.controller("tbListCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
-    $http.get('api/states').then(function(response){
-        $scope.keys = response.data;
-    });
-}]);
-
-app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
-    $scope.Utils = { keys : Object.keys };
-    $scope.display = {};
-
-    // Init
-    $scope.selectedVersion = $location.search().versionid;
-
-    var key = $location.url().replace('/state/', '');
-    $http.get('api/history/'+key).then(function(response){
-        $scope.history = response.data;
-        $scope.versions = {};
-        for (i=0; i<response.data.length; i++) {
-            $scope.versions[response.data[i].VersionId] = new Date(response.data[i].LastModified).toLocaleString();
-        }
-        $scope.$watch('selectedVersion', function(ver) {
-            $location.search('versionid', ver);
-        });
-    });
-
-    $scope.$on('$locationChangeSuccess', function() {
-        $http.get('api'+$location.url()).then(function(response){
-            $scope.path = $location.path();
-            $scope.details = response.data;
-            $scope.setSelected = function(mod, res) {
-                $scope.selectedmod = mod;
-                $scope.selectedres = res;
-            };
-        });
-    });
-}]);
-        </script>
-
     </body>
 </html>
