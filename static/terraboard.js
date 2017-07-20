@@ -37,9 +37,27 @@ app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, 
         $http.get('api'+$location.url()).then(function(response){
             $scope.path = $location.path();
             $scope.details = response.data;
+            var mods = $scope.details.modules;
+
+            // Init
+            if ($location.hash() != "") {
+                // Default
+                $scope.selectedmod = 0;
+                $scope.selectedres = $location.hash();
+
+                // Search for module in selected res
+                for (i=0; i < mods.length; i++) {
+                    if ($scope.selectedres.startsWith(mods[i].path[1]+'.')) {
+                        $scope.selectedmod = i;
+                        $scope.selectedres = $scope.selectedres.replace(mods[i].path[1]+'.', '');
+                        break;
+                    }
+                }
+            }
+
             $scope.setSelected = function(mod, res) {
-                $scope.selectedmod = mod;
-                $scope.selectedres = res;
+                var hash = (mod == 0) ? res : $scope.details.modules[mod].path[1]+'.'+res;
+                $location.hash(hash);
             };
         });
     });
