@@ -19,39 +19,7 @@
     </head>
 
     <body ng-app="terraboard">
-        <div class="navbar navbar-default navbar-fixed-top">
-            <div class="container">
-
-                <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-menu">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="http://www.camptocamp.com">
-                        <img alt="Camptocamp" src="static/c2c-logo.png">
-                    </a>
-                </div>
-
-                <ul class="nav navbar-nav navbar-collapse collapse" id="navbar-collapse-menu">
-                    <li class="dropdown" ng-controller="tbListCtrl">
-                        <a id="reports-list-button" class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
-                            Choose a statefile
-                            <span class="caret"></span>
-                        </a>
-                        <ul id="reports-list" class="dropdown-menu">
-                            <li ng-repeat="k in keys"><a href="state/{{k}}" target="_self">{{k}}</a></li>
-                        </ul>
-                    </li>
-                </ul>
-
-                <ul id="breadcrumb" class="nav navbar-nav navbar-right breadcrumb" ng-controller="tbBreadCtrl">
-                    <li class="navbar-text" id="crumb-node">{{path}}</li>
-                </ul>
-            </div>
-        </div>
+        <div ng-include src="'static/navbar.html'"></div>
         <div id="maincont" class="container" ng-controller="tbStateCtrl">
             <div id="mainrow" class="row">
                 <div id="leftcol" class="col-md-4">
