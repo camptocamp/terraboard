@@ -10,6 +10,7 @@ import (
 	"os"
 	"strings"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -38,7 +39,11 @@ func trimBase(r *http.Request, prefix string) string {
 }
 
 func idx(w http.ResponseWriter, r *http.Request) {
-	idx, _ := ioutil.ReadFile("index.html")
+	idx, err := ioutil.ReadFile("index.html")
+	if err != nil {
+		log.Errorf("Failed to open index.html: %v", err)
+		// TODO: Return error page
+	}
 	idxStr := string(idx)
 	idxStr = strings.Replace(idxStr, "base href=\"/\"", fmt.Sprintf("base href=\"%s\"", baseUrl), 1)
 	io.WriteString(w, idxStr)
@@ -106,12 +111,18 @@ func history(w http.ResponseWriter, r *http.Request) {
 		errObj := make(map[string]string)
 		errObj["error"] = fmt.Sprintf("State file history not found: %v", st)
 		errObj["details"] = fmt.Sprintf("%v", err)
-		j, _ := json.Marshal(errObj)
+		j, err := json.Marshal(errObj)
+		if err != nil {
+			log.Errorf("Failed to marshal json: %v", err)
+		}
 		io.WriteString(w, string(j))
 		return
 	}
 
-	j, _ := json.Marshal(result.Versions)
+	j, err := json.Marshal(result.Versions)
+	if err != nil {
+		log.Errorf("Failed to marshal json: %v", err)
+	}
 	io.WriteString(w, string(j))
 }
 
