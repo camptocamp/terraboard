@@ -29,6 +29,10 @@ func init() {
 	}
 }
 
+func addBase(path string) string {
+	return fmt.Sprintf("%s%s", baseUrl, path)
+}
+
 func idx(w http.ResponseWriter, r *http.Request) {
 	idx, _ := ioutil.ReadFile("index.html")
 	idxStr := string(idx)
@@ -64,7 +68,7 @@ func states(w http.ResponseWriter, r *http.Request) {
 
 func state(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	st := strings.TrimPrefix(r.URL.Path, fmt.Sprintf("%sapi/state", baseUrl))
+	st := strings.TrimPrefix(r.URL.Path, addBase("api/state"))
 	input := &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(st),
@@ -89,7 +93,7 @@ func state(w http.ResponseWriter, r *http.Request) {
 
 func history(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	st := strings.TrimPrefix(r.URL.Path, fmt.Sprintf("%sapi/history/", baseUrl))
+	st := strings.TrimPrefix(r.URL.Path, addBase("api/history/"))
 	result, err := svc.ListObjectVersions(&s3.ListObjectVersionsInput{
 		Bucket: aws.String(bucket),
 		Prefix: aws.String(st),
@@ -110,9 +114,9 @@ func history(w http.ResponseWriter, r *http.Request) {
 func main() {
 	http.HandleFunc(baseUrl, idx)
 	staticFs := http.FileServer(http.Dir("static"))
-	http.Handle(fmt.Sprintf("%sstatic/", baseUrl), http.StripPrefix(fmt.Sprintf("%sstatic", baseUrl), staticFs))
-	http.HandleFunc(fmt.Sprintf("%sapi/states", baseUrl), states)
-	http.HandleFunc(fmt.Sprintf("%sapi/state/", baseUrl), state)
-	http.HandleFunc(fmt.Sprintf("%sapi/history/", baseUrl), history)
+	http.Handle(addBase("static/"), http.StripPrefix(addBase("static"), staticFs))
+	http.HandleFunc(addBase("api/states"), states)
+	http.HandleFunc(addBase("api/state/"), state)
+	http.HandleFunc(addBase("api/history/"), history)
 	http.ListenAndServe(":80", nil)
 }
