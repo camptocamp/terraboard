@@ -1,6 +1,6 @@
 FROM golang:1.7.3
 WORKDIR /go/src/github.com/camptocamp/terraboard
-RUN go get github.com/aws/aws-sdk-go
+RUN go get github.com/aws/aws-sdk-go github.com/Sirupsen/logrus
 COPY . .
 RUN go install .
 ENTRYPOINT ["terraboard"]
