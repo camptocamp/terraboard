@@ -117,7 +117,9 @@ var app = angular.module("terraboard", [], function($locationProvider){
 });
 
 app.controller("tbBreadCtrl", ['$scope', '$location', function($scope, $location) {
-   $scope.path = $location.path();
+    $scope.$on('$locationChangeSuccess', function() {
+        $scope.path = $location.path();
+    });
 }]);
 
 app.controller("tbListCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
@@ -146,14 +148,14 @@ app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, 
     });
 
     $scope.$on('$locationChangeSuccess', function() {
-    $http.get('/api'+$location.url()).then(function(response){
-        $scope.path = $location.path();
-        $scope.details = response.data;
-        $scope.setSelected = function(mod, res) {
-            $scope.selectedmod = mod;
-            $scope.selectedres = res;
-        };
-    });
+        $http.get('/api'+$location.url()).then(function(response){
+            $scope.path = $location.path();
+            $scope.details = response.data;
+            $scope.setSelected = function(mod, res) {
+                $scope.selectedmod = mod;
+                $scope.selectedres = res;
+            };
+        });
     });
 }]);
         </script>
