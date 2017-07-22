@@ -18,22 +18,22 @@ type StateVersions struct {
 	Versions map[string]*terraform.State
 }
 
-var states map[string]*StateVersions
+var stateVersions map[string]*StateVersions
 
 func init() {
-	states = make(map[string]*StateVersions)
+	stateVersions = make(map[string]*StateVersions)
 }
 
 func GetState(w http.ResponseWriter, r *http.Request) (state *terraform.State, err error) {
 	st := util.TrimBase(r, "api/state")
-	if _, ok := states[st]; !ok {
+	if _, ok := stateVersions[st]; !ok {
 		// Init
-		states[st] = &StateVersions{}
-		states[st].Versions = make(map[string]*terraform.State)
+		stateVersions[st] = &StateVersions{}
+		stateVersions[st].Versions = make(map[string]*terraform.State)
 	}
 
 	versionId := r.URL.Query().Get("versionid")
-	if s, ok := states[st].Versions[versionId]; ok {
+	if s, ok := stateVersions[st].Versions[versionId]; ok {
 		// Return cached version
 		log.Infof("Getting %s/%s from cache", st, versionId)
 		return s, nil
@@ -75,7 +75,7 @@ func GetState(w http.ResponseWriter, r *http.Request) (state *terraform.State, e
 	if versionId != "" {
 		// Store in cache
 		log.Infof("Adding %s/%s to cache", st, versionId)
-		states[st].Versions[versionId] = state
+		stateVersions[st].Versions[versionId] = state
 	}
 
 	return

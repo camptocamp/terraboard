@@ -17,18 +17,44 @@ import (
 
 var svc *s3.S3
 var bucket string
+var states []string
 
 func init() {
 	sess := session.Must(session.NewSession())
 	svc = s3.New(sess, &aws.Config{})
 	bucket = os.Getenv("AWS_BUCKET")
+
+	buildCache()
+}
+
+func buildCache() {
+	err := refreshStates()
+	if err != nil {
+		log.Errorf("Failed to build cache: %s", err)
+	}
+}
+
+func refreshStates() error {
+	result, err := svc.ListObjects(&s3.ListObjectsInput{
+		Bucket: aws.String(bucket),
+	})
+	if err != nil {
+		return err
+	}
+
+	var keys []string
+	for _, obj := range result.Contents {
+		if strings.HasSuffix(*obj.Key, ".tfstate") {
+			keys = append(keys, *obj.Key)
+		}
+	}
+	states = keys
+	return nil
 }
 
 func ApiStates(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	result, err := svc.ListObjects(&s3.ListObjectsInput{
-		Bucket: aws.String(bucket),
-	})
+	err := refreshStates()
 	if err != nil {
 		errObj := make(map[string]string)
 		errObj["error"] = "Failed to list states"
@@ -38,15 +64,7 @@ func ApiStates(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var keys []string
-
-	for _, obj := range result.Contents {
-		if strings.HasSuffix(*obj.Key, ".tfstate") {
-			keys = append(keys, *obj.Key)
-		}
-	}
-
-	j, _ := json.Marshal(keys)
+	j, _ := json.Marshal(states)
 	io.WriteString(w, string(j))
 }
 
