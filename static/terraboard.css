@@ -34,7 +34,7 @@
     overflow-y: auto;
   }
   #nodes {
-    max-height: calc(100% - 310px);
+    max-height: calc(100% - 200px);
   }
   #node {
     height: 100%;
