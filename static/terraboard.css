@@ -66,6 +66,14 @@ body { padding-top: 60px; }
   background-image: none;
   color: #337ab7;
 }
+#nodeslist .list-group-item.selected {
+  background-color: #d9edf7;
+  color: #337ab7;
+}
+#nodeslist .list-group-item .resource.selected {
+  background-color: #d9edf7;
+  color: #337ab7;
+}
 #nodeslist .list-group-item .glyphicon-star, .panel-title .glyphicon-star {
   float: right;
   color: orange;
