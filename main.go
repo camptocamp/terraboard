@@ -30,9 +30,9 @@ func main() {
 	http.Handle(util.AddBase("static/"), http.StripPrefix(util.AddBase("static"), staticFs))
 
 	// Handle API points
-	http.HandleFunc(util.AddBase("api/states"), api.States)
-	http.HandleFunc(util.AddBase("api/state/"), api.State)
-	http.HandleFunc(util.AddBase("api/history/"), api.History)
+	http.HandleFunc(util.AddBase("api/states"), api.ApiStates)
+	http.HandleFunc(util.AddBase("api/state/"), api.ApiState)
+	http.HandleFunc(util.AddBase("api/history/"), api.ApiHistory)
 
 	// Start server
 	http.ListenAndServe(":80", nil)

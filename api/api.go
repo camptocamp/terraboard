@@ -1,11 +1,9 @@
 package api
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
@@ -26,7 +24,7 @@ func init() {
 	bucket = os.Getenv("AWS_BUCKET")
 }
 
-func States(w http.ResponseWriter, r *http.Request) {
+func ApiStates(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	result, err := svc.ListObjects(&s3.ListObjectsInput{
 		Bucket: aws.String(bucket),
@@ -52,32 +50,17 @@ func States(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, string(j))
 }
 
-func State(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	st := util.TrimBase(r, "api/state")
-	input := &s3.GetObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(st),
-	}
-	if versionId := r.URL.Query().Get("versionid"); versionId != "" {
-		input.VersionId = &versionId
-	}
-	result, err := svc.GetObjectWithContext(context.Background(), input)
+func ApiState(w http.ResponseWriter, r *http.Request) {
+	state, err := GetState(w, r)
 	if err != nil {
-		errObj := make(map[string]string)
-		errObj["error"] = fmt.Sprintf("State file not found: %v", st)
-		errObj["details"] = fmt.Sprintf("%v", err)
-		j, _ := json.Marshal(errObj)
-		io.WriteString(w, string(j))
+		io.WriteString(w, fmt.Sprintf("%s", err))
 		return
 	}
-	defer result.Body.Close()
 
-	content, _ := ioutil.ReadAll(result.Body)
-	io.WriteString(w, string(content))
+	io.WriteString(w, state)
 }
 
-func History(w http.ResponseWriter, r *http.Request) {
+func ApiHistory(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	st := util.TrimBase(r, "api/history/")
 	result, err := svc.ListObjectVersions(&s3.ListObjectVersionsInput{
