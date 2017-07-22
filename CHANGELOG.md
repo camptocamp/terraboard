@@ -1,3 +1,19 @@
+## 0.6.0 (July 22, 2017)
+
+FEATURES:
+
+- Server:
+
+  * Cache versioned states
+  * Add finer internal methods
+  * Add buildCache() (not activated yet)
+
+- UI:
+
+  * Adjust resource list height
+  * Mark selected resource
+
+
 ## 0.5.0 (July 21, 2017)
 
 FEATURES:
