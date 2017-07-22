@@ -32,6 +32,15 @@ func buildCache() {
 	if err != nil {
 		log.Errorf("Failed to build cache: %s", err)
 	}
+
+	for _, st := range states {
+		GetState(st, "")
+
+		versions, _ := getVersions(st)
+		for _, v := range versions {
+			GetState(st, *v.VersionId)
+		}
+	}
 }
 
 func refreshStates() error {
