@@ -57,7 +57,8 @@ func ApiState(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	io.WriteString(w, state)
+	jState, _ := json.Marshal(state)
+	io.WriteString(w, string(jState))
 }
 
 func ApiHistory(w http.ResponseWriter, r *http.Request) {

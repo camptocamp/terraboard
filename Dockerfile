@@ -1,6 +1,6 @@
-FROM golang:1.7.3 as builder
+FROM golang:1.8.0 as builder
+RUN go get github.com/aws/aws-sdk-go github.com/Sirupsen/logrus github.com/hashicorp/terraform
 WORKDIR /go/src/github.com/camptocamp/terraboard
-RUN go get github.com/aws/aws-sdk-go github.com/Sirupsen/logrus
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o terraboard main.go
 

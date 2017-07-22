@@ -11,10 +11,11 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/camptocamp/terraboard/util"
+	"github.com/hashicorp/terraform/terraform"
 )
 
 type StateVersions struct {
-	Versions map[string]string
+	Versions map[string]*terraform.State
 }
 
 var states map[string]*StateVersions
@@ -23,12 +24,12 @@ func init() {
 	states = make(map[string]*StateVersions)
 }
 
-func GetState(w http.ResponseWriter, r *http.Request) (state string, err error) {
+func GetState(w http.ResponseWriter, r *http.Request) (state *terraform.State, err error) {
 	st := util.TrimBase(r, "api/state")
 	if _, ok := states[st]; !ok {
 		// Init
 		states[st] = &StateVersions{}
-		states[st].Versions = make(map[string]string)
+		states[st].Versions = make(map[string]*terraform.State)
 	}
 
 	versionId := r.URL.Query().Get("versionid")
@@ -68,7 +69,8 @@ func GetState(w http.ResponseWriter, r *http.Request) (state string, err error) 
 		j, _ := json.Marshal(errObj)
 		return state, fmt.Errorf("%s", string(j))
 	}
-	state = string(content)
+
+	json.Unmarshal(content, &state)
 
 	if versionId != "" {
 		// Store in cache
