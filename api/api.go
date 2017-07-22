@@ -82,13 +82,21 @@ func ApiState(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, string(jState))
 }
 
+func getVersions(prefix string) (versions []*s3.ObjectVersion, err error) {
+	result, err := svc.ListObjectVersions(&s3.ListObjectVersionsInput{
+		Bucket: aws.String(bucket),
+		Prefix: aws.String(prefix),
+	})
+	if err != nil {
+		return versions, err
+	}
+	return result.Versions, nil
+}
+
 func ApiHistory(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	st := util.TrimBase(r, "api/history/")
-	result, err := svc.ListObjectVersions(&s3.ListObjectVersionsInput{
-		Bucket: aws.String(bucket),
-		Prefix: aws.String(st),
-	})
+	result, err := getVersions(st)
 	if err != nil {
 		errObj := make(map[string]string)
 		errObj["error"] = fmt.Sprintf("State file history not found: %v", st)
@@ -101,7 +109,7 @@ func ApiHistory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	j, err := json.Marshal(result.Versions)
+	j, err := json.Marshal(result)
 	if err != nil {
 		log.Errorf("Failed to marshal json: %v", err)
 	}
