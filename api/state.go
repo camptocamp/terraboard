@@ -5,12 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/camptocamp/terraboard/util"
 	"github.com/hashicorp/terraform/terraform"
 )
 
@@ -24,15 +22,13 @@ func init() {
 	stateVersions = make(map[string]*StateVersions)
 }
 
-func GetState(w http.ResponseWriter, r *http.Request) (state *terraform.State, err error) {
-	st := util.TrimBase(r, "api/state")
+func GetState(st, versionId string) (state *terraform.State, err error) {
 	if _, ok := stateVersions[st]; !ok {
 		// Init
 		stateVersions[st] = &StateVersions{}
 		stateVersions[st].Versions = make(map[string]*terraform.State)
 	}
 
-	versionId := r.URL.Query().Get("versionid")
 	if s, ok := stateVersions[st].Versions[versionId]; ok {
 		// Return cached version
 		log.Infof("Getting %s/%s from cache", st, versionId)
@@ -41,7 +37,6 @@ func GetState(w http.ResponseWriter, r *http.Request) (state *terraform.State, e
 
 	// Retrieve from S3
 	log.Infof("Retrieving %s/%s from S3", st, versionId)
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 	input := &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(st),

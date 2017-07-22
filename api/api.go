@@ -69,13 +69,16 @@ func ApiStates(w http.ResponseWriter, r *http.Request) {
 }
 
 func ApiState(w http.ResponseWriter, r *http.Request) {
-	state, err := GetState(w, r)
+	st := util.TrimBase(r, "api/state")
+	versionId := r.URL.Query().Get("versionid")
+	state, err := GetState(st, versionId)
 	if err != nil {
 		io.WriteString(w, fmt.Sprintf("%s", err))
 		return
 	}
 
 	jState, _ := json.Marshal(state)
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	io.WriteString(w, string(jState))
 }
 
