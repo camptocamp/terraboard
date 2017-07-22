@@ -34,7 +34,7 @@ app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, 
     });
 
     $scope.$on('$locationChangeSuccess', function() {
-        $http.get('api'+$location.url()).then(function(response){
+        $http.get('api'+$location.url(), {cache: true}).then(function(response){
             $scope.path = $location.path();
             $scope.details = response.data;
             var mods = $scope.details.modules;
