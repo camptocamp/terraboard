@@ -16,13 +16,8 @@ type StateVersions struct {
 	Versions map[string]*terraform.State
 }
 
-var stateVersions map[string]*StateVersions
-
-func init() {
-	stateVersions = make(map[string]*StateVersions)
-}
-
 func GetState(st, versionId string) (state *terraform.State, err error) {
+	log.Infof("Getting state for %s/%s", st, versionId)
 	if _, ok := stateVersions[st]; !ok {
 		// Init
 		stateVersions[st] = &StateVersions{}
