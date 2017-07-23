@@ -12,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/camptocamp/terraboard/db"
 	"github.com/camptocamp/terraboard/util"
 )
 
@@ -26,10 +27,11 @@ func init() {
 	bucket = os.Getenv("AWS_BUCKET")
 	stateVersions = make(map[string]*StateVersions)
 
-	//buildCache()
+	db.Init()
+	fillDB()
 }
 
-func buildCache() {
+func fillDB() {
 	log.Infof("Building initial cache")
 
 	err := refreshStates()
@@ -38,11 +40,19 @@ func buildCache() {
 	}
 
 	for _, st := range states {
-		GetState(st, "")
+		state, _ := GetState(st, "")
+		err = db.InsertState("", st, state)
+		if err != nil {
+			log.Errorf("Failed to insert state %s: %v", st, err)
+		}
 
 		versions, _ := getVersions(st)
 		for _, v := range versions {
-			GetState(st, *v.VersionId)
+			state, _ := GetState(st, *v.VersionId)
+			db.InsertState(*v.VersionId, st, state)
+			if err != nil {
+				log.Errorf("Failed to insert state %s/%s: %v", st, *v.VersionId, err)
+			}
 		}
 	}
 }

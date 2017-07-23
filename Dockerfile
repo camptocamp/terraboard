@@ -1,8 +1,9 @@
-FROM golang:1.8.0 as builder
-RUN go get github.com/aws/aws-sdk-go github.com/Sirupsen/logrus github.com/hashicorp/terraform
+FROM tb-builder as builder
+RUN go get github.com/aws/aws-sdk-go github.com/Sirupsen/logrus github.com/hashicorp/terraform github.com/mattn/go-sqlite3
 WORKDIR /go/src/github.com/camptocamp/terraboard
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o terraboard main.go
+RUN CGO_ENABLED=1 GOOS=linux go build -ldflags "-linkmode external -extldflags -static" \
+  -o terraboard main.go
 
 FROM scratch
 WORKDIR /

@@ -13,3 +13,8 @@ services:
       AWS_REGION: ${AWS_DEFAULT_REGION}
       AWS_BUCKET: ${AWS_BUCKET}
       BASE_URL: /
+    volumes:
+      - terraboard-db:/db/
+
+volumes:
+  terraboard-db: {}
