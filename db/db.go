@@ -78,9 +78,22 @@ func InsertState(versionId string, path string, state *terraform.State) error {
 			if err != nil {
 				return err
 			}
-			_, err := stmt.Exec(sId, mId, r.Type, n)
+			res, err := stmt.Exec(sId, mId, r.Type, n)
 			if err != nil {
 				return err
+			}
+
+			rId, _ := res.LastInsertId()
+
+			for k, v := range r.Primary.Attributes {
+				stmt, err = db.Prepare("INSERT INTO attributes(resource_id, name, value) VALUES(?, ?, ?)")
+				if err != nil {
+					return err
+				}
+				_, err := stmt.Exec(rId, k, v)
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
