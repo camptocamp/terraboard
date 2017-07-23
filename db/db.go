@@ -38,7 +38,6 @@ func Init() {
 
 func InsertState(versionId string, path string, state *terraform.State) error {
 	log.Info("Inserting new state")
-	log.Infof("DB: %v", db)
 	stmt, err := db.Prepare("INSERT INTO states(version_id, path, tf_version, serial) VALUES(?, ?, ?, ?)")
 	if err != nil {
 		return err
@@ -103,6 +102,23 @@ func InsertState(versionId string, path string, state *terraform.State) error {
 	return nil
 }
 
-func GetState(version string, path string) {
+func GetState(path, versionId string) (state *terraform.State, err error) {
+	rows, err := db.Query(fmt.Sprintf("SELECT (id, tf_version, serial) FROM states WHERE path = '%s' AND version_id = '%s'", path, versionId))
+	if err != nil {
+		return state, err
+	}
+	var mId int
+	var tfVersion string
+	var serial int64
+	rows.Next()
+	err = rows.Scan(&mId, &tfVersion, &serial)
+	if err != nil {
+		return state, err
+	}
+	rows.Close()
 
+	return &terraform.State{
+		TFVersion: tfVersion,
+		Serial:    serial,
+	}, nil
 }

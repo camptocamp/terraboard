@@ -46,6 +46,13 @@ func fillDB() {
 			log.Errorf("Failed to insert state %s: %v", st, err)
 		}
 
+		// Try to get
+		s, err := db.GetState(st, "")
+		if err != nil {
+			log.Errorf("Failed to get state from DB %s: %v", st, err)
+		}
+		log.Infof("s=%v", s)
+
 		versions, _ := getVersions(st)
 		for _, v := range versions {
 			state, _ := GetState(st, *v.VersionId)
