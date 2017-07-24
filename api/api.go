@@ -47,12 +47,6 @@ func refreshDB() {
 				log.Errorf("Failed to insert state %s: %v", st, err)
 			}
 
-			// Try to get
-			log.Errorf("GETTING STATE")
-			s := db.GetState(st, "")
-			sj, _ := json.Marshal(s)
-			log.Errorf("s=%v", string(sj))
-
 			versions, _ := getVersions(st)
 			for _, v := range versions {
 				state, _ := GetState(st, *v.VersionId)
