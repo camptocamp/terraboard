@@ -28,7 +28,8 @@ func init() {
 	stateVersions = make(map[string]*StateVersions)
 
 	db.Init()
-	fillDB()
+	// TODO: update DB
+	//fillDB()
 }
 
 func fillDB() {
@@ -47,11 +48,10 @@ func fillDB() {
 		}
 
 		// Try to get
-		s, err := db.GetState(st, "")
-		if err != nil {
-			log.Errorf("Failed to get state from DB %s: %v", st, err)
-		}
-		log.Infof("s=%v", s)
+		log.Errorf("GETTING STATE")
+		s := db.GetState(st, "")
+		sj, _ := json.Marshal(s)
+		log.Errorf("s=%v", string(sj))
 
 		versions, _ := getVersions(st)
 		for _, v := range versions {
@@ -99,13 +99,9 @@ func ApiStates(w http.ResponseWriter, r *http.Request) {
 }
 
 func ApiState(w http.ResponseWriter, r *http.Request) {
-	st := util.TrimBase(r, "api/state")
+	st := util.TrimBase(r, "api/state/")
 	versionId := r.URL.Query().Get("versionid")
-	state, err := GetState(st, versionId)
-	if err != nil {
-		io.WriteString(w, fmt.Sprintf("%s", err))
-		return
-	}
+	state := db.GetState(st, versionId)
 
 	jState, _ := json.Marshal(state)
 	w.Header().Set("Access-Control-Allow-Origin", "*")
