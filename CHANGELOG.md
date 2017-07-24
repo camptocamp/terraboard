@@ -1,3 +1,12 @@
+## 0.7.0 (July 24, 2017)
+
+FEATURES:
+
+- Server:
+
+  * Use a SQLite3 database to store states locally
+
+
 ## 0.6.0 (July 22, 2017)
 
 FEATURES:
