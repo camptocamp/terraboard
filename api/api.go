@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/aws"
@@ -28,39 +29,41 @@ func init() {
 	stateVersions = make(map[string]*StateVersions)
 
 	db.Init()
-	// TODO: update DB
-	//fillDB()
+	go refreshDB()
 }
 
-func fillDB() {
-	log.Infof("Building initial cache")
-
-	err := refreshStates()
-	if err != nil {
-		log.Errorf("Failed to build cache: %s", err)
-	}
-
-	for _, st := range states {
-		state, _ := GetState(st, "")
-		err = db.InsertState("", st, state)
+func refreshDB() {
+	for {
+		log.Infof("Refreshing DB from S3")
+		err := refreshStates()
 		if err != nil {
-			log.Errorf("Failed to insert state %s: %v", st, err)
+			log.Errorf("Failed to build cache: %s", err)
 		}
 
-		// Try to get
-		log.Errorf("GETTING STATE")
-		s := db.GetState(st, "")
-		sj, _ := json.Marshal(s)
-		log.Errorf("s=%v", string(sj))
-
-		versions, _ := getVersions(st)
-		for _, v := range versions {
-			state, _ := GetState(st, *v.VersionId)
-			db.InsertState(*v.VersionId, st, state)
+		for _, st := range states {
+			state, _ := GetState(st, "")
+			err = db.InsertState("", st, state)
 			if err != nil {
-				log.Errorf("Failed to insert state %s/%s: %v", st, *v.VersionId, err)
+				log.Errorf("Failed to insert state %s: %v", st, err)
+			}
+
+			// Try to get
+			log.Errorf("GETTING STATE")
+			s := db.GetState(st, "")
+			sj, _ := json.Marshal(s)
+			log.Errorf("s=%v", string(sj))
+
+			versions, _ := getVersions(st)
+			for _, v := range versions {
+				state, _ := GetState(st, *v.VersionId)
+				db.InsertState(*v.VersionId, st, state)
+				if err != nil {
+					log.Errorf("Failed to insert state %s/%s: %v", st, *v.VersionId, err)
+				}
 			}
 		}
+
+		time.Sleep(1 * time.Minute)
 	}
 }
 

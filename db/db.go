@@ -62,7 +62,12 @@ func Init() {
 }
 
 func InsertState(versionId string, path string, state *terraform.State) error {
-	log.Info("Inserting new state")
+	var testState State
+	db.Find(&testState, "path = ? AND version_id = ?", path, versionId)
+	if testState.Path == path {
+		log.Infof("State %s/%s is already in the DB", path, versionId)
+		return nil
+	}
 
 	st := &State{
 		Path:      path,
