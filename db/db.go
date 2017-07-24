@@ -135,6 +135,6 @@ func SearchResource(query url.Values) (resources []Resource) {
 		values = append(values, v[0])
 	}
 
-	db.Find(&resources, values...)
+	db.Preload("Attributes").Find(&resources, values...)
 	return
 }

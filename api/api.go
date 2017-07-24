@@ -42,6 +42,11 @@ func refreshDB() {
 		knownVersions := db.KnownVersions()
 
 		for _, st := range states {
+			// FIXME: UpdateState duplicates entries!
+			// We should not use it, instead point to the right version in the UI
+			// s3State, _ := GetS3State(st, "")
+			//db.UpdateState(st, "", s3State)
+
 			versions, _ := getVersions(st)
 			for _, v := range versions {
 				if isKnownVersion(knownVersions, *v.VersionId) {
@@ -158,6 +163,17 @@ func ApiHistory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	j, err := json.Marshal(result)
+	if err != nil {
+		log.Errorf("Failed to marshal json: %v", err)
+	}
+	io.WriteString(w, string(j))
+}
+
+func ApiSearchResource(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	query := r.URL.Query()
+	result := db.SearchResource(query)
 	j, err := json.Marshal(result)
 	if err != nil {
 		log.Errorf("Failed to marshal json: %v", err)
