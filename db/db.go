@@ -56,7 +56,7 @@ func Init() {
 
 	db.AutoMigrate(&State{}, &Module{}, &Resource{}, &Attribute{})
 
-	db.LogMode(true)
+	//db.LogMode(true)
 
 	log.Infof("New db is %v", db)
 }
