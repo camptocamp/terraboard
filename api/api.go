@@ -40,8 +40,12 @@ func refreshDB() {
 			log.Errorf("Failed to build cache: %s", err)
 		}
 
+		// Refresh knownVersions
+		knownVersions := db.KnownVersions()
+
 		for _, st := range states {
 			state, _ := GetState(st, "")
+			// TODO: UPDATE
 			err = db.InsertState("", st, state)
 			if err != nil {
 				log.Errorf("Failed to insert state %s: %v", st, err)
@@ -49,6 +53,10 @@ func refreshDB() {
 
 			versions, _ := getVersions(st)
 			for _, v := range versions {
+				if isKnownVersion(knownVersions, *v.VersionId) {
+					log.Infof("Version %s for %s is already known, skipping", *v.VersionId, st)
+					continue
+				}
 				state, _ := GetState(st, *v.VersionId)
 				db.InsertState(*v.VersionId, st, state)
 				if err != nil {
@@ -59,6 +67,15 @@ func refreshDB() {
 
 		time.Sleep(1 * time.Minute)
 	}
+}
+
+func isKnownVersion(knownVersions []string, version string) bool {
+	for _, v := range knownVersions {
+		if v == version {
+			return true
+		}
+	}
+	return false
 }
 
 func refreshStates() error {

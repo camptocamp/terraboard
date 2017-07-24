@@ -106,3 +106,15 @@ func GetState(path, versionId string) (state State) {
 	db.Preload("Modules").Preload("Modules.Resources").Preload("Modules.Resources.Attributes").Find(&state, "path = ? AND version_id = ?", path, versionId)
 	return
 }
+
+func KnownVersions() (versions []string) {
+	// TODO: err
+	rows, _ := db.Table("states").Select("DISTINCT version_id").Rows()
+	defer rows.Close()
+	for rows.Next() {
+		var version string
+		rows.Scan(&version) // TODO: err
+		versions = append(versions, version)
+	}
+	return
+}
