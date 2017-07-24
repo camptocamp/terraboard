@@ -42,11 +42,6 @@ func refreshDB() {
 		knownVersions := db.KnownVersions()
 
 		for _, st := range states {
-			// FIXME: UpdateState duplicates entries!
-			// We should not use it, instead point to the right version in the UI
-			// s3State, _ := GetS3State(st, "")
-			//db.UpdateState(st, "", s3State)
-
 			versions, _ := getVersions(st)
 			for _, v := range versions {
 				if isKnownVersion(knownVersions, *v.VersionId) {
@@ -111,11 +106,29 @@ func ApiStates(w http.ResponseWriter, r *http.Request) {
 func ApiState(w http.ResponseWriter, r *http.Request) {
 	st := util.TrimBase(r, "api/state/")
 	versionId := r.URL.Query().Get("versionid")
+	if versionId == "" {
+		versionId, _ = defaultVersion(st) // TODO: err
+	}
 	state := db.GetState(st, versionId)
 
 	jState, _ := json.Marshal(state)
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	io.WriteString(w, string(jState))
+}
+
+func defaultVersion(path string) (string, error) {
+	versions, err := getVersions(path) // TODO: err
+	if err != nil {
+		return "", fmt.Errorf("Failed to list versions for %s: %v", path, err)
+	}
+
+	for _, v := range versions {
+		if *v.IsLatest {
+			return *v.VersionId, nil
+		}
+	}
+
+	return "", fmt.Errorf("Failed to find default version for %s", path)
 }
 
 func getVersions(prefix string) (versions []*s3.ObjectVersion, err error) {

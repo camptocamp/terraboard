@@ -106,27 +106,6 @@ func InsertState(path string, versionId string, state *terraform.State) error {
 	return nil
 }
 
-func UpdateState(path string, versionId string, state *terraform.State) error {
-	st := GetState(path, "")
-	if st.Path == path {
-		// Update latest known
-		oldSt := stateS3toDB(state, path, "")
-		st.VersionId = oldSt.VersionId
-		st.TFVersion = oldSt.TFVersion
-		st.Serial = oldSt.Serial
-		st.Modules = oldSt.Modules
-		db.Save(st)
-	} else {
-		// Insert new value
-		err := InsertState(path, "", state)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 func GetState(path, versionId string) (state State) {
 	db.Preload("Modules").Preload("Modules.Resources").Preload("Modules.Resources.Attributes").Find(&state, "path = ? AND version_id = ?", path, versionId)
 	return
