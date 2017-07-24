@@ -2,6 +2,8 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
+	"net/url"
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
@@ -120,5 +122,19 @@ func KnownVersions() (versions []string) {
 		rows.Scan(&version) // TODO: err
 		versions = append(versions, version)
 	}
+	return
+}
+
+func SearchResource(query url.Values) (resources []Resource) {
+	var queryParts []string
+	values := []interface{}{
+		strings.Join(queryParts, " AND "),
+	}
+	for k, v := range query {
+		queryParts = append(queryParts, fmt.Sprintf("%s = ?", k))
+		values = append(values, v[0])
+	}
+
+	db.Find(&resources, values...)
 	return
 }
