@@ -43,24 +43,21 @@ app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, 
             if ($location.hash() != "") {
                 // Default
                 $scope.selectedmod = 0;
-                $scope.selectedres = 0;
 
                 // Search for module in selected res
-                if $location.hash() != "" {
-                    var targetRes = $location.hash();
-                    for (i=0; i < mods.length; i++) {
-                        if (targetRes.startsWith(mods[i].path+'.')) {
-                            $scope.selectedmod = i;
-                            targetRes = targetRes.replace(mods[i].path+'.', '');
+                var targetRes = $location.hash();
+                for (i=0; i < mods.length; i++) {
+                    if (targetRes.startsWith(mods[i].path+'.')) {
+                        $scope.selectedmod = i;
+                    }
+                }
 
-                            for (j=0; j < mods.resources.length; j++) {
-                                if (targetRes == mods.resources[j].type + '.' + mods.resources[j].name) {
-                                    $scope.selectedres = j;
-                                    break;
-                                }
-                            }
-                            break;
-                        }
+                targetRes = targetRes.replace(mods[$scope.selectedmod].path+'.', '');
+                var resources = mods[$scope.selectedmod].resources;
+                for (j=0; j < resources.length; j++) {
+                    if (targetRes == resources[j].type+'.'+resources[j].name) {
+                        $scope.selectedres = j;
+                        break;
                     }
                 }
 
@@ -68,8 +65,11 @@ app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, 
                 $scope.display.mod = $scope.selectedmod;
             }
 
-            $scope.setSelected = function(mod, res) {
-                var hash = (mod == 0) ? res : $scope.details.modules[mod].path+'.'+res;
+            $scope.setSelected = function(m, r) {
+                var mod = $scope.details.modules[m];
+                var res = mod.resources[r];
+                var res_title = res.type+'.'+res.name;
+                var hash = (mod == 0) ? res_title : mod.path+'.'+res_title;
                 $location.hash(hash);
             };
         });
