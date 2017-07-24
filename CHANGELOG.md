@@ -1,3 +1,17 @@
+## 0.7.2 (July 24, 2017)
+
+FIXES:
+
+- Server:
+
+  * Do not UpdateState(), select default version instead
+  * Do not insert states without versions, select default version instead
+
+- UI:
+
+  * Select default version from state
+
+
 ## 0.7.1 (July 24, 2017)
 
 FIXES:
