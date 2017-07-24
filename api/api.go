@@ -42,8 +42,10 @@ func refreshDB() {
 		knownVersions := db.KnownVersions()
 
 		for _, st := range states {
-			s3State, _ := GetS3State(st, "") // TODO: err
-			db.UpdateState(st, "", s3State)  // TODO: err
+			// FIXME: UpdateState duplicates entries!
+			// We should not use it, instead point to the right version in the UI
+			// s3State, _ := GetS3State(st, "")
+			//db.UpdateState(st, "", s3State)
 
 			versions, _ := getVersions(st)
 			for _, v := range versions {
