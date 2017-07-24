@@ -1,3 +1,16 @@
+## 0.7.1 (July 24, 2017)
+
+FIXES:
+
+- Server:
+
+  * Add indices on tables to improve performance
+
+- UI:
+
+  * Fix selected class on resource
+
+
 ## 0.7.0 (July 24, 2017)
 
 FEATURES:
