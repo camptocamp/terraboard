@@ -15,8 +15,8 @@ var db *gorm.DB
 
 type State struct {
 	gorm.Model `json:"-"`
-	Path       string   `json:"path"`
-	VersionId  string   `json:"version_id"`
+	Path       string   `gorm:"index" json:"path"`
+	VersionId  string   `gorm:"index" json:"version_id"`
 	TFVersion  string   `json:"terraform_version"`
 	Serial     int64    `json:"serial"`
 	Modules    []Module `json:"modules"`
@@ -24,14 +24,14 @@ type State struct {
 
 type Module struct {
 	ID        int           `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
-	StateID   sql.NullInt64 `json:"-"`
+	StateID   sql.NullInt64 `gorm:"index" json:"-"`
 	Path      string        `json:"path"`
 	Resources []Resource    `json:"resources"`
 }
 
 type Resource struct {
 	ID         int           `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
-	ModuleID   sql.NullInt64 `json:"-"`
+	ModuleID   sql.NullInt64 `gorm:"index" json:"-"`
 	Type       string        `json:"type"`
 	Name       string        `json:"name"`
 	Attributes []Attribute   `json:"attributes"`
@@ -39,7 +39,7 @@ type Resource struct {
 
 type Attribute struct {
 	ID         int           `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
-	ResourceID sql.NullInt64 `json:"-"`
+	ResourceID sql.NullInt64 `gorm:"index" json:"-"`
 	Key        string        `json:"key"`
 	Value      string        `json:"value"`
 }
