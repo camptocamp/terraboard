@@ -44,12 +44,8 @@ func refreshDB() {
 		knownVersions := db.KnownVersions()
 
 		for _, st := range states {
-			state, _ := GetState(st, "")
-			// TODO: UPDATE
-			err = db.InsertState("", st, state)
-			if err != nil {
-				log.Errorf("Failed to insert state %s: %v", st, err)
-			}
+			s3State, _ := GetS3State(st, "") // TODO: err
+			db.UpdateState(st, "", s3State)  // TODO: err
 
 			versions, _ := getVersions(st)
 			for _, v := range versions {
@@ -57,8 +53,8 @@ func refreshDB() {
 					log.Infof("Version %s for %s is already known, skipping", *v.VersionId, st)
 					continue
 				}
-				state, _ := GetState(st, *v.VersionId)
-				db.InsertState(*v.VersionId, st, state)
+				state, _ := GetS3State(st, *v.VersionId)
+				db.InsertState(st, *v.VersionId, state)
 				if err != nil {
 					log.Errorf("Failed to insert state %s/%s: %v", st, *v.VersionId, err)
 				}

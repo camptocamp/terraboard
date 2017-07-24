@@ -16,7 +16,7 @@ type StateVersions struct {
 	Versions map[string]*terraform.State
 }
 
-func GetState(st, versionId string) (state *terraform.State, err error) {
+func GetS3State(st, versionId string) (state *terraform.State, err error) {
 	log.Infof("Getting state for %s/%s", st, versionId)
 	if _, ok := stateVersions[st]; !ok {
 		// Init

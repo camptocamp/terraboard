@@ -61,15 +61,8 @@ func Init() {
 	log.Infof("New db is %v", db)
 }
 
-func InsertState(versionId string, path string, state *terraform.State) error {
-	var testState State
-	db.Find(&testState, "path = ? AND version_id = ?", path, versionId)
-	if testState.Path == path {
-		log.Infof("State %s/%s is already in the DB", path, versionId)
-		return nil
-	}
-
-	st := &State{
+func stateS3toDB(state *terraform.State, path string, versionId string) (st State) {
+	st = State{
 		Path:      path,
 		VersionId: versionId,
 		TFVersion: state.TFVersion,
@@ -97,8 +90,40 @@ func InsertState(versionId string, path string, state *terraform.State) error {
 		}
 		st.Modules = append(st.Modules, mod)
 	}
+	return
+}
 
+func InsertState(path string, versionId string, state *terraform.State) error {
+	var testState State
+	db.Find(&testState, "path = ? AND version_id = ?", path, versionId)
+	if testState.Path == path {
+		log.Infof("State %s/%s is already in the DB", path, versionId)
+		return nil
+	}
+
+	st := stateS3toDB(state, path, versionId)
 	db.Create(st)
+	return nil
+}
+
+func UpdateState(path string, versionId string, state *terraform.State) error {
+	st := GetState(path, "")
+	if st.Path == path {
+		// Update latest known
+		oldSt := stateS3toDB(state, path, "")
+		st.VersionId = oldSt.VersionId
+		st.TFVersion = oldSt.TFVersion
+		st.Serial = oldSt.Serial
+		st.Modules = oldSt.Modules
+		db.Save(st)
+	} else {
+		// Insert new value
+		err := InsertState(path, "", state)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
