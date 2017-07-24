@@ -15,20 +15,26 @@ var db *gorm.DB
 
 type State struct {
 	gorm.Model `json:"-"`
-	Path       string     `json:"path"`
-	VersionId  string     `json:"version_id"`
-	TFVersion  string     `json:"terraform_version"`
-	Serial     int64      `json:"serial"`
-	Resources  []Resource `json:"resources"`
+	Path       string   `json:"path"`
+	VersionId  string   `json:"version_id"`
+	TFVersion  string   `json:"terraform_version"`
+	Serial     int64    `json:"serial"`
+	Modules    []Module `json:"modules"`
+}
+
+type Module struct {
+	ID        int           `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
+	StateID   sql.NullInt64 `json:"-"`
+	Path      string        `json:"path"`
+	Resources []Resource    `json:"resources"`
 }
 
 type Resource struct {
 	ID         int           `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
-	StateID    sql.NullInt64 `json:"-"`
+	ModuleID   sql.NullInt64 `json:"-"`
 	Type       string        `json:"type"`
 	Name       string        `json:"name"`
 	Attributes []Attribute   `json:"attributes"`
-	Module     string        `json:"module"`
 }
 
 type Attribute struct {
@@ -48,7 +54,7 @@ func Init() {
 
 	log.Infof("Automigrate")
 
-	db.AutoMigrate(&State{}, &Resource{}, &Attribute{})
+	db.AutoMigrate(&State{}, &Module{}, &Resource{}, &Attribute{})
 
 	db.LogMode(true)
 
@@ -66,12 +72,13 @@ func InsertState(versionId string, path string, state *terraform.State) error {
 	}
 
 	for _, m := range state.Modules {
-		mod := strings.Join(m.Path, "/")
+		mod := Module{
+			Path: strings.Join(m.Path, "/"),
+		}
 		for n, r := range m.Resources {
 			res := Resource{
-				Type:   r.Type,
-				Name:   n,
-				Module: mod,
+				Type: r.Type,
+				Name: n,
 			}
 
 			for k, v := range r.Primary.Attributes {
@@ -81,8 +88,9 @@ func InsertState(versionId string, path string, state *terraform.State) error {
 				})
 			}
 
-			st.Resources = append(st.Resources, res)
+			mod.Resources = append(mod.Resources, res)
 		}
+		st.Modules = append(st.Modules, mod)
 	}
 
 	db.Create(st)
@@ -90,8 +98,6 @@ func InsertState(versionId string, path string, state *terraform.State) error {
 }
 
 func GetState(path, versionId string) (state State) {
-	log.Infof("Getting state from DB for %s/%s", path, versionId)
-	db.Preload("Resources").Preload("Resources.Attributes").Find(&state, "path = ? AND version_id = ?", path, versionId)
-	log.Infof("state=%v", state)
+	db.Preload("Modules").Preload("Modules.Resources").Preload("Modules.Resources.Attributes").Find(&state, "path = ? AND version_id = ?", path, versionId)
 	return
 }
