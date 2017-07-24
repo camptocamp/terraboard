@@ -102,7 +102,7 @@ func InsertState(path string, versionId string, state *terraform.State) error {
 	}
 
 	st := stateS3toDB(state, path, versionId)
-	db.Create(st)
+	db.Create(&st)
 	return nil
 }
 
