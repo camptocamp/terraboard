@@ -12,25 +12,7 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 )
 
-type StateVersions struct {
-	Versions map[string]*terraform.State
-}
-
 func GetS3State(st, versionId string) (state *terraform.State, err error) {
-	log.Infof("Getting state for %s/%s", st, versionId)
-	if _, ok := stateVersions[st]; !ok {
-		// Init
-		stateVersions[st] = &StateVersions{}
-		stateVersions[st].Versions = make(map[string]*terraform.State)
-	}
-
-	if s, ok := stateVersions[st].Versions[versionId]; ok {
-		// Return cached version
-		log.Infof("Getting %s/%s from cache", st, versionId)
-		return s, nil
-	}
-
-	// Retrieve from S3
 	log.Infof("Retrieving %s/%s from S3", st, versionId)
 	input := &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
@@ -61,12 +43,6 @@ func GetS3State(st, versionId string) (state *terraform.State, err error) {
 	}
 
 	json.Unmarshal(content, &state)
-
-	if versionId != "" {
-		// Store in cache
-		log.Infof("Adding %s/%s to cache", st, versionId)
-		stateVersions[st].Versions[versionId] = state
-	}
 
 	return
 }

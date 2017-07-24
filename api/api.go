@@ -20,13 +20,11 @@ import (
 var svc *s3.S3
 var bucket string
 var states []string
-var stateVersions map[string]*StateVersions
 
 func init() {
 	sess := session.Must(session.NewSession())
 	svc = s3.New(sess, &aws.Config{})
 	bucket = os.Getenv("AWS_BUCKET")
-	stateVersions = make(map[string]*StateVersions)
 
 	db.Init()
 	go refreshDB()
