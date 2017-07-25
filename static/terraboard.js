@@ -87,6 +87,16 @@ app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, 
 }]);
 
 app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', function($scope, $http) {
+    $http.get('api/resource/types').then(function(response){
+        $scope.resource_keys = response.data;
+    });
+    $http.get('api/resource/names').then(function(response){
+        $scope.resource_names = response.data;
+    });
+    $http.get('api/attribute/keys').then(function(response){
+        $scope.attribute_keys = response.data;
+    });
+
     $scope.doSearch= function() {
         var params = {};
         if ($scope.resType != "") {

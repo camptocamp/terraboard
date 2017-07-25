@@ -1,14 +1,53 @@
-<div class="form-group">
-    <form novalidate class="simple-form">
-        Type <input ng-model="resType">
-        ID <input ng-model="resID">
-        Key <input ng-model="attrKey">
-        Value <input ng-model="attrVal">
-
-        <input type="submit" ng-click="doSearch()" value="Save" />
-    </form>
-</div>
-
+<form class="form-inline">
+    <div class="form-group">
+        <label for="resource_type">Resource Type</label>
+        <ui-select id="resource_type"
+                   ng-model="$parent.resType"
+                   theme="bootstrap"
+                   ng-disabled="disabled"
+                   ng-change="doSearch()"
+                   style="min-width: 200px;"
+                   reset-search-input="false"
+                   title="Resource Type">
+            <ui-select-match placeholder="Resource Type">{{$parent.resType}}</ui-select-match>
+            <ui-select-choices repeat="k in resource_keys | filter: $select.search">
+                {{k}}
+            </ui-select-choices>
+        </ui-select>
+    </div>
+    <div class="form-group">
+        <label for="resource_id">Resource ID</label>
+        <ui-select id="resource_id"
+                   ng-model="$parent.resID"
+                   theme="bootstrap"
+                   ng-disabled="disabled"
+                   ng-change="doSearch()"
+                   style="min-width: 200px;"
+                   reset-search-input="false"
+                   title="Resource ID">
+            <ui-select-match placeholder="Resource ID">{{$parent.resID}}</ui-select-match>
+            <ui-select-choices repeat="k in resource_names | filter: $parent.resType | filter: $select.search">
+                {{k}}
+            </ui-select-choices>
+        </ui-select>
+    </div>
+    <div class="form-group">
+        <label for="attribute_key">Attribute Key</label>
+        <ui-select id="attribute_key"
+                   ng-model="$parent.attrKey"
+                   theme="bootstrap"
+                   ng-disabled="disabled"
+                   ng-change="doSearch()"
+                   style="min-width: 200px;"
+                   reset-search-input="false"
+                   title="Attribute Key">
+            <ui-select-match placeholder="Attribute Key">{{$parent.attrKey}}</ui-select-match>
+            <ui-select-choices repeat="k in attribute_keys | filter: $select.search">
+                {{k}}
+            </ui-select-choices>
+        </ui-select>
+    </div>
+</form>
 <hr />
 
 <div id="results">
