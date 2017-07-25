@@ -1,1 +1,42 @@
-Searching for type {{type}}
+<div class="form-group">
+    Search for <select ng-model="searchType" ng-change="doSearch()"><option>resource</option><option>attribute</option></select>
+    <div ng-if="searchResource">
+        Type <input ng-model="resType" ng-change="doSearch()">
+        ID <input ng-model="resID" ng-change="doSearch()">
+    </div>
+    <div ng-if="searchAttribute">
+        Key <input ng-model="attrKey" ng-change="doSearch()">
+        Value <input ng-model="attrVal" ng-change="doSearch()">
+    </div>
+</div>
+
+<hr />
+
+<div id="results">
+    <table class="table">
+        <thead>
+            <th>Path</th>
+            <th>Version ID</th>
+            <th>TF Version</th>
+            <th>Serial</th>
+            <th>Module Path</th>
+            <th>Resource Type</th>
+            <th>Resource ID</th>
+            <th>Key</th>
+            <th>Value</th>
+        </thead>
+        <tbody>
+            <tr ng-repeat="r in results">
+                <td>{{r.path}}</td>
+                <td>{{r.version_id}}</td>
+                <td>{{r.tf_version}}</td>
+                <td>{{r.serial}}</td>
+                <td>{{r.module_path}}</td>
+                <td>{{r.resource_type}}</td>
+                <td>{{r.resource_name}}</td>
+                <td>{{r.attribute_key}}</td>
+                <td>{{r.attribute_value}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

@@ -6,7 +6,7 @@ var app = angular.module("terraboard", ['ngRoute', 'ngSanitize', 'ui.select'], f
     }).when("/state/:path*", {
         templateUrl: "static/state.html",
         controller: "tbStateCtrl"
-    }).when("/search/:type", {
+    }).when("/search", {
         templateUrl: "static/search.html",
         controller: "tbSearchCtrl"
     }).otherwise({
@@ -86,5 +86,33 @@ app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, 
     });
 }]);
 
-app.controller("tbSearchCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
+app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', function($scope, $http) {
+    $scope.doSearch= function() {
+        if ($scope.searchType == 'resource') {
+          $scope.searchResource = true;
+          $scope.searchAttribute = false;
+        }
+        if ($scope.searchType == 'attribute') {
+          $scope.searchResource = false;
+          $scope.searchAttribute = true;
+        }
+
+        var params = {};
+        if ($scope.resType != "") {
+            params.type = $scope.resType;
+        }
+        if ($scope.resID != "") {
+            params.name = $scope.resID;
+        }
+        if ($scope.attrKey != "") {
+            params.key = $scope.attrKey;
+        }
+        if ($scope.attrVal != "") {
+            params.key = $scope.attrVal;
+        }
+        var query = $.param(params);
+        $http.get('api/search/'+$scope.searchType+'?'+query).then(function(response){
+            $scope.results = response.data;
+        });
+    }
 }]);

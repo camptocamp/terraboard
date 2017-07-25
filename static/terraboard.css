@@ -177,3 +177,7 @@ pre.sh_sourceCode .sh_oldfile {
 .navbar-brand img {
   height: 50px;
 }
+#results {
+  height: 100%;
+  overflow-y: auto;
+}
