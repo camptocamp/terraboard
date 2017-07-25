@@ -1,32 +1,77 @@
 <div class="form-group">
     Search for <select ng-model="searchType" ng-change="doSearch()"><option>resource</option><option>attribute</option></select>
     <div ng-if="searchResource">
-        Type <input ng-model="resType" ng-change="doSearch()">
-        ID <input ng-model="resID" ng-change="doSearch()">
+        Type <input ng-model="$parent.resType" ng-change="doSearch()">
+        ID <input ng-model="$parent.resID" ng-change="doSearch()">
     </div>
     <div ng-if="searchAttribute">
-        Key <input ng-model="attrKey" ng-change="doSearch()">
-        Value <input ng-model="attrVal" ng-change="doSearch()">
+        Key <input ng-model="$parent.attrKey" ng-change="doSearch()">
+        Value <input ng-model="$parent.attrVal" ng-change="doSearch()">
     </div>
 </div>
 
 <hr />
 
 <div id="results">
-    <table class="table">
+    <table class="table table-border table-striped">
         <thead>
-            <th>Path</th>
-            <th>Version ID</th>
-            <th>TF Version</th>
-            <th>Serial</th>
-            <th>Module Path</th>
-            <th>Resource Type</th>
-            <th>Resource ID</th>
-            <th>Key</th>
-            <th>Value</th>
+            <th>
+                <a href="#" ng-click="sortType = 'path'">
+                    Path
+                    <span ng-show="sortType == 'path'" class="glyphicon glyphicon-chevron-down"></span>
+                </a>
+            </th>
+            <th>
+                <a href="#" ng-click="sortType = 'version_id'">
+                    Version ID
+                    <span ng-show="sortType == 'version_id'" class="glyphicon glyphicon-chevron-down"></span>
+                </a>
+            </th>
+            <th>
+                <a href="#" ng-click="sortType = 'tf_version'">
+                    TF Version
+                    <span ng-show="sortType == 'tf_version'" class="glyphicon glyphicon-chevron-down"></span>
+                </a>
+            </th>
+            <th>
+                <a href="#" ng-click="sortType = 'serial'">
+                    Serial
+                    <span ng-show="sortType == 'serial'" class="glyphicon glyphicon-chevron-down"></span>
+                </a>
+            </th>
+            <th>
+                <a href="#" ng-click="sortType = 'module_path'">
+                    Module Path
+                    <span ng-show="sortType == 'module_path'" class="glyphicon glyphicon-chevron-down"></span>
+                </a>
+            </th>
+            <th>
+                <a href="#" ng-click="sortType = 'resource_type'">
+                    Resource Type
+                    <span ng-show="sortType == 'resource_type'" class="glyphicon glyphicon-chevron-down"></span>
+                </a>
+            </th>
+            <th>
+                <a href="#" ng-click="sortType = 'resource_name'">
+                    Resource ID
+                    <span ng-show="sortType == 'resource_name'" class="glyphicon glyphicon-chevron-down"></span>
+                </a>
+            </th>
+            <th>
+                <a href="#" ng-click="sortType = 'attribute_key'">
+                    Key
+                    <span ng-show="sortType == 'attribute_key'" class="glyphicon glyphicon-chevron-down"></span>
+                </a>
+            </th>
+            <th>
+                <a href="#" ng-click="sortType = 'attribute_value'">
+                    Value
+                    <span ng-show="sortType == 'attribute_value'" class="glyphicon glyphicon-chevron-down"></span>
+                </a>
+            </th>
         </thead>
         <tbody>
-            <tr ng-repeat="r in results">
+            <tr ng-repeat="r in results | orderBy:sortType:sortReverse">
                 <td>{{r.path}}</td>
                 <td>{{r.version_id}}</td>
                 <td>{{r.tf_version}}</td>

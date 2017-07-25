@@ -108,9 +108,10 @@ app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', 
             params.key = $scope.attrKey;
         }
         if ($scope.attrVal != "") {
-            params.key = $scope.attrVal;
+            params.value = $scope.attrVal;
         }
         var query = $.param(params);
+        console.log(query);
         $http.get('api/search/'+$scope.searchType+'?'+query).then(function(response){
             $scope.results = response.data;
         });
