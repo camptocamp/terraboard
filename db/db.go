@@ -136,19 +136,38 @@ type SearchResult struct {
 	AttributeValue string `gorm:"column:value" json:"attribute_value"`
 }
 
-func SearchResource(query url.Values) (results []SearchResult) {
+func SearchResource(query url.Values, defaultVersion string) (results []SearchResult) {
 	log.Infof("Searching for resource with query=%v", query)
 
 	selectQuery := make(map[string]interface{})
-	for k, v := range query {
-		selectQuery[k] = v[0]
+
+	var targetVersion string
+	switch v := query.Get("versionid"); string(v) {
+	case "*":
+	case "":
+		targetVersion = defaultVersion
+	default:
+		targetVersion = string(v)
 	}
 
-	db.Table("resources").
+	if v := query.Get("type"); string(v) != "" {
+		selectQuery["type"] = string(v)
+	}
+
+	if v := query.Get("name"); string(v) != "" {
+		selectQuery["name"] = string(v)
+	}
+
+	baseSelect := db.Table("resources").
 		Select("states.path, states.version_id, states.tf_version, states.serial, modules.path, resources.type, resources.name").
 		Joins("LEFT JOIN modules ON resources.module_id = modules.id LEFT JOIN states ON modules.state_id = states.id").
-		Where(selectQuery).
-		Find(&results)
+		Where(selectQuery)
+
+	if targetVersion != "" {
+		baseSelect = baseSelect.Where("states.version_id = ?", targetVersion)
+	}
+
+	baseSelect.Find(&results)
 
 	return
 }
