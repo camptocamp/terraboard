@@ -1,3 +1,11 @@
+## 0.8.0 (July 26, 2017)
+
+FEATURES:
+
+* Add a landing page
+* Add a search interface
+
+
 ## 0.7.2 (July 24, 2017)
 
 FIXES:
