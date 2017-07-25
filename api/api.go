@@ -214,7 +214,8 @@ func ApiResourceNames(w http.ResponseWriter, r *http.Request) {
 
 func ApiAttributeKeys(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	result, _ := db.ListAttributeKeys()
+	resourceType := r.URL.Query().Get("resource_type")
+	result, _ := db.ListAttributeKeys(resourceType)
 	j, err := json.Marshal(result)
 	if err != nil {
 		log.Errorf("Failed to marshal json: %v", err)

@@ -251,6 +251,26 @@ func ListResourceNames() ([]string, error) {
 	return listField("resources", "name")
 }
 
-func ListAttributeKeys() ([]string, error) {
-	return listField("attributes", "key")
+func ListAttributeKeys(resourceType string) (results []string, err error) {
+	query := db.Table("attributes").
+		Select(fmt.Sprintf("DISTINCT %s", "key")).
+		Joins("LEFT JOIN resources ON attributes.resource_id = resources.id")
+
+	if resourceType != "" {
+		query = query.Where("resources.type = ?", resourceType)
+	}
+
+	rows, err := query.Rows()
+	defer rows.Close()
+	if err != nil {
+		return results, err
+	}
+
+	for rows.Next() {
+		var t string
+		rows.Scan(&t)
+		results = append(results, t)
+	}
+
+	return
 }
