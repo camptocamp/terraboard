@@ -4,7 +4,8 @@ RUN go get github.com/aws/aws-sdk-go github.com/Sirupsen/logrus github.com/hashi
 WORKDIR /go/src/github.com/camptocamp/terraboard
 COPY . .
 RUN CGO_ENABLED=1 GOOS=linux go build -ldflags "-linkmode external -extldflags -static" \
-  -o terraboard main.go
+  -o terraboard main.go \
+  && strip terraboard
 
 FROM scratch
 WORKDIR /
