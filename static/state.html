@@ -36,7 +36,7 @@
                         !-->
                     </div>
                 </div>
-                <div id="node" class="col-md-8">
+                <div id="node" class="col-md-8" ng-if="selectedres">
                     <h2 class="node-title">{{(details.modules[selectedmod].path == 'root') ? "" : details.modules[selectedmod].path + "."}}{{details.modules[selectedmod].resources[selectedres].type}}.{{details.modules[selectedmod].resources[selectedres].name}}</h2>
                     <div class="panel-group">
                         <div class="panel panel-info">

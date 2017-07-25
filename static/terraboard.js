@@ -16,6 +16,7 @@ app.controller("tbBreadCtrl", ['$scope', '$location', function($scope, $location
 }]);
 
 app.controller("tbListCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
+    $scope.path = $location.path().replace('/state/', '');
     $http.get('api/states').then(function(response){
         $scope.keys = response.data;
     });
