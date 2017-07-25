@@ -11,12 +11,12 @@ var app = angular.module("terraboard", ['ngRoute', 'ngSanitize', 'ui.select'], f
     });
 });
 
-app.controller("tbBreadCtrl", ['$scope', '$location', function($scope, $location) {
-    $scope.path = $location.path().replace('/state/', '');
-}]);
-
 app.controller("tbListCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
-    $scope.path = $location.path().replace('/state/', '');
+    if ($location.path() == '/') {
+        $scope.placeholder = 'Enter a state file path...';
+    } else {
+        $scope.placeholder = $location.path().replace('/state/', '');
+    }
     $http.get('api/states').then(function(response){
         $scope.keys = response.data;
     });

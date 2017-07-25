@@ -171,60 +171,6 @@ pre.sh_sourceCode .sh_oldfile {
   text-overflow: clip;
   overflow: auto;
 }
-.glyphicon-ok.ack, .glyphicon.star {
-  float: right;
-  color: gray;
-  padding-left: 5px;
-}
-.glyphicon-star.star:hover, .starred .star {
-  content: "\e050";
-  color: orange;
-}
-.glyphicon-ok.ack:hover {
-  color: green;
-}
-div.acked, li.list-group-item.acked {
-  opacity: 0.5;
-}
-.acked pre {
-  display: none;
-}
-.acked .glyphicon-ok, .glyphicon-ok.acked {
-  opacity: 1.0;
-  color: green;
-}
-.acked .glyphicon-ok:hover, .glyphicon-ok.acked:hover {
-  color: gray;
-}
-.all_acked {
-  opacity: 0.5;
-}
-.navbar .breadcrumb {
-  padding: 0;
-  margin: 0 30px;
-  background-color: inherit;
-}
-.navbar .breadcrumb .navbar-text {
-  margin-left: 0;
-  margin-right: 0;
-}
-#keys-help {
-  position: fixed;
-  display: none;
-  z-index: 999999;
-  left: 15%;
-  top: 10px;
-}
-#keys-help .jumbotron {
-  width: 40%px;
-}
-#keys-help .shortcuts {
-  columns: 2;
-  -webkit-columns: 2;
-}
-#keys-help .shortcut {
-  display: inline-block;
-}
 .navbar-brand {
   padding: 0;
 }
