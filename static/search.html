@@ -1,13 +1,12 @@
 <div class="form-group">
-    Search for <select ng-model="searchType" ng-change="doSearch()"><option>resource</option><option>attribute</option></select>
-    <div ng-if="searchResource">
-        Type <input ng-model="$parent.resType" ng-change="doSearch()">
-        ID <input ng-model="$parent.resID" ng-change="doSearch()">
-    </div>
-    <div ng-if="searchAttribute">
-        Key <input ng-model="$parent.attrKey" ng-change="doSearch()">
-        Value <input ng-model="$parent.attrVal" ng-change="doSearch()">
-    </div>
+    <form novalidate class="simple-form">
+        Type <input ng-model="resType">
+        ID <input ng-model="resID">
+        Key <input ng-model="attrKey">
+        Value <input ng-model="attrVal">
+
+        <input type="submit" ng-click="doSearch()" value="Save" />
+    </form>
 </div>
 
 <hr />

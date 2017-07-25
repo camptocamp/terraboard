@@ -88,15 +88,6 @@ app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, 
 
 app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', function($scope, $http) {
     $scope.doSearch= function() {
-        if ($scope.searchType == 'resource') {
-          $scope.searchResource = true;
-          $scope.searchAttribute = false;
-        }
-        if ($scope.searchType == 'attribute') {
-          $scope.searchResource = false;
-          $scope.searchAttribute = true;
-        }
-
         var params = {};
         if ($scope.resType != "") {
             params.type = $scope.resType;
@@ -112,7 +103,7 @@ app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', 
         }
         var query = $.param(params);
         console.log(query);
-        $http.get('api/search/'+$scope.searchType+'?'+query).then(function(response){
+        $http.get('api/search/attribute?'+query).then(function(response){
             $scope.results = response.data;
         });
     }
