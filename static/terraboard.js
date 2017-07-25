@@ -97,6 +97,14 @@ app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', 
         $scope.attribute_keys = response.data;
     });
 
+    $scope.refreshAttrKeys = function() {
+        console.log("Refreshing keys");
+        $http.get('api/attribute/keys?resource_type='+$scope.resType).then(function(response){
+            console.log(response.data);
+            $scope.attribute_keys = response.data;
+        });
+    };
+
     $scope.doSearch = function() {
         var params = {};
         if ($scope.resType != "") {

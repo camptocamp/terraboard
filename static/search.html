@@ -42,7 +42,10 @@
                    reset-search-input="false"
                    title="Attribute Key">
             <ui-select-match placeholder="Attribute Key">{{$parent.attrKey}}</ui-select-match>
-            <ui-select-choices repeat="k in attribute_keys | filter: $select.search">
+            <ui-select-choices
+                repeat="k in attribute_keys | filter: $select.search"
+                refresh="refreshAttrKeys()"
+                refresh-delay="0">
                 {{k}}
             </ui-select-choices>
         </ui-select>
