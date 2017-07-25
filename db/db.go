@@ -2,7 +2,6 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
 	"net/url"
 	"strings"
 
@@ -125,16 +124,26 @@ func KnownVersions() (versions []string) {
 	return
 }
 
-func SearchResource(query url.Values) (resources []Resource) {
-	var queryParts []string
-	values := []interface{}{
-		strings.Join(queryParts, " AND "),
-	}
-	for k, v := range query {
-		queryParts = append(queryParts, fmt.Sprintf("%s = ?", k))
-		values = append(values, v[0])
-	}
+type SearchResult struct {
+	Path         string `gorm:"column:path" json:"path"`
+	VersionId    string `gorm:"column:version_id" json:"version_id"`
+	TFVersion    string `gorm:"column:tf_version" json:"tf_version"`
+	Serial       int64  `gorm:"column:serial" json:"serial"`
+	ModulePath   string `gorm:"column:path" json:"module_path"`
+	ResourceType string `gorm:"column:type" json:"resource_type"`
+	ResourceName string `gorm:"column:name" json:"resource_name"`
+}
 
-	db.Preload("Attributes").Find(&resources, values...)
+func SearchResource(query url.Values) (results []SearchResult) {
+	key := query.Get("key")
+	value := query.Get("value")
+	log.Infof("Searching for resource with query=%v", query)
+
+	db.Table("attributes").
+		Select("states.path, states.version_id, states.tf_version, states.serial, modules.path, resources.type, resources.name").
+		Joins("LEFT JOIN resources ON attributes.resource_id = resources.id LEFT JOIN modules ON resources.module_id = modules.id LEFT JOIN states ON modules.state_id = states.id").
+		Where("key = ? AND value = ?", key, value).
+		Find(&results)
+
 	return
 }
