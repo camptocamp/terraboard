@@ -57,6 +57,7 @@
 <div id="results">
     <table class="table table-border table-striped">
         <thead>
+            <th></th>
             <th>
                 <a href="#" ng-click="sortType = 'path'">
                     Path
@@ -114,6 +115,7 @@
         </thead>
         <tbody>
             <tr ng-repeat="r in results | orderBy:sortType:sortReverse">
+                <td><a href="state/{{r.path}}?versionid={{r.version_id}}#{{r.module_path}}.{{r.resource_type}}.{{r.resource_name}}"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></td>
                 <td>{{r.path}}</td>
                 <td>{{r.version_id}}</td>
                 <td>{{r.tf_version}}</td>
