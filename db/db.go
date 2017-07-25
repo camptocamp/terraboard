@@ -226,3 +226,31 @@ func SearchAttribute(query url.Values) (results []SearchResult) {
 
 	return
 }
+
+func listField(table, field string) (results []string, err error) {
+	rows, err := db.Table(table).Select(fmt.Sprintf("DISTINCT %s", field)).Rows()
+	defer rows.Close()
+	if err != nil {
+		return results, err
+	}
+
+	for rows.Next() {
+		var t string
+		rows.Scan(&t)
+		results = append(results, t)
+	}
+
+	return
+}
+
+func ListResourceTypes() ([]string, error) {
+	return listField("resources", "type")
+}
+
+func ListResourceNames() ([]string, error) {
+	return listField("resources", "name")
+}
+
+func ListAttributeKeys() ([]string, error) {
+	return listField("attributes", "key")
+}

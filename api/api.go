@@ -191,3 +191,33 @@ func ApiSearchAttribute(w http.ResponseWriter, r *http.Request) {
 	}
 	io.WriteString(w, string(j))
 }
+
+func ApiResourceTypes(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	result, _ := db.ListResourceTypes()
+	j, err := json.Marshal(result)
+	if err != nil {
+		log.Errorf("Failed to marshal json: %v", err)
+	}
+	io.WriteString(w, string(j))
+}
+
+func ApiResourceNames(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	result, _ := db.ListResourceNames()
+	j, err := json.Marshal(result)
+	if err != nil {
+		log.Errorf("Failed to marshal json: %v", err)
+	}
+	io.WriteString(w, string(j))
+}
+
+func ApiAttributeKeys(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	result, _ := db.ListAttributeKeys()
+	j, err := json.Marshal(result)
+	if err != nil {
+		log.Errorf("Failed to marshal json: %v", err)
+	}
+	io.WriteString(w, string(j))
+}
