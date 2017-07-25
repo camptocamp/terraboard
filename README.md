@@ -22,7 +22,7 @@ Terraboard is a web dashboard to visualize and query
 Terraboard currently supports getting the Terraform states from AWS S3. It
 requires:
 
-* A **versionned** S3 bucket name with one or more Terraform states,
+* A **versioned** S3 bucket name with one or more Terraform states,
   named with a `.tfstate` suffix
 * AWS credentials with the following rights on the bucket:
    - `s3:GetObject`
