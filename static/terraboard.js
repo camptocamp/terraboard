@@ -6,16 +6,19 @@ var app = angular.module("terraboard", ['ngRoute', 'ngSanitize', 'ui.select'], f
     }).when("/state/:path*", {
         templateUrl: "static/state.html",
         controller: "tbStateCtrl"
+    }).when("/search/:type", {
+        templateUrl: "static/search.html",
+        controller: "tbSearchCtrl"
     }).otherwise({
         redirectTo: "/"
     });
 });
 
 app.controller("tbListCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
-    if ($location.path() == '/') {
-        $scope.placeholder = 'Enter a state file path...';
-    } else {
+    if ($location.path().startsWith("/state/")) {
         $scope.placeholder = $location.path().replace('/state/', '');
+    } else {
+        $scope.placeholder = 'Enter a state file path...';
     }
     $http.get('api/states').then(function(response){
         $scope.keys = response.data;
@@ -83,3 +86,5 @@ app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, 
     });
 }]);
 
+app.controller("tbSearchCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
+}]);
