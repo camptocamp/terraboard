@@ -194,14 +194,6 @@ func SearchAttribute(query url.Values) (results []SearchResult) {
 	default:
 	}
 
-	if v := query.Get("key"); string(v) != "" {
-		selectQuery["key"] = string(v)
-	}
-
-	if v := query.Get("value"); string(v) != "" {
-		selectQuery["value"] = string(v)
-	}
-
 	baseSelect := db.Table("attributes").
 		Select(fmt.Sprintf("states.path, states.version_id, states.tf_version, %s as serial, modules.path as module_path, resources.type, resources.name, attributes.key, attributes.value", statesSelect)).
 		Group("states.path, modules.path, resources.type, resources.name, attributes.key").
@@ -210,6 +202,22 @@ func SearchAttribute(query url.Values) (results []SearchResult) {
 	if targetVersion != "" {
 		// filter by version unless we want all (*) or most recent ("")
 		baseSelect = baseSelect.Where("states.version_id = ?", targetVersion)
+	}
+
+	if v := query.Get("type"); string(v) != "" {
+		baseSelect = baseSelect.Where("resources.type LIKE ?", fmt.Sprintf("%%%s%%", v))
+	}
+
+	if v := query.Get("name"); string(v) != "" {
+		baseSelect = baseSelect.Where("resources.name LIKE ?", fmt.Sprintf("%%%s%%", v))
+	}
+
+	if v := query.Get("key"); string(v) != "" {
+		baseSelect = baseSelect.Where("attributes.key LIKE ?", fmt.Sprintf("%%%s%%", v))
+	}
+
+	if v := query.Get("value"); string(v) != "" {
+		baseSelect = baseSelect.Where("attributes.value LIKE ?", fmt.Sprintf("%%%s%%", v))
 	}
 
 	baseSelect.Where(selectQuery).
