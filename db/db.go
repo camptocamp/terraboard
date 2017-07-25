@@ -144,6 +144,23 @@ func SearchResource(query url.Values) (results []SearchResult) {
 		selectQuery[k] = v[0]
 	}
 
+	db.Table("resources").
+		Select("states.path, states.version_id, states.tf_version, states.serial, modules.path, resources.type, resources.name").
+		Joins("LEFT JOIN modules ON resources.module_id = modules.id LEFT JOIN states ON modules.state_id = states.id").
+		Where(selectQuery).
+		Find(&results)
+
+	return
+}
+
+func SearchAttribute(query url.Values) (results []SearchResult) {
+	log.Infof("Searching for attribute with query=%v", query)
+
+	selectQuery := make(map[string]interface{})
+	for k, v := range query {
+		selectQuery[k] = v[0]
+	}
+
 	db.Table("attributes").
 		Select("states.path, states.version_id, states.tf_version, states.serial, modules.path, resources.type, resources.name, attributes.key, attributes.value").
 		Joins("LEFT JOIN resources ON attributes.resource_id = resources.id LEFT JOIN modules ON resources.module_id = modules.id LEFT JOIN states ON modules.state_id = states.id").

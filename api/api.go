@@ -180,3 +180,14 @@ func ApiSearchResource(w http.ResponseWriter, r *http.Request) {
 	}
 	io.WriteString(w, string(j))
 }
+
+func ApiSearchAttribute(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	query := r.URL.Query()
+	result := db.SearchAttribute(query)
+	j, err := json.Marshal(result)
+	if err != nil {
+		log.Errorf("Failed to marshal json: %v", err)
+	}
+	io.WriteString(w, string(j))
+}

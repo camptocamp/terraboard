@@ -34,6 +34,7 @@ func main() {
 	http.HandleFunc(util.AddBase("api/state/"), api.ApiState)
 	http.HandleFunc(util.AddBase("api/history/"), api.ApiHistory)
 	http.HandleFunc(util.AddBase("api/search/resource"), api.ApiSearchResource)
+	http.HandleFunc(util.AddBase("api/search/attribute"), api.ApiSearchAttribute)
 
 	// Start server
 	http.ListenAndServe(":80", nil)
