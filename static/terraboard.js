@@ -1,11 +1,18 @@
-var app = angular.module("terraboard", [], function($locationProvider){
+var app = angular.module("terraboard", ['ngRoute', 'ngSanitize', 'ui.select'], function($locationProvider, $routeProvider){
     $locationProvider.html5Mode(true);
+
+    $routeProvider.when("/", {
+        templateUrl: "static/main.html"
+    }).when("/state/:path*", {
+        templateUrl: "static/state.html",
+        controller: "tbStateCtrl"
+    }).otherwise({
+        redirectTo: "/"
+    });
 });
 
 app.controller("tbBreadCtrl", ['$scope', '$location', function($scope, $location) {
-    $scope.$on('$locationChangeSuccess', function() {
-        $scope.path = $location.path().replace('/state/', '');
-    });
+    $scope.path = $location.path().replace('/state/', '');
 }]);
 
 app.controller("tbListCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
@@ -33,47 +40,45 @@ app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, 
         });
     });
 
-    $scope.$on('$locationChangeSuccess', function() {
-        $http.get('api'+$location.url(), {cache: true}).then(function(response){
-            $scope.path = $location.path();
-            $scope.details = response.data;
-            $scope.selectedVersion = $scope.details.version_id;
-            var mods = $scope.details.modules;
+    $http.get('api'+$location.url(), {cache: true}).then(function(response){
+        $scope.path = $location.path();
+        $scope.details = response.data;
+        $scope.selectedVersion = $scope.details.version_id;
+        var mods = $scope.details.modules;
 
-            // Init
-            if ($location.hash() != "") {
-                // Default
-                $scope.selectedmod = 0;
+        // Init
+        if ($location.hash() != "") {
+            // Default
+            $scope.selectedmod = 0;
 
-                // Search for module in selected res
-                var targetRes = $location.hash();
-                for (i=0; i < mods.length; i++) {
-                    if (targetRes.startsWith(mods[i].path+'.')) {
-                        $scope.selectedmod = i;
-                    }
+            // Search for module in selected res
+            var targetRes = $location.hash();
+            for (i=0; i < mods.length; i++) {
+                if (targetRes.startsWith(mods[i].path+'.')) {
+                    $scope.selectedmod = i;
                 }
-
-                targetRes = targetRes.replace(mods[$scope.selectedmod].path+'.', '');
-                var resources = mods[$scope.selectedmod].resources;
-                for (j=0; j < resources.length; j++) {
-                    if (targetRes == resources[j].type+'.'+resources[j].name) {
-                        $scope.selectedres = j;
-                        break;
-                    }
-                }
-
-                // Init display.mod
-                $scope.display.mod = $scope.selectedmod;
             }
 
-            $scope.setSelected = function(m, r) {
-                var mod = $scope.details.modules[m];
-                var res = mod.resources[r];
-                var res_title = res.type+'.'+res.name;
-                var hash = (mod == 0) ? res_title : mod.path+'.'+res_title;
-                $location.hash(hash);
-            };
-        });
+            targetRes = targetRes.replace(mods[$scope.selectedmod].path+'.', '');
+            var resources = mods[$scope.selectedmod].resources;
+            for (j=0; j < resources.length; j++) {
+                if (targetRes == resources[j].type+'.'+resources[j].name) {
+                    $scope.selectedres = j;
+                    break;
+                }
+            }
+
+            // Init display.mod
+            $scope.display.mod = $scope.selectedmod;
+        }
+
+        $scope.setSelected = function(m, r) {
+            var mod = $scope.details.modules[m];
+            var res = mod.resources[r];
+            var res_title = res.type+'.'+res.name;
+            var hash = (mod == 0) ? res_title : mod.path+'.'+res_title;
+            $location.hash(hash);
+        };
     });
 }]);
 

@@ -16,13 +16,17 @@
 
         <ul class="nav navbar-nav navbar-collapse collapse" id="navbar-collapse-menu">
             <li class="dropdown" ng-controller="tbListCtrl">
-                <a id="reports-list-button" class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
-                    Choose a statefile
-                    <span class="caret"></span>
-                </a>
-                <ul id="reports-list" class="dropdown-menu">
-                    <li ng-repeat="k in keys"><a href="state/{{k}}" target="_self">{{k}}</a></li>
-                </ul>
+                <ui-select ng-model="keys.selected"
+                           theme="bootstrap"
+                           ng-disabled="disabled"
+                           reset-search-input="false"
+                           style="min-width: 300px;"
+                           title="Choose a state file">
+                    <ui-select-match placeholder="Enter a state file path...">{{$select.selected.state}}</ui-select-match>
+                    <ui-select-choices repeat="k in keys | filter: $select.search">
+                        <a href="state/{{k}}" target="_self">{{k | highlight: $selected.search}}</a>
+                    </ui-select-choices>
+                </ui-select>
             </li>
         </ul>
 
