@@ -137,14 +137,17 @@ type SearchResult struct {
 }
 
 func SearchResource(query url.Values) (results []SearchResult) {
-	key := query.Get("key")
-	value := query.Get("value")
 	log.Infof("Searching for resource with query=%v", query)
+
+	selectQuery := make(map[string]interface{})
+	for k, v := range query {
+		selectQuery[k] = v[0]
+	}
 
 	db.Table("attributes").
 		Select("states.path, states.version_id, states.tf_version, states.serial, modules.path, resources.type, resources.name, attributes.key, attributes.value").
 		Joins("LEFT JOIN resources ON attributes.resource_id = resources.id LEFT JOIN modules ON resources.module_id = modules.id LEFT JOIN states ON modules.state_id = states.id").
-		Where("key = ? AND value = ?", key, value).
+		Where(selectQuery).
 		Find(&results)
 
 	return
