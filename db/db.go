@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"net/url"
 	"strings"
 
@@ -129,25 +130,27 @@ type SearchResult struct {
 	VersionId      string `gorm:"column:version_id" json:"version_id"`
 	TFVersion      string `gorm:"column:tf_version" json:"tf_version"`
 	Serial         int64  `gorm:"column:serial" json:"serial"`
-	ModulePath     string `gorm:"column:path" json:"module_path"`
+	ModulePath     string `gorm:"column:module_path" json:"module_path"`
 	ResourceType   string `gorm:"column:type" json:"resource_type"`
 	ResourceName   string `gorm:"column:name" json:"resource_name"`
 	AttributeKey   string `gorm:"column:key" json:"attribute_key"`
 	AttributeValue string `gorm:"column:value" json:"attribute_value"`
 }
 
-func SearchResource(query url.Values, defaultVersion string) (results []SearchResult) {
+func SearchResource(query url.Values) (results []SearchResult) {
 	log.Infof("Searching for resource with query=%v", query)
 
 	selectQuery := make(map[string]interface{})
 
-	var targetVersion string
-	switch v := query.Get("versionid"); string(v) {
-	case "*":
+	statesSelect := "states.serial"
+	targetVersion := string(query.Get("versionid"))
+	switch targetVersion {
 	case "":
-		targetVersion = defaultVersion
+		// Select most recent version of each path
+		statesSelect = "max(states.serial)"
+	case "*":
+		targetVersion = ""
 	default:
-		targetVersion = string(v)
 	}
 
 	if v := query.Get("type"); string(v) != "" {
@@ -159,31 +162,34 @@ func SearchResource(query url.Values, defaultVersion string) (results []SearchRe
 	}
 
 	baseSelect := db.Table("resources").
-		Select("states.path, states.version_id, states.tf_version, states.serial, modules.path, resources.type, resources.name").
-		Joins("LEFT JOIN modules ON resources.module_id = modules.id LEFT JOIN states ON modules.state_id = states.id").
-		Where(selectQuery)
+		Select(fmt.Sprintf("states.path, states.version_id, states.tf_version, %s as serial, modules.path as module_path, resources.type, resources.name", statesSelect)).
+		Group("states.path, modules.path, resources.type, resources.name").
+		Joins("LEFT JOIN modules ON resources.module_id = modules.id LEFT JOIN states ON modules.state_id = states.id")
 
 	if targetVersion != "" {
+		// filter by version unless we want all (*) or most recent ("")
 		baseSelect = baseSelect.Where("states.version_id = ?", targetVersion)
 	}
 
-	baseSelect.Find(&results)
+	baseSelect.Where(selectQuery).Find(&results)
 
 	return
 }
 
-func SearchAttribute(query url.Values, defaultVersion string) (results []SearchResult) {
+func SearchAttribute(query url.Values) (results []SearchResult) {
 	log.Infof("Searching for attribute with query=%v", query)
 
 	selectQuery := make(map[string]interface{})
 
-	var targetVersion string
-	switch v := query.Get("versionid"); string(v) {
-	case "*":
+	statesSelect := "states.serial"
+	targetVersion := string(query.Get("versionid"))
+	switch targetVersion {
 	case "":
-		targetVersion = defaultVersion
+		// Select most recent version of each path
+		statesSelect = "max(states.serial)"
+	case "*":
+		targetVersion = ""
 	default:
-		targetVersion = string(v)
 	}
 
 	if v := query.Get("key"); string(v) != "" {
@@ -195,15 +201,16 @@ func SearchAttribute(query url.Values, defaultVersion string) (results []SearchR
 	}
 
 	baseSelect := db.Table("attributes").
-		Select("states.path, states.version_id, states.tf_version, states.serial, modules.path, resources.type, resources.name, attributes.key, attributes.value").
-		Joins("LEFT JOIN resources ON attributes.resource_id = resources.id LEFT JOIN modules ON resources.module_id = modules.id LEFT JOIN states ON modules.state_id = states.id").
-		Where(selectQuery)
+		Select(fmt.Sprintf("states.path, states.version_id, states.tf_version, %s as serial, modules.path as module_path, resources.type, resources.name, attributes.key, attributes.value", statesSelect)).
+		Group("states.path, modules.path, resources.type, resources.name, attributes.key").
+		Joins("LEFT JOIN resources ON attributes.resource_id = resources.id LEFT JOIN modules ON resources.module_id = modules.id LEFT JOIN states ON modules.state_id = states.id")
 
 	if targetVersion != "" {
+		// filter by version unless we want all (*) or most recent ("")
 		baseSelect = baseSelect.Where("states.version_id = ?", targetVersion)
 	}
 
-	baseSelect.Find(&results)
+	baseSelect.Where(selectQuery).Find(&results)
 
 	return
 }

@@ -173,8 +173,7 @@ func ApiHistory(w http.ResponseWriter, r *http.Request) {
 func ApiSearchResource(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	query := r.URL.Query()
-	defaultV, _ := defaultVersion("")
-	result := db.SearchResource(query, defaultV)
+	result := db.SearchResource(query)
 	j, err := json.Marshal(result)
 	if err != nil {
 		log.Errorf("Failed to marshal json: %v", err)
@@ -185,8 +184,7 @@ func ApiSearchResource(w http.ResponseWriter, r *http.Request) {
 func ApiSearchAttribute(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	query := r.URL.Query()
-	defaultV, _ := defaultVersion("")
-	result := db.SearchAttribute(query, defaultV)
+	result := db.SearchAttribute(query)
 	j, err := json.Marshal(result)
 	if err != nil {
 		log.Errorf("Failed to marshal json: %v", err)
