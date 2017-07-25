@@ -153,19 +153,38 @@ func SearchResource(query url.Values) (results []SearchResult) {
 	return
 }
 
-func SearchAttribute(query url.Values) (results []SearchResult) {
+func SearchAttribute(query url.Values, defaultVersion string) (results []SearchResult) {
 	log.Infof("Searching for attribute with query=%v", query)
 
 	selectQuery := make(map[string]interface{})
-	for k, v := range query {
-		selectQuery[k] = v[0]
+
+	var targetVersion string
+	switch v := query.Get("versionid"); string(v) {
+	case "*":
+	case "":
+		targetVersion = defaultVersion
+	default:
+		targetVersion = string(v)
 	}
 
-	db.Table("attributes").
+	if v := query.Get("key"); string(v) != "" {
+		selectQuery["key"] = string(v)
+	}
+
+	if v := query.Get("value"); string(v) != "" {
+		selectQuery["value"] = string(v)
+	}
+
+	baseSelect := db.Table("attributes").
 		Select("states.path, states.version_id, states.tf_version, states.serial, modules.path, resources.type, resources.name, attributes.key, attributes.value").
 		Joins("LEFT JOIN resources ON attributes.resource_id = resources.id LEFT JOIN modules ON resources.module_id = modules.id LEFT JOIN states ON modules.state_id = states.id").
-		Where(selectQuery).
-		Find(&results)
+		Where(selectQuery)
+
+	if targetVersion != "" {
+		baseSelect = baseSelect.Where("states.version_id = ?", targetVersion)
+	}
+
+	baseSelect.Find(&results)
 
 	return
 }
