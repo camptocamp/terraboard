@@ -171,7 +171,9 @@ func SearchResource(query url.Values) (results []SearchResult) {
 		baseSelect = baseSelect.Where("states.version_id = ?", targetVersion)
 	}
 
-	baseSelect.Where(selectQuery).Find(&results)
+	baseSelect.Where(selectQuery).
+		Order("states.path, states.serial, modules.path, resources.type, resources.name").
+		Find(&results)
 
 	return
 }
@@ -210,7 +212,9 @@ func SearchAttribute(query url.Values) (results []SearchResult) {
 		baseSelect = baseSelect.Where("states.version_id = ?", targetVersion)
 	}
 
-	baseSelect.Where(selectQuery).Find(&results)
+	baseSelect.Where(selectQuery).
+		Order("states.path, states.serial, modules.path, resources.type, resources.name, attributes.key").
+		Find(&results)
 
 	return
 }
