@@ -97,7 +97,7 @@ app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', 
         $scope.attribute_keys = response.data;
     });
 
-    $scope.doSearch= function() {
+    $scope.doSearch = function() {
         var params = {};
         if ($scope.resType != "") {
             params.type = $scope.resType;
@@ -116,5 +116,13 @@ app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', 
         $http.get('api/search/attribute?'+query).then(function(response){
             $scope.results = response.data;
         });
+    }
+
+    $scope.clearForm = function() {
+        $scope.resType = undefined;
+        $scope.resID = undefined;
+        $scope.attrKey = undefined;
+        $scope.attrVal = undefined;
+        $scope.results = undefined;
     }
 }]);
