@@ -173,13 +173,13 @@ func (db *Database) SearchResource(query url.Values) (results []SearchResult) {
 	sql := "SELECT states.path, states.version_id, states.tf_version, states.serial, modules.path as module_path, resources.type, resources.name"
 
 	if targetVersion == "" {
-		sql += " FROM (SELECT states.path, max(states.serial) as mx FROM states GROUP BY states.path) t"
+		sql += " FROM (SELECT states.path, max(states.serial) as mx FROM states GROUP BY states.path) t" +
+			" JOIN states ON t.path = states.path AND t.mx = states.serial"
 	} else {
 		sql += " FROM states"
 	}
 
-	sql += " JOIN states ON t.path = states.path AND t.mx = states.serial" +
-		" JOIN modules ON states.id = modules.state_id" +
+	sql += " JOIN modules ON states.id = modules.state_id" +
 		" JOIN resources ON modules.id = resources.module_id"
 
 	var where []string
@@ -221,13 +221,13 @@ func (db *Database) SearchAttribute(query url.Values) (results []SearchResult) {
 	sql := "SELECT states.path, states.version_id, states.tf_version, states.serial, modules.path as module_path, resources.type, resources.name, attributes.key, attributes.value"
 
 	if targetVersion == "" {
-		sql += " FROM (SELECT states.path, max(states.serial) as mx FROM states GROUP BY states.path) t"
+		sql += " FROM (SELECT states.path, max(states.serial) as mx FROM states GROUP BY states.path) t" +
+			" JOIN states ON t.path = states.path AND t.mx = states.serial"
 	} else {
 		sql += " FROM states"
 	}
 
-	sql += " JOIN states ON t.path = states.path AND t.mx = states.serial" +
-		" JOIN modules ON states.id = modules.state_id" +
+	sql += " JOIN modules ON states.id = modules.state_id" +
 		" JOIN resources ON modules.id = resources.module_id" +
 		" JOIN attributes ON resources.id = attributes.resource_id"
 
