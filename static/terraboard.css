@@ -185,3 +185,6 @@ pre.sh_sourceCode .sh_oldfile {
     margin: 0 auto;
     width: 30vh;
 }
+#navigate span {
+  cursor: pointer;
+}
