@@ -5,23 +5,34 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/hashicorp/terraform/terraform"
 
 	"github.com/jinzhu/gorm"
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
-var db *gorm.DB
+type Database struct {
+	*gorm.DB
+}
+
+type Version struct {
+	ID           uint      `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
+	VersionID    string    `gorm:"index" json:"version_id"`
+	LastModified time.Time `json:"last_modified"`
+}
 
 type State struct {
 	gorm.Model `json:"-"`
-	Path       string   `gorm:"index" json:"path"`
-	VersionId  string   `gorm:"index" json:"version_id"`
-	TFVersion  string   `json:"terraform_version"`
-	Serial     int64    `json:"serial"`
-	Modules    []Module `json:"modules"`
+	Path       string        `gorm:"index" json:"path"`
+	Version    Version       `json:"version"`
+	VersionID  sql.NullInt64 `gorm:"index" json:"-"`
+	TFVersion  string        `json:"terraform_version"`
+	Serial     int64         `json:"serial"`
+	Modules    []Module      `json:"modules"`
 }
 
 type Module struct {
@@ -46,9 +57,9 @@ type Attribute struct {
 	Value      string        `json:"value"`
 }
 
-func Init() {
+func Init() *Database {
 	var err error
-	db, err = gorm.Open("sqlite3", "./db/terraboard.db")
+	db, err := gorm.Open("postgres", "host=db user=gorm dbname=gorm sslmode=disable password=mypassword")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -56,17 +67,21 @@ func Init() {
 
 	log.Infof("Automigrate")
 
-	db.AutoMigrate(&State{}, &Module{}, &Resource{}, &Attribute{})
+	db.AutoMigrate(&Version{}, &State{}, &Module{}, &Resource{}, &Attribute{})
 
 	db.LogMode(true)
 
 	log.Infof("New db is %v", db)
+
+	return &Database{db}
 }
 
-func stateS3toDB(state *terraform.State, path string, versionId string) (st State) {
+func (db *Database) stateS3toDB(state *terraform.State, path string, versionId string) (st State) {
+	var version Version
+	db.First(&version, Version{VersionID: versionId})
 	st = State{
 		Path:      path,
-		VersionId: versionId,
+		Version:   version,
 		TFVersion: state.TFVersion,
 		Serial:    state.Serial,
 	}
@@ -95,27 +110,39 @@ func stateS3toDB(state *terraform.State, path string, versionId string) (st Stat
 	return
 }
 
-func InsertState(path string, versionId string, state *terraform.State) error {
+func (db *Database) InsertState(path string, versionId string, state *terraform.State) error {
 	var testState State
-	db.Find(&testState, "path = ? AND version_id = ?", path, versionId)
+	db.Joins("JOIN versions on states.version_id=versions.id").
+		Find(&testState, "states.path = ? AND versions.version_id = ?", path, versionId)
 	if testState.Path == path {
 		log.Infof("State %s/%s is already in the DB", path, versionId)
 		return nil
 	}
 
-	st := stateS3toDB(state, path, versionId)
+	st := db.stateS3toDB(state, path, versionId)
 	db.Create(&st)
 	return nil
 }
 
-func GetState(path, versionId string) (state State) {
-	db.Preload("Modules").Preload("Modules.Resources").Preload("Modules.Resources.Attributes").Find(&state, "path = ? AND version_id = ?", path, versionId)
+func (db *Database) InsertVersion(version *s3.ObjectVersion) error {
+	var v Version
+	db.FirstOrCreate(&v, Version{
+		VersionID:    *version.VersionId,
+		LastModified: *version.LastModified,
+	})
+	return nil
+}
+
+func (db *Database) GetState(path, versionId string) (state State) {
+	db.Joins("JOIN versions on states.version_id=versions.id").
+		Preload("Version").Preload("Modules").Preload("Modules.Resources").Preload("Modules.Resources.Attributes").
+		Find(&state, "states.path = ? AND versions.version_id = ?", path, versionId)
 	return
 }
 
-func KnownVersions() (versions []string) {
+func (db *Database) KnownVersions() (versions []string) {
 	// TODO: err
-	rows, _ := db.Table("states").Select("DISTINCT version_id").Rows()
+	rows, _ := db.Table("versions").Select("DISTINCT version_id").Rows()
 	defer rows.Close()
 	for rows.Next() {
 		var version string
@@ -137,10 +164,8 @@ type SearchResult struct {
 	AttributeValue string `gorm:"column:value" json:"attribute_value"`
 }
 
-func SearchResource(query url.Values) (results []SearchResult) {
+func (db *Database) SearchResource(query url.Values) (results []SearchResult) {
 	log.Infof("Searching for resource with query=%v", query)
-
-	selectQuery := make(map[string]interface{})
 
 	statesSelect := "states.serial"
 	targetVersion := string(query.Get("versionid"))
@@ -153,35 +178,45 @@ func SearchResource(query url.Values) (results []SearchResult) {
 	default:
 	}
 
+	// gorm doesn't support subqueries...
+	sql := "SELECT states.path, states.version_id, states.tf_version, states.serial, modules.path as module_path, resources.type, resources.name" +
+		fmt.Sprintf(" FROM (SELECT states.path, %s as mx FROM states GROUP BY states.path) t", statesSelect) +
+		" JOIN states ON t.path = states.path AND t.mx = states.serial" +
+		" JOIN modules ON states.id = modules.state_id" +
+		" JOIN resources ON modules.id = resources.module_id"
+
+	var where []string
+	if targetVersion != "" {
+		// filter by version unless we want all (*) or most recent ("")
+		where = append(where, fmt.Sprintf("states.version_id = '%s'", targetVersion))
+	}
+
 	if v := query.Get("type"); string(v) != "" {
-		selectQuery["type"] = string(v)
+		where = append(where, fmt.Sprintf("resources.type LIKE '%s'", fmt.Sprintf("%%%s%%", v)))
 	}
 
 	if v := query.Get("name"); string(v) != "" {
-		selectQuery["name"] = string(v)
+		where = append(where, fmt.Sprintf("resources.name LIKE '%s'", fmt.Sprintf("%%%s%%", v)))
 	}
 
-	baseSelect := db.Table("resources").
-		Select(fmt.Sprintf("states.path, states.version_id, states.tf_version, %s as serial, modules.path as module_path, resources.type, resources.name", statesSelect)).
-		Group("states.path, modules.path, resources.type, resources.name").
-		Joins("LEFT JOIN modules ON resources.module_id = modules.id LEFT JOIN states ON modules.state_id = states.id")
+	if len(where) > 0 {
+		sql += fmt.Sprintf(" WHERE %s", strings.Join(where, " AND "))
+	}
+	sql += " ORDER BY states.path, states.serial, modules.path, resources.type, resources.name"
 
-	if targetVersion != "" {
-		// filter by version unless we want all (*) or most recent ("")
-		baseSelect = baseSelect.Where("states.version_id = ?", targetVersion)
+	// Limit and offset
+	sql += " LIMIT 100"
+	if v := query.Get("from"); string(v) != "" {
+		sql += fmt.Sprintf(" OFFSET %s", string(v))
 	}
 
-	baseSelect.Where(selectQuery).
-		Order("states.path, states.serial, modules.path, resources.type, resources.name").
-		Find(&results)
+	db.Raw(sql).Scan(&results)
 
 	return
 }
 
-func SearchAttribute(query url.Values) (results []SearchResult) {
+func (db *Database) SearchAttribute(query url.Values) (results []SearchResult) {
 	log.Infof("Searching for attribute with query=%v", query)
-
-	selectQuery := make(map[string]interface{})
 
 	statesSelect := "states.serial"
 	targetVersion := string(query.Get("versionid"))
@@ -194,40 +229,53 @@ func SearchAttribute(query url.Values) (results []SearchResult) {
 	default:
 	}
 
-	baseSelect := db.Table("attributes").
-		Select(fmt.Sprintf("states.path, states.version_id, states.tf_version, %s as serial, modules.path as module_path, resources.type, resources.name, attributes.key, attributes.value", statesSelect)).
-		Group("states.path, modules.path, resources.type, resources.name, attributes.key").
-		Joins("LEFT JOIN resources ON attributes.resource_id = resources.id LEFT JOIN modules ON resources.module_id = modules.id LEFT JOIN states ON modules.state_id = states.id")
+	// gorm doesn't support subqueries...
+	sql := "SELECT states.path, states.version_id, states.tf_version, states.serial, modules.path as module_path, resources.type, resources.name, attributes.key, attributes.value" +
+		fmt.Sprintf(" FROM (SELECT states.path, %s as mx FROM states GROUP BY states.path) t", statesSelect) +
+		" JOIN states ON t.path = states.path AND t.mx = states.serial" +
+		" JOIN modules ON states.id = modules.state_id" +
+		" JOIN resources ON modules.id = resources.module_id" +
+		" JOIN attributes ON resources.id = attributes.resource_id"
 
+	var where []string
 	if targetVersion != "" {
 		// filter by version unless we want all (*) or most recent ("")
-		baseSelect = baseSelect.Where("states.version_id = ?", targetVersion)
+		where = append(where, fmt.Sprintf("states.version_id = '%s'", targetVersion))
 	}
 
 	if v := query.Get("type"); string(v) != "" {
-		baseSelect = baseSelect.Where("resources.type LIKE ?", fmt.Sprintf("%%%s%%", v))
+		where = append(where, fmt.Sprintf("resources.type LIKE '%s'", fmt.Sprintf("%%%s%%", v)))
 	}
 
 	if v := query.Get("name"); string(v) != "" {
-		baseSelect = baseSelect.Where("resources.name LIKE ?", fmt.Sprintf("%%%s%%", v))
+		where = append(where, fmt.Sprintf("resources.name LIKE '%s'", fmt.Sprintf("%%%s%%", v)))
 	}
 
 	if v := query.Get("key"); string(v) != "" {
-		baseSelect = baseSelect.Where("attributes.key LIKE ?", fmt.Sprintf("%%%s%%", v))
+		where = append(where, fmt.Sprintf("attributes.key LIKE '%s'", fmt.Sprintf("%%%s%%", v)))
 	}
 
 	if v := query.Get("value"); string(v) != "" {
-		baseSelect = baseSelect.Where("attributes.value LIKE ?", fmt.Sprintf("%%%s%%", v))
+		where = append(where, fmt.Sprintf("attributes.value LIKE '%s'", fmt.Sprintf("%%%s%%", v)))
 	}
 
-	baseSelect.Where(selectQuery).
-		Order("states.path, states.serial, modules.path, resources.type, resources.name, attributes.key").
-		Find(&results)
+	if len(where) > 0 {
+		sql += fmt.Sprintf(" WHERE %s", strings.Join(where, " AND "))
+	}
+	sql += " ORDER BY states.path, states.serial, modules.path, resources.type, resources.name, attributes.key"
+
+	// Limit and offset
+	sql += " LIMIT 100"
+	if v := query.Get("from"); string(v) != "" {
+		sql += fmt.Sprintf(" OFFSET %s", string(v))
+	}
+
+	db.Raw(sql).Find(&results)
 
 	return
 }
 
-func listField(table, field string) (results []string, err error) {
+func (db *Database) listField(table, field string) (results []string, err error) {
 	rows, err := db.Table(table).Select(fmt.Sprintf("DISTINCT %s", field)).Rows()
 	defer rows.Close()
 	if err != nil {
@@ -243,15 +291,15 @@ func listField(table, field string) (results []string, err error) {
 	return
 }
 
-func ListResourceTypes() ([]string, error) {
-	return listField("resources", "type")
+func (db *Database) ListResourceTypes() ([]string, error) {
+	return db.listField("resources", "type")
 }
 
-func ListResourceNames() ([]string, error) {
-	return listField("resources", "name")
+func (db *Database) ListResourceNames() ([]string, error) {
+	return db.listField("resources", "name")
 }
 
-func ListAttributeKeys(resourceType string) (results []string, err error) {
+func (db *Database) ListAttributeKeys(resourceType string) (results []string, err error) {
 	query := db.Table("attributes").
 		Select(fmt.Sprintf("DISTINCT %s", "key")).
 		Joins("LEFT JOIN resources ON attributes.resource_id = resources.id")
