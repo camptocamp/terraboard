@@ -73,12 +73,6 @@
                 </a>
             </th>
             <th>
-                <a href="#" ng-click="sortType = 'version_id'">
-                    Version ID
-                    <span ng-show="sortType == 'version_id'" class="glyphicon glyphicon-chevron-down"></span>
-                </a>
-            </th>
-            <th>
                 <a href="#" ng-click="sortType = 'tf_version'">
                     TF Version
                     <span ng-show="sortType == 'tf_version'" class="glyphicon glyphicon-chevron-down"></span>
@@ -94,12 +88,6 @@
                 <a href="#" ng-click="sortType = 'module_path'">
                     Module Path
                     <span ng-show="sortType == 'module_path'" class="glyphicon glyphicon-chevron-down"></span>
-                </a>
-            </th>
-            <th>
-                <a href="#" ng-click="sortType = 'resource_type'">
-                    Resource Type
-                    <span ng-show="sortType == 'resource_type'" class="glyphicon glyphicon-chevron-down"></span>
                 </a>
             </th>
             <th>
@@ -122,14 +110,12 @@
             </th>
         </thead>
         <tbody>
-            <tr ng-repeat="r in results | orderBy:sortType:sortReverse">
+            <tr ng-repeat="r in results.results | orderBy:sortType:sortReverse">
                 <td><a href="state/{{r.path}}?versionid={{r.version_id}}#{{r.module_path}}.{{r.resource_type}}.{{r.resource_name}}"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></td>
                 <td>{{r.path}}</td>
-                <td>{{r.version_id}}</td>
                 <td>{{r.tf_version}}</td>
                 <td>{{r.serial}}</td>
                 <td>{{r.module_path}}</td>
-                <td>{{r.resource_type}}</td>
                 <td>{{r.resource_name}}</td>
                 <td>{{r.attribute_key}}</td>
                 <td>{{r.attribute_value}}</td>
