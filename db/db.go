@@ -27,8 +27,8 @@ type Version struct {
 
 type State struct {
 	gorm.Model `json:"-"`
-	Path       string `gorm:"index" json:"path"`
-	Version    Version
+	Path       string        `gorm:"index" json:"path"`
+	Version    Version       `json:"version"`
 	VersionID  sql.NullInt64 `gorm:"index" json:"-"`
 	TFVersion  string        `json:"terraform_version"`
 	Serial     int64         `json:"serial"`
