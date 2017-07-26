@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/camptocamp/terraboard/db"
 	"github.com/camptocamp/terraboard/s3"
 	"github.com/camptocamp/terraboard/util"
@@ -14,32 +13,45 @@ import (
 
 var states []string
 
+func JSONError(w http.ResponseWriter, message string, err error) {
+	errObj := make(map[string]string)
+	errObj["error"] = message
+	errObj["details"] = fmt.Sprintf("%v", err)
+	j, _ := json.Marshal(errObj)
+	io.WriteString(w, string(j))
+}
+
 func ListStates(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	states, err := s3.GetStates()
 	if err != nil {
-		errObj := make(map[string]string)
-		errObj["error"] = "Failed to list states"
-		errObj["details"] = fmt.Sprintf("%v", err)
-		j, _ := json.Marshal(errObj)
-		io.WriteString(w, string(j))
-		return
+		JSONError(w, "Failed to list states", err)
 	}
 
-	j, _ := json.Marshal(states)
+	j, err := json.Marshal(states)
+	if err != nil {
+		JSONError(w, "Failed to marshal states", err)
+	}
 	io.WriteString(w, string(j))
 }
 
 func GetState(w http.ResponseWriter, r *http.Request, d *db.Database) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	st := util.TrimBase(r, "api/state/")
 	versionId := r.URL.Query().Get("versionid")
+	var err error
 	if versionId == "" {
-		versionId, _ = d.DefaultVersion(st) // TODO: err
+		versionId, err = d.DefaultVersion(st)
+		if err != nil {
+			JSONError(w, "Failed to retrieve default version", err)
+		}
 	}
 	state := d.GetState(st, versionId)
 
-	jState, _ := json.Marshal(state)
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	jState, err := json.Marshal(state)
+	if err != nil {
+		JSONError(w, "Failed to marshal state", err)
+	}
 	io.WriteString(w, string(jState))
 }
 
@@ -48,20 +60,12 @@ func GetHistory(w http.ResponseWriter, r *http.Request) {
 	st := util.TrimBase(r, "api/history/")
 	result, err := s3.GetVersions(st)
 	if err != nil {
-		errObj := make(map[string]string)
-		errObj["error"] = fmt.Sprintf("State file history not found: %v", st)
-		errObj["details"] = fmt.Sprintf("%v", err)
-		j, err := json.Marshal(errObj)
-		if err != nil {
-			log.Errorf("Failed to marshal json: %v", err)
-		}
-		io.WriteString(w, string(j))
-		return
+		JSONError(w, fmt.Sprintf("State file history not found: %v", st), err)
 	}
 
 	j, err := json.Marshal(result)
 	if err != nil {
-		log.Errorf("Failed to marshal json: %v", err)
+		JSONError(w, "Failed to marshal history", err)
 	}
 	io.WriteString(w, string(j))
 }
@@ -79,7 +83,7 @@ func SearchAttribute(w http.ResponseWriter, r *http.Request, d *db.Database) {
 
 	j, err := json.Marshal(response)
 	if err != nil {
-		log.Errorf("Failed to marshal json: %v", err)
+		JSONError(w, "Failed to marshal json", err)
 	}
 	io.WriteString(w, string(j))
 }
@@ -89,7 +93,7 @@ func ListResourceTypes(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	result, _ := d.ListResourceTypes()
 	j, err := json.Marshal(result)
 	if err != nil {
-		log.Errorf("Failed to marshal json: %v", err)
+		JSONError(w, "Failed to marshal json", err)
 	}
 	io.WriteString(w, string(j))
 }
@@ -99,7 +103,7 @@ func ListResourceNames(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	result, _ := d.ListResourceNames()
 	j, err := json.Marshal(result)
 	if err != nil {
-		log.Errorf("Failed to marshal json: %v", err)
+		JSONError(w, "Failed to marshal json", err)
 	}
 	io.WriteString(w, string(j))
 }
@@ -110,7 +114,7 @@ func ListAttributeKeys(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	result, _ := d.ListAttributeKeys(resourceType)
 	j, err := json.Marshal(result)
 	if err != nil {
-		log.Errorf("Failed to marshal json: %v", err)
+		JSONError(w, "Failed to marshal json", err)
 	}
 	io.WriteString(w, string(j))
 }
