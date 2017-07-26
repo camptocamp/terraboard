@@ -204,6 +204,12 @@ func (db *Database) SearchResource(query url.Values) (results []SearchResult) {
 	}
 	sql += " ORDER BY states.path, states.serial, modules.path, resources.type, resources.name"
 
+	// Limit and offset
+	sql += " LIMIT 100"
+	if v := query.Get("from"); string(v) != "" {
+		sql += fmt.Sprintf(" OFFSET %s", string(v))
+	}
+
 	db.Raw(sql).Scan(&results)
 
 	return
@@ -257,6 +263,12 @@ func (db *Database) SearchAttribute(query url.Values) (results []SearchResult) {
 		sql += fmt.Sprintf(" WHERE %s", strings.Join(where, " AND "))
 	}
 	sql += " ORDER BY states.path, states.serial, modules.path, resources.type, resources.name, attributes.key"
+
+	// Limit and offset
+	sql += " LIMIT 100"
+	if v := query.Get("from"); string(v) != "" {
+		sql += fmt.Sprintf(" OFFSET %s", string(v))
+	}
 
 	db.Raw(sql).Find(&results)
 
