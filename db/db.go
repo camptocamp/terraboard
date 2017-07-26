@@ -57,6 +57,8 @@ type Attribute struct {
 	Value      string        `json:"value"`
 }
 
+var pageSize = 20
+
 func Init() *Database {
 	var err error
 	db, err := gorm.Open("postgres", "host=db user=gorm dbname=gorm sslmode=disable password=mypassword")
@@ -205,7 +207,7 @@ func (db *Database) SearchAttribute(query url.Values) (results []SearchResult, t
 	sql := "SELECT states.path, states.version_id, states.tf_version, states.serial, modules.path as module_path, resources.type, resources.name, attributes.key, attributes.value" +
 		sqlQuery +
 		" ORDER BY states.path, states.serial, modules.path, resources.type, resources.name, attributes.key" +
-		" LIMIT 100"
+		fmt.Sprintf(" LIMIT %v", pageSize)
 
 	if v := query.Get("from"); string(v) != "" {
 		sql += fmt.Sprintf(" OFFSET %s", string(v))
