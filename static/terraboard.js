@@ -107,6 +107,7 @@ app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', 
 
     $scope.itemsPerPage = 20;
     $scope.page = 1;
+    $scope.nextPage = 2;
 
     $scope.doSearch = function(page) {
         var params = {};
@@ -124,13 +125,15 @@ app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', 
         }
         if (page != undefined) {
             params.page = page;
-            $scope.page = page;
         }
         var query = $.param(params);
         console.log(query);
         $http.get('api/search/attribute?'+query).then(function(response){
             $scope.results = response.data;
             $scope.pages = Math.ceil($scope.results.total / $scope.itemsPerPage);
+            $scope.page = $scope.results.page;
+            $scope.prevPage = (page <= 1) ? undefined : $scope.page - 1;
+            $scope.nextPage = (page >= $scope.pages) ? undefined : $scope.page + 1;
             $scope.startItems = $scope.itemsPerPage*($scope.page-1)+1;
             $scope.itemsInPage = Math.min($scope.itemsPerPage*$scope.page, $scope.results.total)
         });

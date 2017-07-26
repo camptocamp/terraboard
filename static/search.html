@@ -60,7 +60,7 @@
 </form>
 <hr />
 
-<label>Total: {{results.total}}</label>
+<label ng-show="results"><span class="glyphicon glyphicon-triangle-left" ng-click="doSearch(prevPage)" ng-show="prevPage"></span> {{startItems}}-{{itemsInPage}}/{{results.total}} <span class="glyphicon glyphicon-triangle-right" ng-click="doSearch(nextPage)" ng-show="nextPage"></span></label>
 
 <div id="results">
     <table class="table table-border table-striped">
