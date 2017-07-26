@@ -95,28 +95,13 @@ func ApiState(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	st := util.TrimBase(r, "api/state/")
 	versionId := r.URL.Query().Get("versionid")
 	if versionId == "" {
-		versionId, _ = defaultVersion(st) // TODO: err
+		versionId, _ = d.DefaultVersion(st) // TODO: err
 	}
 	state := d.GetState(st, versionId)
 
 	jState, _ := json.Marshal(state)
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	io.WriteString(w, string(jState))
-}
-
-func defaultVersion(path string) (string, error) {
-	versions, err := getVersions(path) // TODO: err
-	if err != nil {
-		return "", fmt.Errorf("Failed to list versions for %s: %v", path, err)
-	}
-
-	for _, v := range versions {
-		if *v.IsLatest {
-			return *v.VersionId, nil
-		}
-	}
-
-	return "", fmt.Errorf("Failed to find default version for %s", path)
 }
 
 func getVersions(prefix string) (versions []*s3.ObjectVersion, err error) {
