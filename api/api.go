@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/camptocamp/terraboard/db"
@@ -14,36 +13,6 @@ import (
 )
 
 var states []string
-
-func RefreshDB(d *db.Database) {
-	for {
-		log.Infof("Refreshing DB from S3")
-		states, err := s3.GetStates()
-		if err != nil {
-			log.Errorf("Failed to build cache: %s", err)
-		}
-
-		for _, st := range states {
-			versions, _ := s3.GetVersions(st)
-			for _, v := range versions {
-				d.InsertVersion(v)
-
-				s := d.GetState(st, *v.VersionId)
-				if s.Path == st {
-					log.Infof("State %s/%s is already in the DB, skipping", st, *v.VersionId)
-					continue
-				}
-				state, _ := s3.GetState(st, *v.VersionId)
-				d.InsertState(st, *v.VersionId, state)
-				if err != nil {
-					log.Errorf("Failed to insert state %s/%s: %v", st, *v.VersionId, err)
-				}
-			}
-		}
-
-		time.Sleep(1 * time.Minute)
-	}
-}
 
 func ListStates(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
