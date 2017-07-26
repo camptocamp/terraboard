@@ -1,5 +1,5 @@
-#FROM golang:1.8.3 as builder
-FROM tb-builder as builder
+FROM golang:1.8.3 as builder
+#FROM tb-builder as builder
 RUN go get github.com/aws/aws-sdk-go github.com/Sirupsen/logrus github.com/hashicorp/terraform github.com/jinzhu/gorm github.com/lib/pq
 WORKDIR /go/src/github.com/camptocamp/terraboard
 COPY . .
