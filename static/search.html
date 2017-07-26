@@ -10,7 +10,7 @@
                    reset-search-input="false"
                    title="Resource Type">
             <ui-select-match placeholder="Resource Type">{{$parent.resType}}</ui-select-match>
-            <ui-select-choices repeat="k in resource_keys | filter: $select.search">
+            <ui-select-choices repeat="k in resource_keys | filter: $select.search | orderBy">
                 {{k}}
             </ui-select-choices>
         </ui-select>
@@ -26,7 +26,7 @@
                    reset-search-input="false"
                    title="Resource ID">
             <ui-select-match placeholder="Resource ID">{{$parent.resID}}</ui-select-match>
-            <ui-select-choices repeat="k in resource_names | filter: $parent.resType | filter: $select.search">
+            <ui-select-choices repeat="k in resource_names | filter: $parent.resType | filter: $select.search | orderBy">
                 {{k}}
             </ui-select-choices>
         </ui-select>
@@ -43,7 +43,7 @@
                    title="Attribute Key">
             <ui-select-match placeholder="Attribute Key">{{$parent.attrKey}}</ui-select-match>
             <ui-select-choices
-                repeat="k in attribute_keys | filter: $select.search"
+                repeat="k in attribute_keys | filter: $select.search | orderBy"
                 refresh="refreshAttrKeys()"
                 refresh-delay="0">
                 {{k}}
