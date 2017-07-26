@@ -63,16 +63,11 @@ func Init() *Database {
 	if err != nil {
 		log.Fatal(err)
 	}
-	//defer db.Close()
 
 	log.Infof("Automigrate")
-
 	db.AutoMigrate(&Version{}, &State{}, &Module{}, &Resource{}, &Attribute{})
 
 	db.LogMode(true)
-
-	log.Infof("New db is %v", db)
-
 	return &Database{db}
 }
 
@@ -111,14 +106,6 @@ func (db *Database) stateS3toDB(state *terraform.State, path string, versionId s
 }
 
 func (db *Database) InsertState(path string, versionId string, state *terraform.State) error {
-	var testState State
-	db.Joins("JOIN versions on states.version_id=versions.id").
-		Find(&testState, "states.path = ? AND versions.version_id = ?", path, versionId)
-	if testState.Path == path {
-		log.Infof("State %s/%s is already in the DB", path, versionId)
-		return nil
-	}
-
 	st := db.stateS3toDB(state, path, versionId)
 	db.Create(&st)
 	return nil
@@ -164,70 +151,20 @@ type SearchResult struct {
 	AttributeValue string `gorm:"column:value" json:"attribute_value"`
 }
 
-func (db *Database) SearchResource(query url.Values) (results []SearchResult) {
-	log.Infof("Searching for resource with query=%v", query)
-
-	targetVersion := string(query.Get("versionid"))
-
-	// gorm doesn't support subqueries...
-	sql := "SELECT states.path, states.version_id, states.tf_version, states.serial, modules.path as module_path, resources.type, resources.name"
-
-	if targetVersion == "" {
-		sql += " FROM (SELECT states.path, max(states.serial) as mx FROM states GROUP BY states.path) t" +
-			" JOIN states ON t.path = states.path AND t.mx = states.serial"
-	} else {
-		sql += " FROM states"
-	}
-
-	sql += " JOIN modules ON states.id = modules.state_id" +
-		" JOIN resources ON modules.id = resources.module_id"
-
-	var where []string
-	if targetVersion != "" {
-		// filter by version unless we want all (*) or most recent ("")
-		where = append(where, fmt.Sprintf("states.version_id = '%s'", targetVersion))
-	}
-
-	if v := query.Get("type"); string(v) != "" {
-		where = append(where, fmt.Sprintf("resources.type LIKE '%s'", fmt.Sprintf("%%%s%%", v)))
-	}
-
-	if v := query.Get("name"); string(v) != "" {
-		where = append(where, fmt.Sprintf("resources.name LIKE '%s'", fmt.Sprintf("%%%s%%", v)))
-	}
-
-	if len(where) > 0 {
-		sql += fmt.Sprintf(" WHERE %s", strings.Join(where, " AND "))
-	}
-	sql += " ORDER BY states.path, states.serial, modules.path, resources.type, resources.name"
-
-	// Limit and offset
-	sql += " LIMIT 100"
-	if v := query.Get("from"); string(v) != "" {
-		sql += fmt.Sprintf(" OFFSET %s", string(v))
-	}
-
-	db.Raw(sql).Find(&results)
-
-	return
-}
-
-func (db *Database) SearchAttribute(query url.Values) (results []SearchResult) {
+func (db *Database) SearchAttribute(query url.Values) (results []SearchResult, total int) {
 	log.Infof("Searching for attribute with query=%v", query)
 
 	targetVersion := string(query.Get("versionid"))
 
-	// gorm doesn't support subqueries...
-	sql := "SELECT states.path, states.version_id, states.tf_version, states.serial, modules.path as module_path, resources.type, resources.name, attributes.key, attributes.value"
-
+	sqlQuery := ""
 	if targetVersion == "" {
-		sql += " FROM (SELECT states.path, max(states.serial) as mx FROM states GROUP BY states.path) t" +
+		sqlQuery += " FROM (SELECT states.path, max(states.serial) as mx FROM states GROUP BY states.path) t" +
 			" JOIN states ON t.path = states.path AND t.mx = states.serial"
 	} else {
-		sql += " FROM states"
+		sqlQuery += " FROM states"
 	}
 
-	sql += " JOIN modules ON states.id = modules.state_id" +
+	sqlQuery += " JOIN modules ON states.id = modules.state_id" +
 		" JOIN resources ON modules.id = resources.module_id" +
 		" JOIN attributes ON resources.id = attributes.resource_id"
 
@@ -254,12 +191,22 @@ func (db *Database) SearchAttribute(query url.Values) (results []SearchResult) {
 	}
 
 	if len(where) > 0 {
-		sql += fmt.Sprintf(" WHERE %s", strings.Join(where, " AND "))
+		sqlQuery += fmt.Sprintf(" WHERE %s", strings.Join(where, " AND "))
 	}
-	sql += " ORDER BY states.path, states.serial, modules.path, resources.type, resources.name, attributes.key"
 
-	// Limit and offset
-	sql += " LIMIT 100"
+	// Count everything
+	rows, _ := db.Raw("SELECT count(*)" + sqlQuery).Rows() // TODO: err
+	for rows.Next() {
+		rows.Scan(&total)
+	}
+
+	// Now get results
+	// gorm doesn't support subqueries...
+	sql := "SELECT states.path, states.version_id, states.tf_version, states.serial, modules.path as module_path, resources.type, resources.name, attributes.key, attributes.value" +
+		sqlQuery +
+		" ORDER BY states.path, states.serial, modules.path, resources.type, resources.name, attributes.key" +
+		" LIMIT 100"
+
 	if v := query.Get("from"); string(v) != "" {
 		sql += fmt.Sprintf(" OFFSET %s", string(v))
 	}

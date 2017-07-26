@@ -44,7 +44,6 @@ func main() {
 	http.HandleFunc(util.AddBase("api/states"), api.ApiStates)
 	http.HandleFunc(util.AddBase("api/state/"), handleWithDB(api.ApiState, database))
 	http.HandleFunc(util.AddBase("api/history/"), api.ApiHistory)
-	http.HandleFunc(util.AddBase("api/search/resource"), handleWithDB(api.ApiSearchResource, database))
 	http.HandleFunc(util.AddBase("api/search/attribute"), handleWithDB(api.ApiSearchAttribute, database))
 	http.HandleFunc(util.AddBase("api/resource/types"), handleWithDB(api.ApiResourceTypes, database))
 	http.HandleFunc(util.AddBase("api/resource/names"), handleWithDB(api.ApiResourceNames, database))

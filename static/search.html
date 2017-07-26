@@ -51,12 +51,16 @@
         </ui-select>
     </div>
     <div class=form-group>
-        <label for="attribute_value">Attribute Key</label>
+        <label for="attribute_value">Attribute Value</label><br />
         <input id="attribute_value" ng-model="$parent.attrVal" ng-change="doSearch()">
     </div>
-    <button class="clear" ng-click="clearForm()">Reset</button>
+    <div class=form-group>
+        <button class="clear" ng-click="clearForm()">Reset</button>
+    </div>
 </form>
 <hr />
+
+<label>Total: {{results.total}}</label>
 
 <div id="results">
     <table class="table table-border table-striped">

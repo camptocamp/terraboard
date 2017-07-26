@@ -35,15 +35,14 @@ func RefreshDB(d *db.Database) {
 			log.Errorf("Failed to build cache: %s", err)
 		}
 
-		// Refresh knownVersions
-		knownVersions := d.KnownVersions()
-
 		for _, st := range states {
 			versions, _ := getVersions(st)
 			for _, v := range versions {
 				d.InsertVersion(v)
-				if isKnownVersion(knownVersions, *v.VersionId) {
-					log.Infof("Version %s for %s is already known, skipping", *v.VersionId, st)
+
+				s := d.GetState(st, *v.VersionId)
+				if s.Path == st {
+					log.Infof("State %s/%s is already in the DB, skipping", st, *v.VersionId)
 					continue
 				}
 				state, _ := GetS3State(st, *v.VersionId)
@@ -56,15 +55,6 @@ func RefreshDB(d *db.Database) {
 
 		time.Sleep(1 * time.Minute)
 	}
-}
-
-func isKnownVersion(knownVersions []string, version string) bool {
-	for _, v := range knownVersions {
-		if v == version {
-			return true
-		}
-	}
-	return false
 }
 
 func refreshStates() error {
@@ -164,22 +154,17 @@ func ApiHistory(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, string(j))
 }
 
-func ApiSearchResource(w http.ResponseWriter, r *http.Request, d *db.Database) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	query := r.URL.Query()
-	result := d.SearchResource(query)
-	j, err := json.Marshal(result)
-	if err != nil {
-		log.Errorf("Failed to marshal json: %v", err)
-	}
-	io.WriteString(w, string(j))
-}
-
 func ApiSearchAttribute(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	query := r.URL.Query()
-	result := d.SearchAttribute(query)
-	j, err := json.Marshal(result)
+	result, total := d.SearchAttribute(query)
+
+	// Build response object
+	response := make(map[string]interface{})
+	response["results"] = result
+	response["total"] = total
+
+	j, err := json.Marshal(response)
 	if err != nil {
 		log.Errorf("Failed to marshal json: %v", err)
 	}
