@@ -167,21 +167,18 @@ type SearchResult struct {
 func (db *Database) SearchResource(query url.Values) (results []SearchResult) {
 	log.Infof("Searching for resource with query=%v", query)
 
-	statesSelect := "states.serial"
 	targetVersion := string(query.Get("versionid"))
-	switch targetVersion {
-	case "":
-		// Select most recent version of each path
-		statesSelect = "max(states.serial)"
-	case "*":
-		targetVersion = ""
-	default:
-	}
 
 	// gorm doesn't support subqueries...
-	sql := "SELECT states.path, states.version_id, states.tf_version, states.serial, modules.path as module_path, resources.type, resources.name" +
-		fmt.Sprintf(" FROM (SELECT states.path, %s as mx FROM states GROUP BY states.path) t", statesSelect) +
-		" JOIN states ON t.path = states.path AND t.mx = states.serial" +
+	sql := "SELECT states.path, states.version_id, states.tf_version, states.serial, modules.path as module_path, resources.type, resources.name"
+
+	if targetVersion == "" {
+		sql += " FROM (SELECT states.path, max(states.serial) as mx FROM states GROUP BY states.path) t"
+	} else {
+		sql += " FROM states"
+	}
+
+	sql += " JOIN states ON t.path = states.path AND t.mx = states.serial" +
 		" JOIN modules ON states.id = modules.state_id" +
 		" JOIN resources ON modules.id = resources.module_id"
 
@@ -210,7 +207,7 @@ func (db *Database) SearchResource(query url.Values) (results []SearchResult) {
 		sql += fmt.Sprintf(" OFFSET %s", string(v))
 	}
 
-	db.Raw(sql).Scan(&results)
+	db.Raw(sql).Find(&results)
 
 	return
 }
@@ -218,33 +215,30 @@ func (db *Database) SearchResource(query url.Values) (results []SearchResult) {
 func (db *Database) SearchAttribute(query url.Values) (results []SearchResult) {
 	log.Infof("Searching for attribute with query=%v", query)
 
-	statesSelect := "states.serial"
 	targetVersion := string(query.Get("versionid"))
-	switch targetVersion {
-	case "":
-		// Select most recent version of each path
-		statesSelect = "max(states.serial)"
-	case "*":
-		targetVersion = ""
-	default:
-	}
 
 	// gorm doesn't support subqueries...
-	sql := "SELECT states.path, states.version_id, states.tf_version, states.serial, modules.path as module_path, resources.type, resources.name, attributes.key, attributes.value" +
-		fmt.Sprintf(" FROM (SELECT states.path, %s as mx FROM states GROUP BY states.path) t", statesSelect) +
-		" JOIN states ON t.path = states.path AND t.mx = states.serial" +
+	sql := "SELECT states.path, states.version_id, states.tf_version, states.serial, modules.path as module_path, resources.type, resources.name, attributes.key, attributes.value"
+
+	if targetVersion == "" {
+		sql += " FROM (SELECT states.path, max(states.serial) as mx FROM states GROUP BY states.path) t"
+	} else {
+		sql += " FROM states"
+	}
+
+	sql += " JOIN states ON t.path = states.path AND t.mx = states.serial" +
 		" JOIN modules ON states.id = modules.state_id" +
 		" JOIN resources ON modules.id = resources.module_id" +
 		" JOIN attributes ON resources.id = attributes.resource_id"
 
 	var where []string
-	if targetVersion != "" {
+	if targetVersion != "" && targetVersion != "*" {
 		// filter by version unless we want all (*) or most recent ("")
 		where = append(where, fmt.Sprintf("states.version_id = '%s'", targetVersion))
 	}
 
 	if v := query.Get("type"); string(v) != "" {
-		where = append(where, fmt.Sprintf("resources.type LIKE '%s'", fmt.Sprintf("%%%s%%", v)))
+		where = append(where, fmt.Sprintf("resources.type LIKE '%s'", fmt.Sprintf("%%%s%%", string(v))))
 	}
 
 	if v := query.Get("name"); string(v) != "" {
