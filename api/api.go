@@ -157,11 +157,12 @@ func ApiHistory(w http.ResponseWriter, r *http.Request) {
 func ApiSearchAttribute(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	query := r.URL.Query()
-	result, total := d.SearchAttribute(query)
+	result, page, total := d.SearchAttribute(query)
 
 	// Build response object
 	response := make(map[string]interface{})
 	response["results"] = result
+	response["page"] = page
 	response["total"] = total
 
 	j, err := json.Marshal(response)

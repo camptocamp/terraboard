@@ -154,7 +154,7 @@ type SearchResult struct {
 	AttributeValue string `gorm:"column:value" json:"attribute_value"`
 }
 
-func (db *Database) SearchAttribute(query url.Values) (results []SearchResult, total int) {
+func (db *Database) SearchAttribute(query url.Values) (results []SearchResult, page int, total int) {
 	log.Infof("Searching for attribute with query=%v", query)
 
 	targetVersion := string(query.Get("versionid"))
@@ -211,9 +211,11 @@ func (db *Database) SearchAttribute(query url.Values) (results []SearchResult, t
 		fmt.Sprintf(" LIMIT %v", pageSize)
 
 	if v := string(query.Get("page")); v != "" {
-		p, _ := strconv.Atoi(v) // TODO: err
-		o := (p - 1) * pageSize
+		page, _ = strconv.Atoi(v) // TODO: err
+		o := (page - 1) * pageSize
 		sql += fmt.Sprintf(" OFFSET %v", o)
+	} else {
+		page = 1
 	}
 
 	db.Raw(sql).Find(&results)
