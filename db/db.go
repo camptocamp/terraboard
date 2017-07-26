@@ -270,3 +270,20 @@ func (db *Database) ListAttributeKeys(resourceType string) (results []string, er
 
 	return
 }
+
+func (db *Database) DefaultVersion(path string) (version string, err error) {
+	sqlQuery := "SELECT versions.version_id FROM" +
+		" (SELECT states.path, max(states.serial) as mx FROM states GROUP BY states.path) t" +
+		" JOIN states ON t.path = states.path AND t.mx = states.serial" +
+		" JOIN versions on states.version_id=versions.id" +
+		fmt.Sprintf(" WHERE states.path = '%s'", path)
+
+	rows, err := db.Raw(sqlQuery).Rows()
+	if err != nil {
+		return version, err
+	}
+	for rows.Next() {
+		rows.Scan(&version)
+	}
+	return
+}
