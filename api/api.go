@@ -45,7 +45,7 @@ func RefreshDB(d *db.Database) {
 	}
 }
 
-func ApiStates(w http.ResponseWriter, r *http.Request) {
+func ListStates(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	states, err := s3.GetStates()
 	if err != nil {
@@ -61,7 +61,7 @@ func ApiStates(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, string(j))
 }
 
-func ApiState(w http.ResponseWriter, r *http.Request, d *db.Database) {
+func GetState(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	st := util.TrimBase(r, "api/state/")
 	versionId := r.URL.Query().Get("versionid")
 	if versionId == "" {
@@ -74,7 +74,7 @@ func ApiState(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	io.WriteString(w, string(jState))
 }
 
-func ApiHistory(w http.ResponseWriter, r *http.Request) {
+func GetHistory(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	st := util.TrimBase(r, "api/history/")
 	result, err := s3.GetVersions(st)
@@ -97,7 +97,7 @@ func ApiHistory(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, string(j))
 }
 
-func ApiSearchAttribute(w http.ResponseWriter, r *http.Request, d *db.Database) {
+func SearchAttribute(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	query := r.URL.Query()
 	result, page, total := d.SearchAttribute(query)
@@ -115,7 +115,7 @@ func ApiSearchAttribute(w http.ResponseWriter, r *http.Request, d *db.Database) 
 	io.WriteString(w, string(j))
 }
 
-func ApiResourceTypes(w http.ResponseWriter, r *http.Request, d *db.Database) {
+func ListResourceTypes(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	result, _ := d.ListResourceTypes()
 	j, err := json.Marshal(result)
@@ -125,7 +125,7 @@ func ApiResourceTypes(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	io.WriteString(w, string(j))
 }
 
-func ApiResourceNames(w http.ResponseWriter, r *http.Request, d *db.Database) {
+func ListResourceNames(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	result, _ := d.ListResourceNames()
 	j, err := json.Marshal(result)
@@ -135,7 +135,7 @@ func ApiResourceNames(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	io.WriteString(w, string(j))
 }
 
-func ApiAttributeKeys(w http.ResponseWriter, r *http.Request, d *db.Database) {
+func ListAttributeKeys(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	resourceType := r.URL.Query().Get("resource_type")
 	result, _ := d.ListAttributeKeys(resourceType)

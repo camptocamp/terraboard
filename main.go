@@ -41,13 +41,13 @@ func main() {
 	http.Handle(util.AddBase("static/"), http.StripPrefix(util.AddBase("static"), staticFs))
 
 	// Handle API points
-	http.HandleFunc(util.AddBase("api/states"), api.ApiStates)
-	http.HandleFunc(util.AddBase("api/state/"), handleWithDB(api.ApiState, database))
-	http.HandleFunc(util.AddBase("api/history/"), api.ApiHistory)
-	http.HandleFunc(util.AddBase("api/search/attribute"), handleWithDB(api.ApiSearchAttribute, database))
-	http.HandleFunc(util.AddBase("api/resource/types"), handleWithDB(api.ApiResourceTypes, database))
-	http.HandleFunc(util.AddBase("api/resource/names"), handleWithDB(api.ApiResourceNames, database))
-	http.HandleFunc(util.AddBase("api/attribute/keys"), handleWithDB(api.ApiAttributeKeys, database))
+	http.HandleFunc(util.AddBase("api/states"), api.ListStates)
+	http.HandleFunc(util.AddBase("api/state/"), handleWithDB(api.GetState, database))
+	http.HandleFunc(util.AddBase("api/history/"), api.GetHistory)
+	http.HandleFunc(util.AddBase("api/search/attribute"), handleWithDB(api.SearchAttribute, database))
+	http.HandleFunc(util.AddBase("api/resource/types"), handleWithDB(api.ListResourceTypes, database))
+	http.HandleFunc(util.AddBase("api/resource/names"), handleWithDB(api.ListResourceNames, database))
+	http.HandleFunc(util.AddBase("api/attribute/keys"), handleWithDB(api.ListAttributeKeys, database))
 
 	// Start server
 	http.ListenAndServe(":80", nil)
