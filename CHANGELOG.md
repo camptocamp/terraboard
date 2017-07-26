@@ -1,3 +1,24 @@
+## 0.9.0 (July 26, 2017)
+
+**Warning**: The database was ported from SQLite3 to PostgreSQL and needs to be
+rebuilt!
+
+FEATURES:
+
+- Server:
+
+  * Port to PostgreSQL [GH #2]
+  * Improve and fix search API
+  * Add flags and environment variables
+  * Improve DB refresh idempotence
+  * Migrate all API calls to DB
+
+- UI
+
+  * Use container-fluid instead of container
+  * Improve and fix search interface
+
+
 ## 0.8.0 (July 26, 2017)
 
 FEATURES:

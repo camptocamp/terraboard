@@ -29,6 +29,7 @@ requires:
    - `s3:ListBucket`
    - `s3:ListBucketVersions`
    - `s3:GetObjectVersion`
+* A running PostgreSQL database
 
 
 ## Use with Docker
@@ -39,7 +40,8 @@ $ docker run -d -p 8080:80 \
    -e AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID> \
    -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
    -e AWS_BUCKET=<terraform-bucket> \
-   -v terraboard-db:/db/ \
+   -e DB_PASSWORD="mygreatpasswd" \
+   --link postgres:db \
    camptocamp/terraboard:latest
 ```
 
