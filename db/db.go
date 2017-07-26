@@ -135,7 +135,7 @@ func (db *Database) InsertVersion(version *s3.ObjectVersion) error {
 
 func (db *Database) GetState(path, versionId string) (state State) {
 	db.Joins("JOIN versions on states.version_id=versions.id").
-		Preload("Modules").Preload("Modules.Resources").Preload("Modules.Resources.Attributes").
+		Preload("Version").Preload("Modules").Preload("Modules.Resources").Preload("Modules.Resources.Attributes").
 		Find(&state, "states.path = ? AND versions.version_id = ?", path, versionId)
 	return
 }

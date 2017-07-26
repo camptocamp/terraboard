@@ -47,7 +47,7 @@ app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, 
     $http.get('api'+$location.url(), {cache: true}).then(function(response){
         $scope.path = $location.path();
         $scope.details = response.data;
-        $scope.selectedVersion = $scope.details.version_id;
+        $scope.selectedVersion = $scope.details.Version.version_id;
         var mods = $scope.details.modules;
 
         // Init
