@@ -25,12 +25,9 @@ func init() {
 	sess := session.Must(session.NewSession())
 	svc = s3.New(sess, &aws.Config{})
 	bucket = os.Getenv("AWS_BUCKET")
-
-	db.Init()
-	go refreshDB()
 }
 
-func refreshDB() {
+func RefreshDB(d *db.Database) {
 	for {
 		log.Infof("Refreshing DB from S3")
 		err := refreshStates()
@@ -39,22 +36,18 @@ func refreshDB() {
 		}
 
 		// Refresh knownVersions
-		knownVersions := db.KnownVersions()
+		knownVersions := d.KnownVersions()
 
 		for _, st := range states {
-			// FIXME: UpdateState duplicates entries!
-			// We should not use it, instead point to the right version in the UI
-			// s3State, _ := GetS3State(st, "")
-			//db.UpdateState(st, "", s3State)
-
 			versions, _ := getVersions(st)
 			for _, v := range versions {
+				d.InsertVersion(v)
 				if isKnownVersion(knownVersions, *v.VersionId) {
 					log.Infof("Version %s for %s is already known, skipping", *v.VersionId, st)
 					continue
 				}
 				state, _ := GetS3State(st, *v.VersionId)
-				db.InsertState(st, *v.VersionId, state)
+				d.InsertState(st, *v.VersionId, state)
 				if err != nil {
 					log.Errorf("Failed to insert state %s/%s: %v", st, *v.VersionId, err)
 				}
@@ -108,13 +101,13 @@ func ApiStates(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, string(j))
 }
 
-func ApiState(w http.ResponseWriter, r *http.Request) {
+func ApiState(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	st := util.TrimBase(r, "api/state/")
 	versionId := r.URL.Query().Get("versionid")
 	if versionId == "" {
 		versionId, _ = defaultVersion(st) // TODO: err
 	}
-	state := db.GetState(st, versionId)
+	state := d.GetState(st, versionId)
 
 	jState, _ := json.Marshal(state)
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -144,6 +137,7 @@ func getVersions(prefix string) (versions []*s3.ObjectVersion, err error) {
 	if err != nil {
 		return versions, err
 	}
+
 	return result.Versions, nil
 }
 
@@ -170,10 +164,10 @@ func ApiHistory(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, string(j))
 }
 
-func ApiSearchResource(w http.ResponseWriter, r *http.Request) {
+func ApiSearchResource(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	query := r.URL.Query()
-	result := db.SearchResource(query)
+	result := d.SearchResource(query)
 	j, err := json.Marshal(result)
 	if err != nil {
 		log.Errorf("Failed to marshal json: %v", err)
@@ -181,10 +175,10 @@ func ApiSearchResource(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, string(j))
 }
 
-func ApiSearchAttribute(w http.ResponseWriter, r *http.Request) {
+func ApiSearchAttribute(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	query := r.URL.Query()
-	result := db.SearchAttribute(query)
+	result := d.SearchAttribute(query)
 	j, err := json.Marshal(result)
 	if err != nil {
 		log.Errorf("Failed to marshal json: %v", err)
@@ -192,9 +186,9 @@ func ApiSearchAttribute(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, string(j))
 }
 
-func ApiResourceTypes(w http.ResponseWriter, r *http.Request) {
+func ApiResourceTypes(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	result, _ := db.ListResourceTypes()
+	result, _ := d.ListResourceTypes()
 	j, err := json.Marshal(result)
 	if err != nil {
 		log.Errorf("Failed to marshal json: %v", err)
@@ -202,9 +196,9 @@ func ApiResourceTypes(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, string(j))
 }
 
-func ApiResourceNames(w http.ResponseWriter, r *http.Request) {
+func ApiResourceNames(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	result, _ := db.ListResourceNames()
+	result, _ := d.ListResourceNames()
 	j, err := json.Marshal(result)
 	if err != nil {
 		log.Errorf("Failed to marshal json: %v", err)
@@ -212,10 +206,10 @@ func ApiResourceNames(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, string(j))
 }
 
-func ApiAttributeKeys(w http.ResponseWriter, r *http.Request) {
+func ApiAttributeKeys(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	resourceType := r.URL.Query().Get("resource_type")
-	result, _ := db.ListAttributeKeys(resourceType)
+	result, _ := d.ListAttributeKeys(resourceType)
 	j, err := json.Marshal(result)
 	if err != nil {
 		log.Errorf("Failed to marshal json: %v", err)

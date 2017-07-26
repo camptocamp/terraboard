@@ -1,7 +1,7 @@
 ---
 version: '3'
 services:
-  tb-server:
+  terraboard:
     build:
       context: .
       dockerfile: Dockerfile
@@ -13,8 +13,17 @@ services:
       AWS_REGION: ${AWS_DEFAULT_REGION}
       AWS_BUCKET: ${AWS_BUCKET}
       BASE_URL: /
+    links:
+      - db
+
+  db:
+    image: postgres:9.5
+    environment:
+      POSTGRES_USER: gorm
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: gorm
     volumes:
-      - terraboard-db:/db/
+      - tb-data:/var/lib/postgresql/data
 
 volumes:
-  terraboard-db: {}
+  tb-data: {}
