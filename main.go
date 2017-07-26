@@ -8,6 +8,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/camptocamp/terraboard/api"
+	"github.com/camptocamp/terraboard/config"
 	"github.com/camptocamp/terraboard/db"
 	"github.com/camptocamp/terraboard/s3"
 	"github.com/camptocamp/terraboard/util"
@@ -69,14 +70,19 @@ func refreshDB(d *db.Database) {
 	}
 }
 
+var version = "undefined"
+
 // Main
 func main() {
+	c := config.LoadConfig(version)
+
+	// Set up S3
+	s3.Setup(c)
+
 	// Set up the DB and start S3->DB sync
-	host := "db"
-	user := "gorm"
-	dbname := "gorm"
-	password := "mypassword"
-	database := db.Init(host, user, dbname, password)
+	database := db.Init(
+		c.DB.Host, c.DB.User,
+		c.DB.Name, c.DB.Password)
 	go refreshDB(database)
 	defer database.Close()
 

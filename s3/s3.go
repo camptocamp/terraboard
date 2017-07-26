@@ -5,23 +5,23 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/camptocamp/terraboard/config"
 	"github.com/hashicorp/terraform/terraform"
 )
 
 var svc *s3.S3
 var bucket string
 
-func init() {
+func Setup(c *config.Config) {
 	sess := session.Must(session.NewSession())
 	svc = s3.New(sess, &aws.Config{})
-	bucket = os.Getenv("AWS_BUCKET")
+	bucket = c.S3.Bucket
 }
 
 func GetStates() (states []string, err error) {
