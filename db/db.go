@@ -167,8 +167,6 @@ type SearchResult struct {
 func (db *Database) SearchResource(query url.Values) (results []SearchResult) {
 	log.Infof("Searching for resource with query=%v", query)
 
-	selectQuery := make(map[string]interface{})
-
 	statesSelect := "states.serial"
 	targetVersion := string(query.Get("versionid"))
 	switch targetVersion {
@@ -180,27 +178,33 @@ func (db *Database) SearchResource(query url.Values) (results []SearchResult) {
 	default:
 	}
 
+	// gorm doesn't support subqueries...
+	sql := "SELECT states.path, states.version_id, states.tf_version, states.serial, modules.path as module_path, resources.type, resources.name" +
+		fmt.Sprintf(" FROM (SELECT states.path, %s as mx FROM states GROUP BY states.path) t", statesSelect) +
+		" JOIN states ON t.path = states.path AND t.mx = states.serial" +
+		" JOIN modules ON states.id = modules.state_id" +
+		" JOIN resources ON modules.id = resources.module_id"
+
+	var where []string
+	if targetVersion != "" {
+		// filter by version unless we want all (*) or most recent ("")
+		where = append(where, fmt.Sprintf("states.version_id = '%s'", targetVersion))
+	}
+
 	if v := query.Get("type"); string(v) != "" {
-		selectQuery["type"] = string(v)
+		where = append(where, fmt.Sprintf("resources.type LIKE '%s'", fmt.Sprintf("%%%s%%", v)))
 	}
 
 	if v := query.Get("name"); string(v) != "" {
-		selectQuery["name"] = string(v)
+		where = append(where, fmt.Sprintf("resources.name LIKE '%s'", fmt.Sprintf("%%%s%%", v)))
 	}
 
-	baseSelect := db.Table("resources").
-		Select(fmt.Sprintf("states.path, states.version_id, states.tf_version, %s as serial, modules.path as module_path, resources.type, resources.name", statesSelect)).
-		Group("states.path, modules.path, resources.type, resources.name").
-		Joins("LEFT JOIN modules ON resources.module_id = modules.id LEFT JOIN states ON modules.state_id = states.id")
-
-	if targetVersion != "" {
-		// filter by version unless we want all (*) or most recent ("")
-		baseSelect = baseSelect.Where("states.version_id = ?", targetVersion)
+	if len(where) > 0 {
+		sql += fmt.Sprintf(" WHERE %s", strings.Join(where, " AND "))
 	}
+	sql += " ORDER BY states.path, states.serial, modules.path, resources.type, resources.name"
 
-	baseSelect.Where(selectQuery).
-		Order("states.path, states.serial, modules.path, resources.type, resources.name").
-		Find(&results)
+	db.Raw(sql).Scan(&results)
 
 	return
 }
@@ -208,8 +212,6 @@ func (db *Database) SearchResource(query url.Values) (results []SearchResult) {
 func (db *Database) SearchAttribute(query url.Values) (results []SearchResult) {
 	log.Infof("Searching for attribute with query=%v", query)
 
-	selectQuery := make(map[string]interface{})
-
 	statesSelect := "states.serial"
 	targetVersion := string(query.Get("versionid"))
 	switch targetVersion {
@@ -221,35 +223,42 @@ func (db *Database) SearchAttribute(query url.Values) (results []SearchResult) {
 	default:
 	}
 
-	baseSelect := db.Table("attributes").
-		Select(fmt.Sprintf("states.path, states.version_id, states.tf_version, %s as serial, modules.path as module_path, resources.type, resources.name, attributes.key, attributes.value", statesSelect)).
-		Group("states.path, modules.path, resources.type, resources.name, attributes.key").
-		Joins("LEFT JOIN resources ON attributes.resource_id = resources.id LEFT JOIN modules ON resources.module_id = modules.id LEFT JOIN states ON modules.state_id = states.id")
+	// gorm doesn't support subqueries...
+	sql := "SELECT states.path, states.version_id, states.tf_version, states.serial, modules.path as module_path, resources.type, resources.name, attributes.key, attributes.value" +
+		fmt.Sprintf(" FROM (SELECT states.path, %s as mx FROM states GROUP BY states.path) t", statesSelect) +
+		" JOIN states ON t.path = states.path AND t.mx = states.serial" +
+		" JOIN modules ON states.id = modules.state_id" +
+		" JOIN resources ON modules.id = resources.module_id" +
+		" JOIN attributes ON resources.id = attributes.resource_id"
 
+	var where []string
 	if targetVersion != "" {
 		// filter by version unless we want all (*) or most recent ("")
-		baseSelect = baseSelect.Where("states.version_id = ?", targetVersion)
+		where = append(where, fmt.Sprintf("states.version_id = '%s'", targetVersion))
 	}
 
 	if v := query.Get("type"); string(v) != "" {
-		baseSelect = baseSelect.Where("resources.type LIKE ?", fmt.Sprintf("%%%s%%", v))
+		where = append(where, fmt.Sprintf("resources.type LIKE '%s'", fmt.Sprintf("%%%s%%", v)))
 	}
 
 	if v := query.Get("name"); string(v) != "" {
-		baseSelect = baseSelect.Where("resources.name LIKE ?", fmt.Sprintf("%%%s%%", v))
+		where = append(where, fmt.Sprintf("resources.name LIKE '%s'", fmt.Sprintf("%%%s%%", v)))
 	}
 
 	if v := query.Get("key"); string(v) != "" {
-		baseSelect = baseSelect.Where("attributes.key LIKE ?", fmt.Sprintf("%%%s%%", v))
+		where = append(where, fmt.Sprintf("attributes.key LIKE '%s'", fmt.Sprintf("%%%s%%", v)))
 	}
 
 	if v := query.Get("value"); string(v) != "" {
-		baseSelect = baseSelect.Where("attributes.value LIKE ?", fmt.Sprintf("%%%s%%", v))
+		where = append(where, fmt.Sprintf("attributes.value LIKE '%s'", fmt.Sprintf("%%%s%%", v)))
 	}
 
-	baseSelect.Where(selectQuery).
-		Order("states.path, states.serial, modules.path, resources.type, resources.name, attributes.key").
-		Find(&results)
+	if len(where) > 0 {
+		sql += fmt.Sprintf(" WHERE %s", strings.Join(where, " AND "))
+	}
+	sql += " ORDER BY states.path, states.serial, modules.path, resources.type, resources.name, attributes.key"
+
+	db.Raw(sql).Find(&results)
 
 	return
 }
