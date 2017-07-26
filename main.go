@@ -31,6 +31,7 @@ func handleWithDB(apiF func(w http.ResponseWriter, r *http.Request, d *db.Databa
 func main() {
 	database := db.Init()
 	go api.RefreshDB(database)
+	defer database.Close()
 
 	// Index is a wildcard for all paths
 	http.HandleFunc(util.AddBase(""), idx)
