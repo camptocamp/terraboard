@@ -145,7 +145,7 @@ func (db *Database) GetState(path, versionId string) (state State) {
 
 func (db *Database) KnownVersions() (versions []string) {
 	// TODO: err
-	rows, _ := db.Table("states").Select("DISTINCT version_id").Rows()
+	rows, _ := db.Table("versions").Select("DISTINCT version_id").Rows()
 	defer rows.Close()
 	for rows.Next() {
 		var version string
