@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
@@ -209,8 +210,10 @@ func (db *Database) SearchAttribute(query url.Values) (results []SearchResult, t
 		" ORDER BY states.path, states.serial, modules.path, resources.type, resources.name, attributes.key" +
 		fmt.Sprintf(" LIMIT %v", pageSize)
 
-	if v := query.Get("from"); string(v) != "" {
-		sql += fmt.Sprintf(" OFFSET %s", string(v))
+	if v := string(query.Get("page")); v != "" {
+		p, _ := strconv.Atoi(v) // TODO: err
+		o := (p - 1) * pageSize
+		sql += fmt.Sprintf(" OFFSET %v", o)
 	}
 
 	db.Raw(sql).Find(&results)
