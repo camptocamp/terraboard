@@ -13,6 +13,10 @@ import (
 	"github.com/camptocamp/terraboard/util"
 )
 
+// idx serves index.html, always,
+// so as to let AngularJS manage the app routing.
+// The <base> HTML tag is edited on the fly
+// to reflect the proper base URL
 func idx(w http.ResponseWriter, r *http.Request) {
 	idx, err := ioutil.ReadFile("index.html")
 	if err != nil {
@@ -24,12 +28,17 @@ func idx(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, idxStr)
 }
 
+// Pass the DB to API handlers
+// This takes a callback and returns a HandlerFunc
+// which calls the callback with the DB
 func handleWithDB(apiF func(w http.ResponseWriter, r *http.Request, d *db.Database), d *db.Database) func(http.ResponseWriter, *http.Request) {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		apiF(w, r, d)
 	})
 }
 
+// Refresh the DB from S3
+// This should be the only direct bridge between S3 and the DB
 func refreshDB(d *db.Database) {
 	for {
 		log.Infof("Refreshing DB from S3")
@@ -60,7 +69,9 @@ func refreshDB(d *db.Database) {
 	}
 }
 
+// Main
 func main() {
+	// Set up the DB and start S3->DB sync
 	database := db.Init()
 	go refreshDB(database)
 	defer database.Close()
