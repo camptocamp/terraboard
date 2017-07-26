@@ -25,14 +25,14 @@ type State struct {
 }
 
 type Module struct {
-	ID        int           `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
+	ID        uint          `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
 	StateID   sql.NullInt64 `gorm:"index" json:"-"`
 	Path      string        `json:"path"`
 	Resources []Resource    `json:"resources"`
 }
 
 type Resource struct {
-	ID         int           `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
+	ID         uint          `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
 	ModuleID   sql.NullInt64 `gorm:"index" json:"-"`
 	Type       string        `json:"type"`
 	Name       string        `json:"name"`
@@ -40,7 +40,7 @@ type Resource struct {
 }
 
 type Attribute struct {
-	ID         int           `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
+	ID         uint          `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
 	ResourceID sql.NullInt64 `gorm:"index" json:"-"`
 	Key        string        `json:"key"`
 	Value      string        `json:"value"`
