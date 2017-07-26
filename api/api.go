@@ -5,38 +5,26 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
-	"strings"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/camptocamp/terraboard/db"
+	"github.com/camptocamp/terraboard/s3"
 	"github.com/camptocamp/terraboard/util"
 )
 
-var svc *s3.S3
-var bucket string
 var states []string
-
-func init() {
-	sess := session.Must(session.NewSession())
-	svc = s3.New(sess, &aws.Config{})
-	bucket = os.Getenv("AWS_BUCKET")
-}
 
 func RefreshDB(d *db.Database) {
 	for {
 		log.Infof("Refreshing DB from S3")
-		err := refreshStates()
+		states, err := s3.GetStates()
 		if err != nil {
 			log.Errorf("Failed to build cache: %s", err)
 		}
 
 		for _, st := range states {
-			versions, _ := getVersions(st)
+			versions, _ := s3.GetVersions(st)
 			for _, v := range versions {
 				d.InsertVersion(v)
 
@@ -45,7 +33,7 @@ func RefreshDB(d *db.Database) {
 					log.Infof("State %s/%s is already in the DB, skipping", st, *v.VersionId)
 					continue
 				}
-				state, _ := GetS3State(st, *v.VersionId)
+				state, _ := s3.GetState(st, *v.VersionId)
 				d.InsertState(st, *v.VersionId, state)
 				if err != nil {
 					log.Errorf("Failed to insert state %s/%s: %v", st, *v.VersionId, err)
@@ -57,27 +45,9 @@ func RefreshDB(d *db.Database) {
 	}
 }
 
-func refreshStates() error {
-	result, err := svc.ListObjects(&s3.ListObjectsInput{
-		Bucket: aws.String(bucket),
-	})
-	if err != nil {
-		return err
-	}
-
-	var keys []string
-	for _, obj := range result.Contents {
-		if strings.HasSuffix(*obj.Key, ".tfstate") {
-			keys = append(keys, *obj.Key)
-		}
-	}
-	states = keys
-	return nil
-}
-
 func ApiStates(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	err := refreshStates()
+	states, err := s3.GetStates()
 	if err != nil {
 		errObj := make(map[string]string)
 		errObj["error"] = "Failed to list states"
@@ -104,22 +74,10 @@ func ApiState(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	io.WriteString(w, string(jState))
 }
 
-func getVersions(prefix string) (versions []*s3.ObjectVersion, err error) {
-	result, err := svc.ListObjectVersions(&s3.ListObjectVersionsInput{
-		Bucket: aws.String(bucket),
-		Prefix: aws.String(prefix),
-	})
-	if err != nil {
-		return versions, err
-	}
-
-	return result.Versions, nil
-}
-
 func ApiHistory(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	st := util.TrimBase(r, "api/history/")
-	result, err := getVersions(st)
+	result, err := s3.GetVersions(st)
 	if err != nil {
 		errObj := make(map[string]string)
 		errObj["error"] = fmt.Sprintf("State file history not found: %v", st)
