@@ -115,7 +115,8 @@ func (db *Database) stateS3toDB(state *terraform.State, path string, versionId s
 
 func (db *Database) InsertState(path string, versionId string, state *terraform.State) error {
 	var testState State
-	db.Find(&testState, "path = ? AND version_id = ?", path, versionId)
+	db.Joins("JOIN versions on states.version_id=versions.id").
+		Find(&testState, "states.path = ? AND versions.version_id = ?", path, versionId)
 	if testState.Path == path {
 		log.Infof("State %s/%s is already in the DB", path, versionId)
 		return nil
@@ -136,7 +137,9 @@ func (db *Database) InsertVersion(version *s3.ObjectVersion) error {
 }
 
 func (db *Database) GetState(path, versionId string) (state State) {
-	db.Preload("Modules").Preload("Modules.Resources").Preload("Modules.Resources.Attributes").Find(&state, "path = ? AND version_id = ?", path, versionId)
+	db.Joins("JOIN versions on states.version_id=versions.id").
+		Preload("Modules").Preload("Modules.Resources").Preload("Modules.Resources.Attributes").
+		Find(&state, "states.path = ? AND versions.version_id = ?", path, versionId)
 	return
 }
 
