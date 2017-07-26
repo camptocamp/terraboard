@@ -13,6 +13,7 @@ services:
       AWS_REGION: ${AWS_DEFAULT_REGION}
       AWS_BUCKET: ${AWS_BUCKET}
       BASE_URL: /
+      DB_PASSWORD: mypassword
     links:
       - db
 
