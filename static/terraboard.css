@@ -178,6 +178,10 @@ pre.sh_sourceCode .sh_oldfile {
   height: 50px;
 }
 #results {
-  height: 100%;
+  height: 79vh;
   overflow-y: auto;
+}
+#pages {
+    margin: 0 auto;
+    width: 30vh;
 }

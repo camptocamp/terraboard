@@ -105,7 +105,10 @@ app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', 
         });
     };
 
-    $scope.doSearch = function() {
+    $scope.itemsPerPage = 20;
+    $scope.page = 1;
+
+    $scope.doSearch = function(page) {
         var params = {};
         if ($scope.resType != "") {
             params.type = $scope.resType;
@@ -119,10 +122,17 @@ app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', 
         if ($scope.attrVal != "") {
             params.value = $scope.attrVal;
         }
+        if (page != undefined) {
+            params.page = page;
+            $scope.page = page;
+        }
         var query = $.param(params);
         console.log(query);
         $http.get('api/search/attribute?'+query).then(function(response){
             $scope.results = response.data;
+            $scope.pages = Math.ceil($scope.results.total / $scope.itemsPerPage);
+            $scope.startItems = $scope.itemsPerPage*($scope.page-1)+1;
+            $scope.itemsInPage = Math.min($scope.itemsPerPage*$scope.page, $scope.results.total)
         });
     }
 
