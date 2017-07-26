@@ -60,9 +60,10 @@ type Attribute struct {
 
 var pageSize = 20
 
-func Init() *Database {
+func Init(host, user, dbname, password string) *Database {
 	var err error
-	db, err := gorm.Open("postgres", "host=db user=gorm dbname=gorm sslmode=disable password=mypassword")
+	connString := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", host, user, dbname, password)
+	db, err := gorm.Open("postgres", connString)
 	if err != nil {
 		log.Fatal(err)
 	}

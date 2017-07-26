@@ -72,7 +72,11 @@ func refreshDB(d *db.Database) {
 // Main
 func main() {
 	// Set up the DB and start S3->DB sync
-	database := db.Init()
+	host := "db"
+	user := "gorm"
+	dbname := "gorm"
+	password := "mypassword"
+	database := db.Init(host, user, dbname, password)
 	go refreshDB(database)
 	defer database.Close()
 
