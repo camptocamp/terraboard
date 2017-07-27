@@ -1,3 +1,12 @@
+## 0.10.1 (July 27, 2017)
+
+FIXES:
+
+- UI:
+
+  * Rename Main link to Overview
+  * Use relative path to get back to Overview
+
 ## 0.10.0 (July 27, 2017)
 
 FEATURES:
