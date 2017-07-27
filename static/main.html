@@ -1,15 +1,13 @@
 <div class="jumbotron">
-    <h1>Terraboard</h1>
     <p>
     Welcome to Terraboard. Select a state file from the list above.
     </p>
-
-    <label id="navigate" ng-show="results">
-        <span class="glyphicon glyphicon-triangle-left" ng-click="getStats(prevPage)" ng-show="prevPage"></span> {{startItems}}-{{itemsInPage}}/{{results.total}} <span class="glyphicon glyphicon-triangle-right" ng-click="getStats(nextPage)" ng-show="nextPage"></span>
-    </label>
 </div>
 
 <div id="results">
+    <label id="navigate" ng-show="results">
+        <span class="glyphicon glyphicon-triangle-left" ng-click="getStats(prevPage)" ng-show="prevPage"></span> {{startItems}}-{{itemsInPage}}/{{results.total}} <span class="glyphicon glyphicon-triangle-right" ng-click="getStats(nextPage)" ng-show="nextPage"></span>
+    </label>
     <table class="table table-border table-striped">
         <thead>
             <th></th>
