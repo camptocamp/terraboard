@@ -11,6 +11,8 @@ import (
 type Config struct {
 	Version bool `short:"V" long:"version" description:"Display version."`
 
+	Port int `short:"p" long:"port" description:"Port to listen on." default:"8080"`
+
 	DB struct {
 		Host     string `long:"db-host" env:"DB_HOST" description:"Database host." default:"db"`
 		User     string `long:"db-user" env:"DB_USER" description:"Database user." default:"gorm"`
