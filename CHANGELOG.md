@@ -1,3 +1,27 @@
+## 0.10.0 (July 27, 2017)
+
+FEATURES:
+
+- Server:
+
+  * Change default port to 8080
+  * Add flags and help to command line
+  * Add version
+  * List states from the DB instead of S3
+
+- UI:
+
+  * Add list of state updates to main page
+  * Do search on clear and when search page is loaded
+  * Use sb-admin Bootstrap theme
+
+
+FIXES:
+
+- Server:
+
+  * Crash if HTTP Listenandserve fails [GH #1]
+
 ## 0.9.0 (July 26, 2017)
 
 **Warning**: The database was ported from SQLite3 to PostgreSQL and needs to be
