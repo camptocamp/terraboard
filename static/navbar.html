@@ -16,15 +16,15 @@
 
         <ul class="nav navbar-nav navbar-collapse collapse" id="navbar-collapse-menu">
             <li id="states-select" ng-controller="tbListCtrl">
-                <ui-select ng-model="keys.selected"
+                <ui-select ng-model="states.selected"
                            theme="bootstrap"
                            ng-disabled="disabled"
                            reset-search-input="false"
                            style="min-width: 400px;"
                            title="Choose a state file">
                     <ui-select-match placeholder="{{placeholder}}">{{placeholder}}</ui-select-match>
-                    <ui-select-choices repeat="k in keys | filter: $select.search">
-                        <a href="state/{{k}}" target="_self">{{k | highlight: $select.search}}</a>
+                    <ui-select-choices repeat="state.path as state in states | filter: $select.search">
+                        <a href="state/{{state.path}}" target="_self">{{state.path | highlight: $select.search}}</a>
                     </ui-select-choices>
                 </ui-select>
             </li>

@@ -97,7 +97,7 @@ func main() {
 	http.Handle(util.AddBase("static/"), http.StripPrefix(util.AddBase("static"), staticFs))
 
 	// Handle API points
-	http.HandleFunc(util.AddBase("api/states"), api.ListStates)
+	http.HandleFunc(util.AddBase("api/states"), handleWithDB(api.ListStates, database))
 	http.HandleFunc(util.AddBase("api/state/"), handleWithDB(api.GetState, database))
 	http.HandleFunc(util.AddBase("api/history/"), api.GetHistory)
 	http.HandleFunc(util.AddBase("api/search/attribute"), handleWithDB(api.SearchAttribute, database))

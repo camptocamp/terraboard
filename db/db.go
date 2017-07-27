@@ -224,6 +224,25 @@ func (db *Database) SearchAttribute(query url.Values) (results []SearchResult, p
 	return
 }
 
+type StateStat struct {
+	State
+	VersionID     string    `json:"version_id"`
+	LastModified  time.Time `json:"last_modified"`
+	ResourceCount int       `json:"resource_count"`
+}
+
+func (db *Database) ListStates(query url.Values) (states []StateStat) {
+	db.Table("states").
+		Select("states.path, states.serial, versions.version_id, versions.last_modified, count(resources.id) as resource_count").
+		Joins("JOIN versions ON versions.id = states.version_id").
+		Joins("JOIN modules ON states.id = modules.state_id").
+		Joins("JOIN resources ON modules.id = resources.module_id").
+		Group("states.path, states.serial, versions.version_id, versions.last_modified").
+		Order("versions.last_modified DESC").
+		Limit(pageSize).Find(&states)
+	return
+}
+
 func (db *Database) listField(table, field string) (results []string, err error) {
 	rows, err := db.Table(table).Select(fmt.Sprintf("DISTINCT %s", field)).Rows()
 	defer rows.Close()

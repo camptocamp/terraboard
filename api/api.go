@@ -21,12 +21,9 @@ func JSONError(w http.ResponseWriter, message string, err error) {
 	io.WriteString(w, string(j))
 }
 
-func ListStates(w http.ResponseWriter, r *http.Request) {
+func ListStates(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	states, err := s3.GetStates()
-	if err != nil {
-		JSONError(w, "Failed to list states", err)
-	}
+	states := d.ListStates(r.URL.Query())
 
 	j, err := json.Marshal(states)
 	if err != nil {

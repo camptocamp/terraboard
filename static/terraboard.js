@@ -21,7 +21,7 @@ app.controller("tbListCtrl", ['$scope', '$http', '$location', function($scope, $
         $scope.placeholder = 'Enter a state file path...';
     }
     $http.get('api/states').then(function(response){
-        $scope.keys = response.data;
+        $scope.states = response.data;
     });
 }]);
 
