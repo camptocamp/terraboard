@@ -46,16 +46,16 @@ type Module struct {
 type Resource struct {
 	ID         uint          `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
 	ModuleID   sql.NullInt64 `gorm:"index" json:"-"`
-	Type       string        `json:"type"`
-	Name       string        `json:"name"`
+	Type       string        `gorm:"index" json:"type"`
+	Name       string        `gorm:"index" json:"name"`
 	Attributes []Attribute   `json:"attributes"`
 }
 
 type Attribute struct {
 	ID         uint          `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
 	ResourceID sql.NullInt64 `gorm:"index" json:"-"`
-	Key        string        `json:"key"`
-	Value      string        `json:"value"`
+	Key        string        `gorm:"index" json:"key"`
+	Value      string        `gorm:"index" json:"value"`
 }
 
 var pageSize = 20
@@ -296,7 +296,7 @@ func (db *Database) ListResourceNames() ([]string, error) {
 func (db *Database) ListAttributeKeys(resourceType string) (results []string, err error) {
 	query := db.Table("attributes").
 		Select(fmt.Sprintf("DISTINCT %s", "key")).
-		Joins("LEFT JOIN resources ON attributes.resource_id = resources.id")
+		Joins("JOIN resources ON attributes.resource_id = resources.id")
 
 	if resourceType != "" {
 		query = query.Where("resources.type = ?", resourceType)
