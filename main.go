@@ -20,7 +20,7 @@ import (
 // The <base> HTML tag is edited on the fly
 // to reflect the proper base URL
 func idx(w http.ResponseWriter, r *http.Request) {
-	idx, err := ioutil.ReadFile("index.html")
+	idx, err := ioutil.ReadFile("static/index.html")
 	if err != nil {
 		log.Errorf("Failed to open index.html: %v", err)
 		// TODO: Return error page

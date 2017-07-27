@@ -15,7 +15,6 @@ RUN CGO_ENABLED=1 GOOS=linux go build \
 FROM scratch
 WORKDIR /
 COPY static /static
-COPY index.html /
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /go/src/github.com/camptocamp/terraboard/terraboard /
 ENTRYPOINT ["/terraboard"]

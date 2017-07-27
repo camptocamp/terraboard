@@ -26,6 +26,9 @@
     overflow: hidden;
     height:100%;
   }
+  .container{
+      width: 80vw;
+  }
   #maincont, #leftcol .panel-group {
     overflow: hidden;
     height:100%;

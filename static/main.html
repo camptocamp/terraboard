@@ -1,7 +1,22 @@
-<div class="jumbotron">
-    <p>
-    Welcome to Terraboard. Select a state file from the list above.
-    </p>
+<div class="row">
+    <div class="col-lg-9">
+        <h1 class="page-header">Terraboard</h1>
+    </div>
+    <div class="col-lg-3 col-md-6 ng-isolate-scope">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <h1 class="glyphicon glyphicon-file fa-5x" aria-hidden="true"></h1>
+                    </div>
+                    <div class="col-xs-9 text-right">
+                        <div class="huge ng-binding">{{results.total}}</div>
+                        <div class="ng-binding">statefiles stored</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div id="results">
