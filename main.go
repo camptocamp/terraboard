@@ -105,5 +105,5 @@ func main() {
 	http.HandleFunc(util.AddBase("api/attribute/keys"), handleWithDB(api.ListAttributeKeys, database))
 
 	// Start server
-	http.ListenAndServe(":80", nil)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }

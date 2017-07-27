@@ -35,7 +35,7 @@ requires:
 ## Use with Docker
 
 ```shell
-$ docker run -d -p 8080:80 \
+$ docker run -d -p 8080:8080 \
    -e AWS_REGION=<AWS_DEFAULT_REGION> \
    -e AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID> \
    -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
