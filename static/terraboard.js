@@ -170,5 +170,6 @@ app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', 
         $scope.attrKey = undefined;
         $scope.attrVal = undefined;
         $scope.results = undefined;
+        $scope.doSearch(1);
     }
 }]);
