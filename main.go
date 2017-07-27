@@ -86,7 +86,7 @@ func main() {
 	database := db.Init(
 		c.DB.Host, c.DB.User,
 		c.DB.Name, c.DB.Password)
-	//go refreshDB(database)
+	go refreshDB(database)
 	defer database.Close()
 
 	// Index is a wildcard for all paths
