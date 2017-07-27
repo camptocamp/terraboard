@@ -75,9 +75,9 @@ var version = "undefined"
 
 // Main
 func main() {
-	log.Infof("Terraboard v%s is starting...", version)
-
 	c := config.LoadConfig(version)
+
+	log.Infof("Terraboard v%s is starting...", version)
 
 	// Set up S3
 	s3.Setup(c)
