@@ -23,9 +23,26 @@ func JSONError(w http.ResponseWriter, message string, err error) {
 
 func ListStates(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	states := d.ListStates(r.URL.Query())
+	states := d.ListStates()
 
 	j, err := json.Marshal(states)
+	if err != nil {
+		JSONError(w, "Failed to marshal states", err)
+	}
+	io.WriteString(w, string(j))
+}
+
+func ListStateStats(w http.ResponseWriter, r *http.Request, d *db.Database) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	query := r.URL.Query()
+	states, page, total := d.ListStateStats(query)
+
+	// Build response object
+	response := make(map[string]interface{})
+	response["states"] = states
+	response["page"] = page
+	response["total"] = total
+	j, err := json.Marshal(response)
 	if err != nil {
 		JSONError(w, "Failed to marshal states", err)
 	}

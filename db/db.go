@@ -224,22 +224,48 @@ func (db *Database) SearchAttribute(query url.Values) (results []SearchResult, p
 	return
 }
 
+func (db *Database) ListStates() (states []string) {
+	rows, _ := db.Table("states").Select("DISTINCT path").Rows()
+	defer rows.Close()
+	for rows.Next() {
+		var state string
+		rows.Scan(&state)
+		states = append(states, state)
+	}
+	return
+}
+
 type StateStat struct {
-	State
+	Path          string    `json:"path"`
+	TFVersion     string    `json:"terraform_version"`
+	Serial        int64     `json:"serial"`
 	VersionID     string    `json:"version_id"`
 	LastModified  time.Time `json:"last_modified"`
 	ResourceCount int       `json:"resource_count"`
 }
 
-func (db *Database) ListStates(query url.Values) (states []StateStat) {
+func (db *Database) ListStateStats(query url.Values) (states []StateStat, page int, total int) {
+	rows, _ := db.Table("states").Select("count(*)").Rows()
+	defer rows.Close()
+	for rows.Next() {
+		rows.Scan(&total)
+	}
+
+	offset := 0
+	page = 1
+	if v := string(query.Get("page")); v != "" {
+		page, _ = strconv.Atoi(v) // TODO: err
+		offset = (page - 1) * pageSize
+	}
+
 	db.Table("states").
-		Select("states.path, states.serial, versions.version_id, versions.last_modified, count(resources.id) as resource_count").
+		Select("states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified, count(resources.id) as resource_count").
 		Joins("JOIN versions ON versions.id = states.version_id").
 		Joins("JOIN modules ON states.id = modules.state_id").
 		Joins("JOIN resources ON modules.id = resources.module_id").
-		Group("states.path, states.serial, versions.version_id, versions.last_modified").
+		Group("states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified").
 		Order("versions.last_modified DESC").
-		Limit(pageSize).Find(&states)
+		Limit(pageSize).Offset(offset).Find(&states)
 	return
 }
 
@@ -299,6 +325,7 @@ func (db *Database) DefaultVersion(path string) (version string, err error) {
 		fmt.Sprintf(" WHERE states.path = '%s'", path)
 
 	rows, err := db.Raw(sqlQuery).Rows()
+	defer rows.Close()
 	if err != nil {
 		return version, err
 	}

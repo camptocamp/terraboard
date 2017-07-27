@@ -86,7 +86,7 @@ func main() {
 	database := db.Init(
 		c.DB.Host, c.DB.User,
 		c.DB.Name, c.DB.Password)
-	go refreshDB(database)
+	//go refreshDB(database)
 	defer database.Close()
 
 	// Index is a wildcard for all paths
@@ -98,6 +98,7 @@ func main() {
 
 	// Handle API points
 	http.HandleFunc(util.AddBase("api/states"), handleWithDB(api.ListStates, database))
+	http.HandleFunc(util.AddBase("api/states/stats"), handleWithDB(api.ListStateStats, database))
 	http.HandleFunc(util.AddBase("api/state/"), handleWithDB(api.GetState, database))
 	http.HandleFunc(util.AddBase("api/history/"), api.GetHistory)
 	http.HandleFunc(util.AddBase("api/search/attribute"), handleWithDB(api.SearchAttribute, database))

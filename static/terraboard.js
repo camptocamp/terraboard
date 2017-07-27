@@ -2,7 +2,8 @@ var app = angular.module("terraboard", ['ngRoute', 'ngSanitize', 'ui.select'], f
     $locationProvider.html5Mode(true);
 
     $routeProvider.when("/", {
-        templateUrl: "static/main.html"
+        templateUrl: "static/main.html",
+        controller: "tbMainCtrl"
     }).when("/state/:path*", {
         templateUrl: "static/state.html",
         controller: "tbStateCtrl"
@@ -13,6 +14,30 @@ var app = angular.module("terraboard", ['ngRoute', 'ngSanitize', 'ui.select'], f
         redirectTo: "/"
     });
 });
+
+app.controller("tbMainCtrl", ['$scope', '$http', function($scope, $http) {
+    $scope.itemsPerPage = 20;
+
+    $scope.getStats = function(page) {
+        var params = {};
+        if (page != undefined) {
+            params.page = page;
+        }
+        var query = $.param(params);
+        $http.get('api/states/stats?'+query).then(function(response){
+            $scope.results = response.data;
+            $scope.pages = Math.ceil($scope.results.total / $scope.itemsPerPage);
+            $scope.page = $scope.results.page;
+            $scope.prevPage = (page <= 1) ? undefined : $scope.page - 1;
+            $scope.nextPage = (page >= $scope.pages) ? undefined : $scope.page + 1;
+            $scope.startItems = $scope.itemsPerPage*($scope.page-1)+1;
+            $scope.itemsInPage = Math.min($scope.itemsPerPage*$scope.page, $scope.results.total)
+        });
+    };
+
+    // On page load
+    $scope.getStats(1);
+}]);
 
 app.controller("tbListCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
     if ($location.path().startsWith("/state/")) {
@@ -106,8 +131,6 @@ app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', 
     };
 
     $scope.itemsPerPage = 20;
-    $scope.page = 1;
-    $scope.nextPage = 2;
 
     $scope.doSearch = function(page) {
         var params = {};
@@ -127,7 +150,6 @@ app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', 
             params.page = page;
         }
         var query = $.param(params);
-        console.log(query);
         $http.get('api/search/attribute?'+query).then(function(response){
             $scope.results = response.data;
             $scope.pages = Math.ceil($scope.results.total / $scope.itemsPerPage);
@@ -138,6 +160,9 @@ app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', 
             $scope.itemsInPage = Math.min($scope.itemsPerPage*$scope.page, $scope.results.total)
         });
     }
+
+    // On page load
+    $scope.doSearch(1);
 
     $scope.clearForm = function() {
         $scope.resType = undefined;

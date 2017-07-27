@@ -3,4 +3,56 @@
     <p>
     Welcome to Terraboard. Select a state file from the list above.
     </p>
+
+    <label id="navigate" ng-show="results">
+        <span class="glyphicon glyphicon-triangle-left" ng-click="getStats(prevPage)" ng-show="prevPage"></span> {{startItems}}-{{itemsInPage}}/{{results.total}} <span class="glyphicon glyphicon-triangle-right" ng-click="getStats(nextPage)" ng-show="nextPage"></span>
+    </label>
+</div>
+
+<div id="results">
+    <table class="table table-border table-striped">
+        <thead>
+            <th></th>
+            <th>
+                <a href="#" ng-click="sortType = 'path'">
+                    Path
+                    <span ng-show="sortType == 'path'" class="glyphicon glyphicon-chevron-down"></span>
+                </a>
+            </th>
+            <th>
+                <a href="#" ng-click="sortType = 'terraform_version'">
+                    TF Version
+                    <span ng-show="sortType == 'terraform_version'" class="glyphicon glyphicon-chevron-down"></span>
+                </a>
+            </th>
+            <th>
+                <a href="#" ng-click="sortType = 'serial'">
+                    Serial
+                    <span ng-show="sortType == 'serial'" class="glyphicon glyphicon-chevron-down"></span>
+                </a>
+            </th>
+            <th>
+                <a href="#" ng-click="sortType = 'last_modified'">
+                    Time
+                    <span ng-show="sortType == 'serial'" class="glyphicon glyphicon-chevron-down"></span>
+                </a>
+            </th>
+            <th>
+                <a href="#" ng-click="sortType = 'resources'">
+                    Resources
+                    <span ng-show="sortType == 'resources'" class="glyphicon glyphicon-chevron-down"></span>
+                </a>
+            </th>
+        </thead>
+        <tbody>
+            <tr ng-repeat="r in results.states | orderBy:sortType:sortReverse">
+                <td><a href="state/{{r.path}}?versionid={{r.version_id}}"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></td>
+                <td>{{r.path}}</td>
+                <td>{{r.terraform_version}}</td>
+                <td>{{r.serial}}</td>
+                <td>{{r.last_modified | date:'medium'}}</td>
+                <td>{{r.resource_count}}</td>
+            </tr>
+        </tbody>
+    </table>
 </div>
