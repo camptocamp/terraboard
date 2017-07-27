@@ -199,10 +199,8 @@ func (db *Database) SearchAttribute(query url.Values) (results []SearchResult, p
 	}
 
 	// Count everything
-	rows, _ := db.Raw("SELECT count(*)" + sqlQuery).Rows() // TODO: err
-	for rows.Next() {
-		rows.Scan(&total)
-	}
+	row := db.Raw("SELECT count(*)" + sqlQuery).Row()
+	row.Scan(&total)
 
 	// Now get results
 	// gorm doesn't support subqueries...
@@ -245,11 +243,8 @@ type StateStat struct {
 }
 
 func (db *Database) ListStateStats(query url.Values) (states []StateStat, page int, total int) {
-	rows, _ := db.Table("states").Select("count(*)").Rows()
-	defer rows.Close()
-	for rows.Next() {
-		rows.Scan(&total)
-	}
+	row := db.Table("states").Select("count(*)").Row()
+	row.Scan(&total)
 
 	offset := 0
 	page = 1
@@ -324,13 +319,7 @@ func (db *Database) DefaultVersion(path string) (version string, err error) {
 		" JOIN versions on states.version_id=versions.id" +
 		fmt.Sprintf(" WHERE states.path = '%s'", path)
 
-	rows, err := db.Raw(sqlQuery).Rows()
-	defer rows.Close()
-	if err != nil {
-		return version, err
-	}
-	for rows.Next() {
-		rows.Scan(&version)
-	}
+	row := db.Raw(sqlQuery).Row()
+	row.Scan(&version)
 	return
 }
