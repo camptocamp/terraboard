@@ -86,7 +86,11 @@ func main() {
 	database := db.Init(
 		c.DB.Host, c.DB.User,
 		c.DB.Name, c.DB.Password)
-	go refreshDB(database)
+	if c.DB.NoSync {
+		log.Infof("Not syncing database, as requested.")
+	} else {
+		go refreshDB(database)
+	}
 	defer database.Close()
 
 	// Index is a wildcard for all paths
