@@ -69,6 +69,18 @@ func GetState(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	io.WriteString(w, string(jState))
 }
 
+func GetStateActivity(w http.ResponseWriter, r *http.Request, d *db.Database) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	st := util.TrimBase(r, "api/state/activity/")
+	activity := d.GetStateActivity(st)
+
+	jActivity, err := json.Marshal(activity)
+	if err != nil {
+		JSONError(w, "Failed to marshal state activity", err)
+	}
+	io.WriteString(w, string(jActivity))
+}
+
 func GetHistory(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	st := util.TrimBase(r, "api/history/")
