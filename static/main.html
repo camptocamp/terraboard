@@ -5,12 +5,12 @@
 </div>
 <div class="row">
     <div class="overview-chart col-xs-6 col-sm-3">
-        <canvas height="200px" id="chart-pie-rt" class="chart chart-pie" chart-data="pieRTData" chart-labels="pieRTLabels" chart-options="pieTVOptions"></canvas>
+        <canvas ng-init="getRTChart()" height="200px" id="chart-pie-rt" class="chart chart-pie" chart-data="pieRTData" chart-labels="pieRTLabels" chart-options="pieTVOptions"></canvas>
         <h4>Resource types</h4>
     </div>
      <div class="overview-chart col-xs-6 col-sm-3">
-        <canvas height="200px" id="chart-pie-tv" class="chart chart-pie" chart-data="pieTVData" chart-labels="pieTVLabels" chart-options="pieTVOptions"></canvas>
-        <h4>Resources type</h4>
+        <canvas ng-init="getTVChart()" height="200px" id="chart-pie-tv" class="chart chart-pie" chart-data="pieTVData" chart-labels="pieTVLabels" chart-options="pieTVOptions"></canvas>
+        <h4>Terraform versions</h4>
     </div>
 
     <div class="col-xs-6 col-sm-3 col-sm-offset-1">

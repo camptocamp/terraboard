@@ -18,26 +18,26 @@ var app = angular.module("terraboard", ['ngRoute', 'ngSanitize', 'ui.select', 'c
 app.directive("sparklinechart", function () {
     return {
         restrict: "E",
-	scope: {
+        scope: {
             data: "@"
-	},
-	compile: function (tElement, tAttrs, transclude) {
+        },
+        compile: function (tElement, tAttrs, transclude) {
             tElement.replaceWith("<span>" + tAttrs.data + "</span>");
             return function (scope, element, attrs) {
                 attrs.$observe("data", function (newValue) {
                     element.html(newValue);
-	            element.sparkline(
+                    element.sparkline(
                         'html', {
-		            type: 'line',
-		            width: '200px',
-		            height: 'auto',
-		            barWidth: 11,
-		            barColor: 'blue'
-		        }
+                            type: 'line',
+                            width: '200px',
+                            height: 'auto',
+                            barWidth: 11,
+                            barColor: 'blue'
+                        }
                     );
-		});
+                });
             };
-	}
+        }
     };
 });
 
@@ -90,31 +90,49 @@ app.controller("tbMainCtrl", ['$scope', '$http', function($scope, $http) {
     });
 
     /*
-     * TODO: Display the 6 most important types and put the sum of the rest of types into the 7th
-     * That could make the chart more comprehensible.
+     * Display the 6 most important types and put the sum of the rest of types into the 7th
+     * That makes the chart more comprehensible.
      */
-    $scope.pieRTLabels = [];
-    $scope.pieRTData   = [];
+
+    pieRTData   = new Array(7);
+    pieRTLabels = new Array(7);
     $http.get('api/resource/types/count').then(function(response){
         data = response.data;
-        for (var i = 0; i < data.length; i++) {
-            $scope.pieRTLabels.push(data[i].name);
-            $scope.pieRTData.push(data[i].count);
-        }
+        angular.forEach(data, function(value, i) {
+            if(i < 7) {
+                pieRTLabels[i] = value.name;
+                pieRTData[i]   = parseInt(value.count, 10);
+            } else {
+                pieRTLabels[6] = "Other";
+                pieRTData[6]   += parseInt(value.count, 10);
+            }
+        });
     });
+    $scope.pieRTData   = pieRTData;
+    $scope.pieRTLabels = pieRTLabels;
     $scope.pieRTOptions = { legend: { display: false } };
 
-    $scope.pieTVLabels = [];
-    $scope.pieTVData   = [];
+
+
+    pieTVData   = new Array(7);
+    pieTVLabels = new Array(7);
     $http.get('api/states/tfversion/count').then(function(response){
         data = response.data;
-        for (var i = 0; i < data.length; i++) {
-            $scope.pieTVLabels.push(data[i].name);
-            $scope.pieTVData.push(data[i].count);
-        }
+        angular.forEach(data, function(value, i) {
+            if(i < 7) {
+                pieTVLabels[i] = value.name;
+                pieTVData[i]   = parseInt(value.count, 10);
+            } else {
+                pieTVData[6] += parseInt(value.count, 10);
+                pieTVLabels[6] = "Other";
+            }
+        });
     });
-    $scope.pieTVOptions = { legend: { display: false } };
 
+    $scope.pieTVLabels = pieTVLabels;
+    $scope.pieTVData = pieTVData;
+
+    $scope.pieTVOptions = { legend: { display: false } };
 }]);
 
 app.controller("tbListCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
