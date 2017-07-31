@@ -255,7 +255,7 @@ type StateStat struct {
 }
 
 func (db *Database) ListStateStats(query url.Values) (states []StateStat, page int, total int) {
-	row := db.Table("states").Select("count(*)").Row()
+	row := db.Table("states").Select("count(DISTINCT path)").Row()
 	row.Scan(&total)
 
 	offset := 0
