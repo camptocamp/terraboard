@@ -133,11 +133,11 @@ func (db *Database) GetState(path, versionId string) (state State) {
 
 func (db *Database) GetStateActivity(path string) (states []StateStat) {
 	sql := "SELECT t.path, t.serial, t.tf_version, t.version_id, t.last_modified, count(resources.*) as resource_count" +
-		fmt.Sprintf(" FROM (SELECT states.id, states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified FROM states JOIN versions ON versions.id = states.version_id WHERE states.path = '%s' ORDER BY states.path, versions.last_modified DESC) t", path) +
+		fmt.Sprintf(" FROM (SELECT states.id, states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified FROM states JOIN versions ON versions.id = states.version_id WHERE states.path = '%s' ORDER BY states.path, versions.last_modified ASC) t", path) +
 		" JOIN modules ON modules.state_id = t.id" +
 		" JOIN resources ON resources.module_id = modules.id" +
 		" GROUP BY t.path, t.serial, t.tf_version, t.version_id, t.last_modified" +
-		" ORDER BY last_modified DESC"
+		" ORDER BY last_modified ASC"
 
 	db.Raw(sql).Find(&states)
 	return
@@ -270,7 +270,7 @@ func (db *Database) ListStateStats(query url.Values) (states []StateStat, page i
 		" JOIN modules ON modules.state_id = t.id" +
 		" JOIN resources ON resources.module_id = modules.id" +
 		" GROUP BY t.path, t.serial, t.tf_version, t.version_id, t.last_modified" +
-		" ORDER BY last_modified ASC" +
+		" ORDER BY last_modified DESC" +
 		" LIMIT 20" +
 		fmt.Sprintf(" OFFSET %v", offset)
 
