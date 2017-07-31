@@ -245,6 +245,10 @@ func (db *Database) ListStates() (states []string) {
 	return
 }
 
+func (db *Database) ListTerraformVersionsWithCount() ([]map[string]string, error) {
+	return db.listFieldWithCount("states", "tf_version")
+}
+
 type StateStat struct {
 	Path          string    `json:"path"`
 	TFVersion     string    `json:"terraform_version"`
@@ -294,8 +298,32 @@ func (db *Database) listField(table, field string) (results []string, err error)
 	return
 }
 
+func (db *Database) listFieldWithCount(table, field string) (results []map[string]string, err error) {
+	rows, err := db.Table(table).Select(fmt.Sprintf("%s, COUNT(*)", field)).Group(field).Order("count DESC").Rows()
+	defer rows.Close()
+	if err != nil {
+		return results, err
+	}
+
+	for rows.Next() {
+		var name string
+		var count string
+		r := make(map[string]string)
+		rows.Scan(&name, &count)
+		r["name"] = name
+		r["count"] = count
+		results = append(results, r)
+	}
+
+	return
+}
+
 func (db *Database) ListResourceTypes() ([]string, error) {
 	return db.listField("resources", "type")
+}
+
+func (db *Database) ListResourceTypesWithCount() ([]map[string]string, error) {
+	return db.listFieldWithCount("resources", "type")
 }
 
 func (db *Database) ListResourceNames() ([]string, error) {

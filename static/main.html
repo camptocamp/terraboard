@@ -4,17 +4,22 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-lg-3 col-md-6 ng-isolate-scope pull-right">
+    <div class="overview-chart col-xs-6 col-sm-3">
+        <canvas height="200px" id="chart-pie-rt" class="chart chart-pie" chart-data="pieRTData" chart-labels="pieRTLabels" chart-options="pieTVOptions"></canvas>
+        <h4>Resource types</h4>
+    </div>
+     <div class="overview-chart col-xs-6 col-sm-3">
+        <canvas height="200px" id="chart-pie-tv" class="chart chart-pie" chart-data="pieTVData" chart-labels="pieTVLabels" chart-options="pieTVOptions"></canvas>
+        <h4>Resources type</h4>
+    </div>
+
+    <div class="col-xs-6 col-sm-3 col-sm-offset-1">
         <div class="panel panel-primary">
             <div class="panel-heading">
-                <div class="row">
-                    <div class="col-xs-3">
-                        <h1 class="glyphicon glyphicon-file fa-5x" aria-hidden="true"></h1>
-                    </div>
-                    <div class="col-xs-9 text-right">
-                        <div class="huge ng-binding">{{results.total}}</div>
-                        <div class="ng-binding">statefiles stored</div>
-                    </div>
+                <h1 class="glyphicon glyphicon-file fa-5x" aria-hidden="true"></h1>
+                <div class="col-xs-9 text-right pull-right">
+                    <div class="huge ng-binding">{{results.total}}</div>
+                    <div class="ng-binding">statefiles versions stored</div>
                 </div>
             </div>
         </div>

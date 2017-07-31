@@ -191,3 +191,6 @@ pre.sh_sourceCode .sh_oldfile {
 #navigate span {
   cursor: pointer;
 }
+.overview-chart {
+  text-align: center;
+}

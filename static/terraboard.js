@@ -1,4 +1,4 @@
-var app = angular.module("terraboard", ['ngRoute', 'ngSanitize', 'ui.select'], function($locationProvider, $routeProvider){
+var app = angular.module("terraboard", ['ngRoute', 'ngSanitize', 'ui.select', 'chart.js'], function($locationProvider, $routeProvider){
     $locationProvider.html5Mode(true);
 
     $routeProvider.when("/", {
@@ -16,28 +16,29 @@ var app = angular.module("terraboard", ['ngRoute', 'ngSanitize', 'ui.select'], f
 });
 
 app.directive("sparklinechart", function () {
-	return {
-		restrict: "E",
-		scope: {
-			data: "@"
-		},
-		compile: function (tElement, tAttrs, transclude) {
-			tElement.replaceWith("<span>" + tAttrs.data + "</span>");
-			return function (scope, element, attrs) {
-				attrs.$observe("data", function (newValue) {
-					element.html(newValue);
-					element.sparkline(
-							'html', {
-								type: 'line',
-								width: '200px',
-								height: 'auto',
-								barWidth: 11,
-								barColor: 'blue'
-							});
-				});
-			};
-		}
-	};
+    return {
+        restrict: "E",
+	scope: {
+            data: "@"
+	},
+	compile: function (tElement, tAttrs, transclude) {
+            tElement.replaceWith("<span>" + tAttrs.data + "</span>");
+            return function (scope, element, attrs) {
+                attrs.$observe("data", function (newValue) {
+                    element.html(newValue);
+	            element.sparkline(
+                        'html', {
+		            type: 'line',
+		            width: '200px',
+		            height: 'auto',
+		            barWidth: 11,
+		            barColor: 'blue'
+		        }
+                    );
+		});
+            };
+	}
+    };
 });
 
 app.controller("tbMainCtrl", ['$scope', '$http', function($scope, $http) {
@@ -87,6 +88,33 @@ app.controller("tbMainCtrl", ['$scope', '$http', function($scope, $http) {
             return false;
         };
     });
+
+    /*
+     * TODO: Display the 6 most important types and put the sum of the rest of types into the 7th
+     * That could make the chart more comprehensible.
+     */
+    $scope.pieRTLabels = [];
+    $scope.pieRTData   = [];
+    $http.get('api/resource/types/count').then(function(response){
+        data = response.data;
+        for (var i = 0; i < data.length; i++) {
+            $scope.pieRTLabels.push(data[i].name);
+            $scope.pieRTData.push(data[i].count);
+        }
+    });
+    $scope.pieRTOptions = { legend: { display: false } };
+
+    $scope.pieTVLabels = [];
+    $scope.pieTVData   = [];
+    $http.get('api/states/tfversion/count').then(function(response){
+        data = response.data;
+        for (var i = 0; i < data.length; i++) {
+            $scope.pieTVLabels.push(data[i].name);
+            $scope.pieTVData.push(data[i].count);
+        }
+    });
+    $scope.pieTVOptions = { legend: { display: false } };
+
 }]);
 
 app.controller("tbListCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {

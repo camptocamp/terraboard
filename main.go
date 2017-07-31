@@ -103,11 +103,13 @@ func main() {
 	// Handle API points
 	http.HandleFunc(util.AddBase("api/states"), handleWithDB(api.ListStates, database))
 	http.HandleFunc(util.AddBase("api/states/stats"), handleWithDB(api.ListStateStats, database))
+	http.HandleFunc(util.AddBase("api/states/tfversion/count"), handleWithDB(api.ListTerraformVersionsWithCount, database))
 	http.HandleFunc(util.AddBase("api/state/"), handleWithDB(api.GetState, database))
 	http.HandleFunc(util.AddBase("api/state/activity/"), handleWithDB(api.GetStateActivity, database))
 	http.HandleFunc(util.AddBase("api/locks"), api.GetLocks)
 	http.HandleFunc(util.AddBase("api/search/attribute"), handleWithDB(api.SearchAttribute, database))
 	http.HandleFunc(util.AddBase("api/resource/types"), handleWithDB(api.ListResourceTypes, database))
+	http.HandleFunc(util.AddBase("api/resource/types/count"), handleWithDB(api.ListResourceTypesWithCount, database))
 	http.HandleFunc(util.AddBase("api/resource/names"), handleWithDB(api.ListResourceNames, database))
 	http.HandleFunc(util.AddBase("api/attribute/keys"), handleWithDB(api.ListAttributeKeys, database))
 
