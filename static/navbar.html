@@ -24,7 +24,7 @@
                            style="min-width: 400px;"
                            title="Choose a state file">
                     <ui-select-match placeholder="{{placeholder}}">{{placeholder}}</ui-select-match>
-                    <ui-select-choices repeat="state as state in states | filter: $select.search">
+                    <ui-select-choices repeat="state as state in states | filter: $select.search | orderBy">
                         <a href="state/{{state}}" target="_self">{{state | highlight: $select.search}}</a>
                     </ui-select-choices>
                 </ui-select>
