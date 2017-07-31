@@ -57,6 +57,9 @@
                     <span ng-show="sortType == 'resources'" class="glyphicon glyphicon-chevron-down"></span>
                 </a>
             </th>
+            <th>
+                Activity
+            </th>
         </thead>
         <tbody>
             <tr ng-repeat="r in results.states">
@@ -66,6 +69,9 @@
                 <td>{{r.serial}}</td>
                 <td>{{r.last_modified | date:'medium'}}</td>
                 <td>{{r.resource_count}}</td>
+                <td ng-init="getActivity($index, r.path)">
+                    <sparklinechart data="{{r.activity}}"></sparklinechart>
+                </td>
             </tr>
         </tbody>
     </table>
