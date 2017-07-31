@@ -131,6 +131,18 @@ func (db *Database) GetState(path, versionId string) (state State) {
 	return
 }
 
+func (db *Database) GetStateActivity(path string) (states []StateStat) {
+	sql := "SELECT t.path, t.serial, t.tf_version, t.version_id, t.last_modified, count(resources.*) as resource_count" +
+		fmt.Sprintf(" FROM (SELECT states.id, states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified FROM states JOIN versions ON versions.id = states.version_id WHERE states.path = '%s' ORDER BY states.path, versions.last_modified DESC) t", path) +
+		" JOIN modules ON modules.state_id = t.id" +
+		" JOIN resources ON resources.module_id = modules.id" +
+		" GROUP BY t.path, t.serial, t.tf_version, t.version_id, t.last_modified" +
+		" ORDER BY last_modified DESC"
+
+	db.Raw(sql).Find(&states)
+	return
+}
+
 func (db *Database) KnownVersions() (versions []string) {
 	// TODO: err
 	rows, _ := db.Table("versions").Select("DISTINCT version_id").Rows()
@@ -243,7 +255,7 @@ type StateStat struct {
 }
 
 func (db *Database) ListStateStats(query url.Values) (states []StateStat, page int, total int) {
-	row := db.Table("states").Select("count(*)").Row()
+	row := db.Table("states").Select("count(DISTINCT path)").Row()
 	row.Scan(&total)
 
 	offset := 0
@@ -253,14 +265,16 @@ func (db *Database) ListStateStats(query url.Values) (states []StateStat, page i
 		offset = (page - 1) * pageSize
 	}
 
-	db.Table("states").
-		Select("states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified, count(resources.id) as resource_count").
-		Joins("JOIN versions ON versions.id = states.version_id").
-		Joins("JOIN modules ON states.id = modules.state_id").
-		Joins("JOIN resources ON modules.id = resources.module_id").
-		Group("states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified").
-		Order("versions.last_modified DESC").
-		Limit(pageSize).Offset(offset).Find(&states)
+	sql := "SELECT t.path, t.serial, t.tf_version, t.version_id, t.last_modified, count(resources.*) as resource_count" +
+		" FROM (SELECT DISTINCT ON(states.path) states.id, states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified FROM states JOIN versions ON versions.id = states.version_id ORDER BY states.path, versions.last_modified DESC) t" +
+		" JOIN modules ON modules.state_id = t.id" +
+		" JOIN resources ON resources.module_id = modules.id" +
+		" GROUP BY t.path, t.serial, t.tf_version, t.version_id, t.last_modified" +
+		" ORDER BY last_modified ASC" +
+		" LIMIT 20" +
+		fmt.Sprintf(" OFFSET %v", offset)
+
+	db.Raw(sql).Find(&states)
 	return
 }
 

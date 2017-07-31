@@ -15,6 +15,31 @@ var app = angular.module("terraboard", ['ngRoute', 'ngSanitize', 'ui.select'], f
     });
 });
 
+app.directive("sparklinechart", function () {
+	return {
+		restrict: "E",
+		scope: {
+			data: "@"
+		},
+		compile: function (tElement, tAttrs, transclude) {
+			tElement.replaceWith("<span>" + tAttrs.data + "</span>");
+			return function (scope, element, attrs) {
+				attrs.$observe("data", function (newValue) {
+					element.html(newValue);
+					element.sparkline(
+							'html', {
+								type: 'line',
+								width: '200px',
+								height: 'auto',
+								barWidth: 11,
+								barColor: 'blue'
+							});
+				});
+			};
+		}
+	};
+});
+
 app.controller("tbMainCtrl", ['$scope', '$http', function($scope, $http) {
     $scope.itemsPerPage = 20;
 
@@ -37,6 +62,20 @@ app.controller("tbMainCtrl", ['$scope', '$http', function($scope, $http) {
 
     // On page load
     $scope.getStats(1);
+
+    $scope.getActivity = function(idx, path) {
+        $http.get('api/state/activity/'+path).then(function(response){
+            var states = response.data;
+            var activityData = [];
+            for (i=0; i < states.length; i++) {
+                var date = new Date(states[i].last_modified).getTime() / 1000;
+                activityData.push(date+":"+states[i].resource_count);
+            }
+            var activity = activityData.join(",");
+
+            $scope.results.states[idx].activity = activity;
+        });
+    };
 }]);
 
 app.controller("tbListCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {

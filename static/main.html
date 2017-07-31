@@ -57,15 +57,21 @@
                     <span ng-show="sortType == 'resources'" class="glyphicon glyphicon-chevron-down"></span>
                 </a>
             </th>
+            <th>
+                Activity
+            </th>
         </thead>
         <tbody>
-            <tr ng-repeat="r in results.states | orderBy:sortType:sortReverse">
+            <tr ng-repeat="r in results.states">
                 <td><a href="state/{{r.path}}?versionid={{r.version_id}}"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></td>
                 <td>{{r.path}}</td>
                 <td>{{r.terraform_version}}</td>
                 <td>{{r.serial}}</td>
                 <td>{{r.last_modified | date:'medium'}}</td>
                 <td>{{r.resource_count}}</td>
+                <td ng-init="getActivity($index, r.path)">
+                    <sparklinechart data="{{r.activity}}"></sparklinechart>
+                </td>
             </tr>
         </tbody>
     </table>
