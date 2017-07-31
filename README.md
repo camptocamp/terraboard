@@ -14,7 +14,9 @@ Web Dashboard to inspect Terraform States
 Terraboard is a web dashboard to visualize and query
 [Terraform](https://terraform.io) states.
 
-![Screenshot](screenshot.png)
+![Screenshot Overview](screenshots/main.png)
+
+![Screenshot State](screenshots/state.png)
 
 
 ### Requirements
