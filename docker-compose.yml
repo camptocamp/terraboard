@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: camptocamp/terraboard:devel
     command: --no-sync
     ports:
       - 80:8080
