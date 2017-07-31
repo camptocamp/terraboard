@@ -16,6 +16,8 @@ services:
       DB_PASSWORD: mypassword
     links:
       - db
+    volumes:
+      - ./static:/static:ro
 
   db:
     image: postgres:9.5
