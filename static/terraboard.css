@@ -197,3 +197,15 @@ pre.sh_sourceCode .sh_oldfile {
 .form-inline .ui-select-container .ui-select-search {
   width: 100%;
 }
+.ui-select-match-text{
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 40px;
+}
+.ui-select-toggle > .btn.btn-link {
+  margin-right: 10px;
+  top: 6px;
+  position: absolute;
+  right: 10px;
+}

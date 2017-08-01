@@ -255,7 +255,7 @@ app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, 
     });
 }]);
 
-app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', function($scope, $http) {
+app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', function($scope, $http, $location) {
     $http.get('api/resource/types').then(function(response){
         $scope.resource_keys = response.data;
     });
@@ -304,6 +304,18 @@ app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', 
     }
 
     // On page load
+    if ($location.search().type != "") {
+        $scope.resType = $location.search().type;
+    }
+    if ($location.search().name != "") {
+        $scope.resID = $location.search().name;
+    }
+    if ($location.search().key != "") {
+        $scope.attrKey = $location.search().key;
+    }
+    if ($location.search().val != "") {
+        $scope.attrVal = $location.search().value;
+    }
     $scope.doSearch(1);
 
     $scope.clearForm = function() {
@@ -312,6 +324,27 @@ app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', 
         $scope.attrKey = undefined;
         $scope.attrVal = undefined;
         $scope.results = undefined;
-        $scope.doSearch(1);
+        $location.url('/search');
+    }
+
+    $scope.createPermalink = function(page) {
+        var params = {};
+        if ($scope.resType != "") {
+            params.type = $scope.resType;
+        }
+        if ($scope.resID != "") {
+            params.name = $scope.resID;
+        }
+        if ($scope.attrKey != "") {
+            params.key = $scope.attrKey;
+        }
+        if ($scope.attrVal != "") {
+            params.value = $scope.attrVal;
+        }
+        if (page != undefined) {
+            params.page = page;
+        }
+        var query = $.param(params);
+        $location.url('/search?'+query);
     }
 }]);
