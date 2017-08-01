@@ -133,9 +133,10 @@ app.controller("tbMainCtrl", ['$scope', '$http', function($scope, $http) {
     $scope.pieLockedStatesData   = [0, 0];
     $scope.$watch('locks', function(nv, ov){
         $scope.pieLockedStatesData[0] = Object.keys(nv).length;
+        $scope.pieLockedStatesData[1] -= Object.keys(nv).length;
     });
     $scope.$watch('results.total', function(nv, ov){
-        $scope.pieLockedStatesData[1] = nv;
+        $scope.pieLockedStatesData[1] = nv - $scope.pieLockedStatesData[0];
     });
     $scope.pieLockedStatesOptions = { legend: { display: false } };
 
