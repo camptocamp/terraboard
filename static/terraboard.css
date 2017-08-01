@@ -191,3 +191,11 @@ pre.sh_sourceCode .sh_oldfile {
 #navigate span {
   cursor: pointer;
 }
+.overview-chart {
+  text-align: center;
+}
+.jqstooltip {
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}

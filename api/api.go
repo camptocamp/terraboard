@@ -32,6 +32,18 @@ func ListStates(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	io.WriteString(w, string(j))
 }
 
+func ListTerraformVersionsWithCount(w http.ResponseWriter, r *http.Request, d *db.Database) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	query := r.URL.Query()
+	versions, _ := d.ListTerraformVersionsWithCount(query)
+
+	j, err := json.Marshal(versions)
+	if err != nil {
+		JSONError(w, "Failed to marshal states", err)
+	}
+	io.WriteString(w, string(j))
+}
+
 func ListStateStats(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	query := r.URL.Query()
@@ -116,6 +128,16 @@ func SearchAttribute(w http.ResponseWriter, r *http.Request, d *db.Database) {
 func ListResourceTypes(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	result, _ := d.ListResourceTypes()
+	j, err := json.Marshal(result)
+	if err != nil {
+		JSONError(w, "Failed to marshal json", err)
+	}
+	io.WriteString(w, string(j))
+}
+
+func ListResourceTypesWithCount(w http.ResponseWriter, r *http.Request, d *db.Database) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	result, _ := d.ListResourceTypesWithCount()
 	j, err := json.Marshal(result)
 	if err != nil {
 		JSONError(w, "Failed to marshal json", err)

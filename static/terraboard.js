@@ -1,4 +1,4 @@
-var app = angular.module("terraboard", ['ngRoute', 'ngSanitize', 'ui.select'], function($locationProvider, $routeProvider){
+var app = angular.module("terraboard", ['ngRoute', 'ngSanitize', 'ui.select', 'chart.js'], function($locationProvider, $routeProvider){
     $locationProvider.html5Mode(true);
 
     $routeProvider.when("/", {
@@ -16,28 +16,29 @@ var app = angular.module("terraboard", ['ngRoute', 'ngSanitize', 'ui.select'], f
 });
 
 app.directive("sparklinechart", function () {
-	return {
-		restrict: "E",
-		scope: {
-			data: "@"
-		},
-		compile: function (tElement, tAttrs, transclude) {
-			tElement.replaceWith("<span>" + tAttrs.data + "</span>");
-			return function (scope, element, attrs) {
-				attrs.$observe("data", function (newValue) {
-					element.html(newValue);
-					element.sparkline(
-							'html', {
-								type: 'line',
-								width: '200px',
-								height: 'auto',
-								barWidth: 11,
-								barColor: 'blue'
-							});
-				});
-			};
-		}
-	};
+    return {
+        restrict: "E",
+        scope: {
+            data: "@"
+        },
+        compile: function (tElement, tAttrs, transclude) {
+            tElement.replaceWith("<span>" + tAttrs.data + "</span>");
+            return function (scope, element, attrs) {
+                attrs.$observe("data", function (newValue) {
+                    element.html(newValue);
+                    element.sparkline(
+                        'html', {
+                            type: 'line',
+                            width: '200px',
+                            height: 'auto',
+                            barWidth: 11,
+                            barColor: 'blue'
+                        }
+                    );
+                });
+            };
+        }
+    };
 });
 
 app.controller("tbMainCtrl", ['$scope', '$http', function($scope, $http) {
@@ -87,6 +88,57 @@ app.controller("tbMainCtrl", ['$scope', '$http', function($scope, $http) {
             return false;
         };
     });
+
+    pieResourceTypesLabels   = [[], [], [], [], [], [], ["Total"]];
+    pieResourceTypesData     = [0, 0, 0, 0, 0, 0, 0];
+    $http.get('api/resource/types/count').then(function(response){
+        data = response.data;
+        angular.forEach(data, function(value, i) {
+            if(i < 6) {
+                pieResourceTypesLabels[i] = value.name;
+                pieResourceTypesData[i]   = parseInt(value.count, 10);
+            } else {
+                pieResourceTypesLabels[6].push(value.name+": "+value.count);
+                pieResourceTypesData[6] += parseInt(value.count, 10);
+            }
+        });
+    });
+    $scope.pieResourceTypesData    = pieResourceTypesData;
+    $scope.pieResourceTypesLabels  = pieResourceTypesLabels;
+    $scope.pieResourceTypesOptions = { legend: { display: false } };
+
+
+
+    pieTfVersionsLabels   = [[], [], [], [], [], [], ["Total"]];
+    pieTfVersionsData     = [0, 0, 0, 0, 0, 0, 0];
+    $http.get('api/states/tfversion/count?orderBy=version').then(function(response){
+        data = response.data;
+        angular.forEach(data, function(value, i) {
+            if(i < 6) {
+                pieTfVersionsLabels[i] = [value.name];
+                pieTfVersionsData[i]   = parseInt(value.count, 10);
+            } else {
+                pieTfVersionsData[6] += parseInt(value.count, 10);
+                pieTfVersionsLabels[6].push(value.name+": "+value.count);
+            }
+        });
+    });
+
+    $scope.pieTfVersionsLabels  = pieTfVersionsLabels;
+    $scope.pieTfVersionsData    = pieTfVersionsData;
+    $scope.pieTfVersionsOptions = { legend: { display: false } };
+
+
+    $scope.pieLockedStatesLabels = ["Locked", "Unlocked"];
+    $scope.pieLockedStatesData   = new Array(2);
+    $http.get('api/locks').then(function(response){
+        data = response.data;
+        $scope.pieLockedStatesData[0] = Object.keys(data).length;
+        $scope.pieLockedStatesData[1] = $scope.results.total;
+    });
+    $scope.pieLockedStatesOptions = { legend: { display: false } };
+
+
 }]);
 
 app.controller("tbListCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
