@@ -73,6 +73,28 @@ $ go get github.com/camptocamp/terraboard
 
 ## Development
 
+### Architecture
+
+Terraboard is made of two components:
+
+#### A server process
+
+The server is written in go and runs a web server which serves:
+
+  - the API on known access points, taking the data from the PostgreSQL
+    database
+  - the index page (from [static/index.html](static/index.html)) on all other
+    URLs
+
+The server also has a routine which regularly (every 1 minute) feeds
+the PostgreSQL database from the S3 bucket.
+
+#### A web UI
+
+The UI is an AngularJS application served from `index.html`. All the UI code
+can be found in the [static/](static/) directory.
+
+
 
 ### Testing
 
