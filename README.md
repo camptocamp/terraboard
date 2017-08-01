@@ -32,6 +32,10 @@ requires:
    - `s3:ListBucketVersions`
    - `s3:GetObjectVersion`
 * A running PostgreSQL database
+* If you want to retrieve lock states
+  [from a dynamoDB table](https://www.terraform.io/docs/backends/types/s3.html#dynamodb_table),
+  you need to make sure the provided AWS credentials have `dynamodb:Scan` access to that
+  table.
 
 
 ## Use with Docker
