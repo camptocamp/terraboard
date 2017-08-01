@@ -130,11 +130,12 @@ app.controller("tbMainCtrl", ['$scope', '$http', function($scope, $http) {
 
 
     $scope.pieLockedStatesLabels = ["Locked", "Unlocked"];
-    $scope.pieLockedStatesData   = new Array(2);
-    $http.get('api/locks').then(function(response){
-        data = response.data;
-        $scope.pieLockedStatesData[0] = Object.keys(data).length;
-        $scope.pieLockedStatesData[1] = $scope.results.total;
+    $scope.pieLockedStatesData   = [0, 0];
+    $scope.$watch('locks', function(nv, ov){
+        $scope.pieLockedStatesData[0] = Object.keys(nv).length;
+    });
+    $scope.$watch('results.total', function(nv, ov){
+        $scope.pieLockedStatesData[1] = nv;
     });
     $scope.pieLockedStatesOptions = { legend: { display: false } };
 
