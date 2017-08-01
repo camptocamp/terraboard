@@ -1,3 +1,28 @@
+## 0.11.0 (August 1, 2017)
+
+FEATURES:
+
+- Server:
+
+  * Optimize various database queries
+  * Add state activity to API
+  * Add --no-sync flag to disable S3 syncing
+  * Get version list from activity API point [GH #10]
+  * Retire legacy history API point
+  * Add locks API point [GH #11]
+  * Add tfversion and types counts to API
+
+- UI:
+
+  * Use a non-fluid container and fix the margins
+  * Move index.html to static/ directory
+  * List each path only once in overview, with most recent version
+  * Add state activity to overview [GH #5]
+  * Sort state files in navbar select
+  * Add lock information to overview and state view [GH #11]
+  * Add charts to overview [GH #12]
+
+
 ## 0.10.1 (July 27, 2017)
 
 FIXES:
