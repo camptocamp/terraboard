@@ -1,24 +1,16 @@
 <div class="row">
-   <div class="overview-chart col-xs-6 col-sm-3" style="overflow: visible !important;">
-        <canvas style="width: 200px;height: 200px;overflow: visible !important;" ng-init="getRTChart()" height="200px" id="chart-pie-rt" class="chart chart-pie" chart-data="pieRTData" chart-labels="pieRTLabels" chart-options="pieTVOptions"></canvas>
-        <h4>Resource types</h4>
-    </div>
-     <div class="overview-chart col-xs-6 col-sm-3">
-        <canvas ng-init="getTVChart()" height="200px" id="chart-pie-tv" class="chart chart-pie" chart-data="pieTVData" chart-labels="pieTVLabels" chart-options="pieTVOptions"></canvas>
-        <h4>Terraform versions</h4>
-    </div>
-
-    <div class="col-xs-6 col-sm-3 col-sm-offset-1">
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h1 class="glyphicon glyphicon-file fa-5x" aria-hidden="true"></h1>
-                <div class="col-xs-9 text-right pull-right">
-                    <div class="huge ng-binding">{{results.total}}</div>
-                    <div class="ng-binding">statefiles versions stored</div>
-                </div>
-            </div>
-        </div>
-    </div>
+   <div class="overview-chart col-xs-6 col-sm-3 col-md-3 col-md-offset-1">
+      <canvas height="200px" id="chart-pie-resource-types" class="chart chart-pie" chart-data="pieResourceTypesData" chart-labels="pieResourceTypesLabels" chart-options="pieResourceTypesOptions"></canvas>
+      <h4>Resource types</h4>
+   </div>
+   <div class="overview-chart col-xs-6 col-sm-4">
+      <canvas height="150px" id="chart-pie-terraform-versions" class="chart chart-pie" chart-data="pieTfVersionsData" chart-labels="pieTfVersionsLabels" chart-options="pieTfVersionsOptions"></canvas>
+      <h4>Terraform versions</h4>
+   </div>
+   <div class="overview-chart col-xs-6 col-sm-3">
+      <canvas height="200px" id="chart-pie-ls" class="chart chart-pie" chart-data="pieLockedStatesData" chart-labels="pieLockedStatesLabels" chart-options="pieLockedStatesOptions"></canvas>
+      <h4>States locked</h4>
+   </div>
 </div>
 <div id="results" class="row">
     <label id="navigate" ng-show="results">

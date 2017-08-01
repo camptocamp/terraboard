@@ -89,63 +89,54 @@ app.controller("tbMainCtrl", ['$scope', '$http', function($scope, $http) {
         };
     });
 
-    /*
-     * Display the 6 most important types and put the sum of the rest of types into the 7th
-     * That makes the chart more comprehensible.
-     */
-
-    pieRTLabels   = [[], [], [], [], [], [], ["Total"]];
-    pieRTData     = [0, 0, 0, 0, 0, 0, 0];
+    pieResourceTypesLabels   = [[], [], [], [], [], [], ["Total"]];
+    pieResourceTypesData     = [0, 0, 0, 0, 0, 0, 0];
     $http.get('api/resource/types/count').then(function(response){
         data = response.data;
         angular.forEach(data, function(value, i) {
             if(i < 6) {
-                pieRTLabels[i] = value.name;
-                pieRTData[i]   = parseInt(value.count, 10);
+                pieResourceTypesLabels[i] = value.name;
+                pieResourceTypesData[i]   = parseInt(value.count, 10);
             } else {
-                pieRTLabels[6].push(value.name+": "+value.count);
-                pieRTData[6] += parseInt(value.count, 10);
+                pieResourceTypesLabels[6].push(value.name+": "+value.count);
+                pieResourceTypesData[6] += parseInt(value.count, 10);
             }
         });
     });
-    $scope.pieRTData   = pieRTData;
-    $scope.pieRTLabels = pieRTLabels;
-    $scope.pieRTOptions = { legend: { display: false } };
+    $scope.pieResourceTypesData    = pieResourceTypesData;
+    $scope.pieResourceTypesLabels  = pieResourceTypesLabels;
+    $scope.pieResourceTypesOptions = { legend: { display: false } };
 
 
 
-    pieTVLabels   = [[], [], [], [], [], [], ["Total"]];
-    pieTVData     = [0, 0, 0, 0, 0, 0, 0];
+    pieTfVersionsLabels   = [[], [], [], [], [], [], ["Total"]];
+    pieTfVersionsData     = [0, 0, 0, 0, 0, 0, 0];
     $http.get('api/states/tfversion/count?orderBy=version').then(function(response){
         data = response.data;
-        console.log(data);
         angular.forEach(data, function(value, i) {
             if(i < 6) {
-                pieTVLabels[i] = [value.name];
-                pieTVData[i]   = parseInt(value.count, 10);
+                pieTfVersionsLabels[i] = [value.name];
+                pieTfVersionsData[i]   = parseInt(value.count, 10);
             } else {
-                pieTVData[6] += parseInt(value.count, 10);
-                pieTVLabels[6].push(value.name+": "+value.count);
+                pieTfVersionsData[6] += parseInt(value.count, 10);
+                pieTfVersionsLabels[6].push(value.name+": "+value.count);
             }
         });
     });
 
-    $scope.pieTVLabels = pieTVLabels;
-    $scope.pieTVData = pieTVData;
+    $scope.pieTfVersionsLabels  = pieTfVersionsLabels;
+    $scope.pieTfVersionsData    = pieTfVersionsData;
+    $scope.pieTfVersionsOptions = { legend: { display: false } };
 
-    $scope.pieTVOptions = { legend: { display: false } };
 
-    pieLSLabels   = [[], [], [], [], [], [], ["Total"]];
-    pieLSData     = [0, 0, 0, 0, 0, 0, 0];
+    $scope.pieLockedStatesLabels = ["Locked", "Unlocked"];
+    $scope.pieLockedStatesData   = new Array(2);
     $http.get('api/locks').then(function(response){
         data = response.data;
-        console.log(data.length);
+        $scope.pieLockedStatesData[0] = Object.keys(data).length;
+        $scope.pieLockedStatesData[1] = $scope.results.total;
     });
-
-    $scope.pieTVLabels = pieTVLabels;
-    $scope.pieTVData = pieTVData;
-
-    $scope.pieTVOptions = { legend: { display: false } };
+    $scope.pieLockedStatesOptions = { legend: { display: false } };
 
 
 }]);

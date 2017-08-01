@@ -248,11 +248,13 @@ func (db *Database) ListStates() (states []string) {
 func (db *Database) ListTerraformVersionsWithCount(query url.Values) (results []map[string]string, err error) {
 	orderBy := string(query.Get("orderBy"))
 	sql := "SELECT t.tf_version, COUNT(*) FROM (SELECT DISTINCT ON(states.path) states.id, states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified FROM states JOIN versions ON versions.id = states.version_id ORDER BY states.path, versions.last_modified DESC) t GROUP BY t.tf_version ORDER BY "
+
 	if orderBy == "version" {
 		sql += "string_to_array(t.tf_version, '.')::int[] DESC"
 	} else {
 		sql += "count DESC"
 	}
+
 	rows, err := db.Raw(sql).Rows()
 	defer rows.Close()
 	if err != nil {
@@ -268,7 +270,6 @@ func (db *Database) ListTerraformVersionsWithCount(query url.Values) (results []
 		r["count"] = count
 		results = append(results, r)
 	}
-
 	return
 }
 
@@ -347,6 +348,7 @@ func (db *Database) ListResourceTypes() ([]string, error) {
 
 func (db *Database) ListResourceTypesWithCount() (results []map[string]string, err error) {
 	sql := "SELECT resources.type, COUNT(*) FROM (SELECT DISTINCT ON(states.path) states.id, states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified FROM states JOIN versions ON versions.id = states.version_id ORDER BY states.path, versions.last_modified DESC) t JOIN modules ON modules.state_id = t.id JOIN resources ON resources.module_id = modules.id GROUP BY resources.type ORDER BY count DESC"
+	
 	rows, err := db.Raw(sql).Rows()
 	defer rows.Close()
 	if err != nil {
@@ -362,7 +364,6 @@ func (db *Database) ListResourceTypesWithCount() (results []map[string]string, e
 		r["count"] = count
 		results = append(results, r)
 	}
-
 	return
 }
 

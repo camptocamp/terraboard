@@ -35,9 +35,9 @@ func ListStates(w http.ResponseWriter, r *http.Request, d *db.Database) {
 func ListTerraformVersionsWithCount(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	query := r.URL.Query()
-	version, _ := d.ListTerraformVersionsWithCount(query)
+	versions, _ := d.ListTerraformVersionsWithCount(query)
 
-	j, err := json.Marshal(version)
+	j, err := json.Marshal(versions)
 	if err != nil {
 		JSONError(w, "Failed to marshal states", err)
 	}
