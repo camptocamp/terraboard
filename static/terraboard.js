@@ -158,23 +158,32 @@ app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, 
     $scope.display = {};
 
     // Init
-    $scope.selectedVersion = $location.search().versionid;
+    $scope.selectedVersion = {
+        versionId: $location.search().versionid
+    };
 
     var key = $location.url().replace('/state/', '');
     $http.get('api/state/activity/'+key).then(function(response){
-        $scope.versions = {};
+        $scope.versions = [];
         for (i=0; i<response.data.length; i++) {
-            $scope.versions[response.data[i].version_id] = new Date(response.data[i].last_modified).toLocaleString();
+            var ver = {
+                versionId: response.data[i].version_id,
+                date: new Date(response.data[i].last_modified.toLocaleString())
+            };
+            $scope.versions.unshift(ver);
         }
+
         $scope.$watch('selectedVersion', function(ver) {
-            $location.search('versionid', ver);
+            $location.search('versionid', ver.versionId);
         });
     });
 
     $http.get('api'+$location.url(), {cache: true}).then(function(response){
         $scope.path = $location.path().replace('/state/', '');
         $scope.details = response.data;
-        $scope.selectedVersion = $scope.details.version.version_id;
+        $scope.selectedVersion = {
+            versionId: $scope.details.version.version_id
+        };
         var mods = $scope.details.modules;
 
         // Init
