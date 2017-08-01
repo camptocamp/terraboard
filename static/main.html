@@ -1,11 +1,6 @@
 <div class="row">
-    <div class="col-lg-9">
-        <h1 class="page-header">Terraboard</h1>
-    </div>
-</div>
-<div class="row">
-    <div class="overview-chart col-xs-6 col-sm-3">
-        <canvas ng-init="getRTChart()" height="200px" id="chart-pie-rt" class="chart chart-pie" chart-data="pieRTData" chart-labels="pieRTLabels" chart-options="pieTVOptions"></canvas>
+   <div class="overview-chart col-xs-6 col-sm-3" style="overflow: visible !important;">
+        <canvas style="width: 200px;height: 200px;overflow: visible !important;" ng-init="getRTChart()" height="200px" id="chart-pie-rt" class="chart chart-pie" chart-data="pieRTData" chart-labels="pieRTLabels" chart-options="pieTVOptions"></canvas>
         <h4>Resource types</h4>
     </div>
      <div class="overview-chart col-xs-6 col-sm-3">

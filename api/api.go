@@ -34,7 +34,8 @@ func ListStates(w http.ResponseWriter, r *http.Request, d *db.Database) {
 
 func ListTerraformVersionsWithCount(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	version, _ := d.ListTerraformVersionsWithCount()
+	query := r.URL.Query()
+	version, _ := d.ListTerraformVersionsWithCount(query)
 
 	j, err := json.Marshal(version)
 	if err != nil {

@@ -94,17 +94,17 @@ app.controller("tbMainCtrl", ['$scope', '$http', function($scope, $http) {
      * That makes the chart more comprehensible.
      */
 
-    pieRTData   = new Array(7);
-    pieRTLabels = new Array(7);
+    pieRTLabels   = [[], [], [], [], [], [], ["Total"]];
+    pieRTData     = [0, 0, 0, 0, 0, 0, 0];
     $http.get('api/resource/types/count').then(function(response){
         data = response.data;
         angular.forEach(data, function(value, i) {
-            if(i < 7) {
+            if(i < 6) {
                 pieRTLabels[i] = value.name;
                 pieRTData[i]   = parseInt(value.count, 10);
             } else {
-                pieRTLabels[6] = "Other";
-                pieRTData[6]   += parseInt(value.count, 10);
+                pieRTLabels[6].push(value.name+": "+value.count);
+                pieRTData[6] += parseInt(value.count, 10);
             }
         });
     });
@@ -114,17 +114,18 @@ app.controller("tbMainCtrl", ['$scope', '$http', function($scope, $http) {
 
 
 
-    pieTVData   = new Array(7);
-    pieTVLabels = new Array(7);
-    $http.get('api/states/tfversion/count').then(function(response){
+    pieTVLabels   = [[], [], [], [], [], [], ["Total"]];
+    pieTVData     = [0, 0, 0, 0, 0, 0, 0];
+    $http.get('api/states/tfversion/count?orderBy=version').then(function(response){
         data = response.data;
+        console.log(data);
         angular.forEach(data, function(value, i) {
-            if(i < 7) {
-                pieTVLabels[i] = value.name;
+            if(i < 6) {
+                pieTVLabels[i] = [value.name];
                 pieTVData[i]   = parseInt(value.count, 10);
             } else {
                 pieTVData[6] += parseInt(value.count, 10);
-                pieTVLabels[6] = "Other";
+                pieTVLabels[6].push(value.name+": "+value.count);
             }
         });
     });
