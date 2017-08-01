@@ -67,6 +67,7 @@ func GetLocks() (locks map[string]LockInfo, err error) {
 	}
 
 	locks = make(map[string]LockInfo)
+	infoPrefix := fmt.Sprintf("%s/", bucket)
 	for _, lock := range lockList {
 		if lock.Info != "" {
 			var info LockInfo
@@ -75,7 +76,7 @@ func GetLocks() (locks map[string]LockInfo, err error) {
 				return locks, err
 			}
 
-			locks[info.Path] = info
+			locks[strings.TrimPrefix(info.Path, infoPrefix)] = info
 		}
 	}
 	return

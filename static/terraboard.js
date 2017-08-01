@@ -76,6 +76,16 @@ app.controller("tbMainCtrl", ['$scope', '$http', function($scope, $http) {
             $scope.results.states[idx].activity = activity;
         });
     };
+
+    $http.get('api/locks').then(function(response){
+        $scope.locks = response.data;
+    });
+    $scope.isLocked = function(path) {
+        if (path in $scope.locks) {
+            return true;
+        }
+        return false;
+    };
 }]);
 
 app.controller("tbListCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {

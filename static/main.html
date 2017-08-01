@@ -26,7 +26,8 @@
     </label>
     <table class="table table-border table-striped">
         <thead>
-            <th></th>
+            <th></th> <!-- link -->
+            <th></th> <!-- lock -->
             <th>
                 <a href="#" ng-click="sortType = 'path'">
                     Path
@@ -64,6 +65,7 @@
         <tbody>
             <tr ng-repeat="r in results.states">
                 <td><a href="state/{{r.path}}?versionid={{r.version_id}}"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></td>
+                <td><span ng-if="isLocked(r.path)" class="glyphicon glyphicon-lock"></span></td>
                 <td>{{r.path}}</td>
                 <td>{{r.terraform_version}}</td>
                 <td>{{r.serial}}</td>
