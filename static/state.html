@@ -11,7 +11,7 @@
                 <ul class="list-group">
                     <li class="list-group-item">Terraform version: {{details.terraform_version}}</li>
                     <li class="list-group-item">Serial: {{details.serial}}</li>
-                    <li class="list-group-item">Version: <select ng-model="selectedVersion" ng-options="version as date for (version, date) in versions"></select></li>
+                    <li class="list-group-item">Version: <select ng-model="selectedVersion" ng-options="version as version.date for version in versions track by version.versionId"></select></li>
                 </ul>
             </div>
             <div id="nodes" class="panel panel-info">
