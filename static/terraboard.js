@@ -32,18 +32,29 @@ app.directive("sparklinechart", function () {
                             width: '200px',
                             height: 'auto',
                             barWidth: 11,
-                            barColor: 'blue'
+                            barColor: 'blue',
+                            tooltipFormatter: function(sp, opts, fields) {
+                                console.log(fields.x);
+                                var date = new Date(0);
+                                date.setUTCSeconds(fields.x);
+                                return date.toLocaleString()+' - '+fields.y+' resources';
+                            }
                         }
                     );
+                    element.bind('sparklineClick', function(ev) {
+                        var sparkline = ev.sparklines[0],
+                        region = sparkline.getCurrentRegionFields();
+                        var path = element[0].attributes.path.value;
+                        scope.$parent.$parent.goToState(path, region.x);
+                    });
                 });
             };
         }
     };
 });
 
-app.controller("tbMainCtrl", ['$scope', '$http', function($scope, $http) {
+app.controller("tbMainCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
     $scope.itemsPerPage = 20;
-
     $scope.getStats = function(page) {
         var params = {};
         if (page != undefined) {
@@ -64,18 +75,29 @@ app.controller("tbMainCtrl", ['$scope', '$http', function($scope, $http) {
     // On page load
     $scope.getStats(1);
 
+    // Version map for sparklines click events
+    $scope.versionMap = {};
     $scope.getActivity = function(idx, path) {
         $http.get('api/state/activity/'+path).then(function(response){
             var states = response.data;
+            $scope.versionMap[path] = {};
             var activityData = [];
             for (i=0; i < states.length; i++) {
                 var date = new Date(states[i].last_modified).getTime() / 1000;
                 activityData.push(date+":"+states[i].resource_count);
+                $scope.versionMap[path][date] = states[i].version_id;
             }
             var activity = activityData.join(",");
 
             $scope.results.states[idx].activity = activity;
         });
+    };
+
+    $scope.goToState = function(path, epoch) {
+        var versionId = $scope.versionMap[path][epoch];
+        var url = 'state/'+path+'?versionid='+versionId;
+        $location.url(url);
+        $scope.$apply();
     };
 
     $http.get('api/locks').then(function(response){

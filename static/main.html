@@ -64,7 +64,7 @@
                 <td>{{r.last_modified | date:'medium'}}</td>
                 <td>{{r.resource_count}}</td>
                 <td ng-init="getActivity($index, r.path)">
-                    <sparklinechart data="{{r.activity}}"></sparklinechart>
+                    <sparklinechart path="{{r.path}}" data="{{r.activity}}"></sparklinechart>
                 </td>
             </tr>
         </tbody>
