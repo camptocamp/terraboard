@@ -1,6 +1,6 @@
 # Terraboard
 
-Web Dashboard to inspect Terraform States
+:chart_with_upwards_trend: A web dashboard to inspect Terraform States :earth_africa:
 
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/camptocamp/terraboard.svg)](https://hub.docker.com/r/camptocamp/terraboard/)
