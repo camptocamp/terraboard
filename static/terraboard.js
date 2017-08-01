@@ -134,6 +134,20 @@ app.controller("tbMainCtrl", ['$scope', '$http', function($scope, $http) {
     $scope.pieTVData = pieTVData;
 
     $scope.pieTVOptions = { legend: { display: false } };
+
+    pieLSLabels   = [[], [], [], [], [], [], ["Total"]];
+    pieLSData     = [0, 0, 0, 0, 0, 0, 0];
+    $http.get('api/locks').then(function(response){
+        data = response.data;
+        console.log(data.length);
+    });
+
+    $scope.pieTVLabels = pieTVLabels;
+    $scope.pieTVData = pieTVData;
+
+    $scope.pieTVOptions = { legend: { display: false } };
+
+
 }]);
 
 app.controller("tbListCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
