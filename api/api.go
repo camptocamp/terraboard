@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/camptocamp/terraboard/db"
-	"github.com/camptocamp/terraboard/s3"
 	"github.com/camptocamp/terraboard/util"
 )
 
@@ -79,21 +78,6 @@ func GetStateActivity(w http.ResponseWriter, r *http.Request, d *db.Database) {
 		JSONError(w, "Failed to marshal state activity", err)
 	}
 	io.WriteString(w, string(jActivity))
-}
-
-func GetHistory(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	st := util.TrimBase(r, "api/history/")
-	result, err := s3.GetVersions(st)
-	if err != nil {
-		JSONError(w, fmt.Sprintf("State file history not found: %v", st), err)
-	}
-
-	j, err := json.Marshal(result)
-	if err != nil {
-		JSONError(w, "Failed to marshal history", err)
-	}
-	io.WriteString(w, string(j))
 }
 
 func SearchAttribute(w http.ResponseWriter, r *http.Request, d *db.Database) {

@@ -98,7 +98,6 @@ app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, 
 
     var key = $location.url().replace('/state/', '');
     $http.get('api/state/activity/'+key).then(function(response){
-        $scope.history = response.data;
         $scope.versions = {};
         for (i=0; i<response.data.length; i++) {
             $scope.versions[response.data[i].version_id] = new Date(response.data[i].last_modified).toLocaleString();

@@ -105,7 +105,6 @@ func main() {
 	http.HandleFunc(util.AddBase("api/states/stats"), handleWithDB(api.ListStateStats, database))
 	http.HandleFunc(util.AddBase("api/state/"), handleWithDB(api.GetState, database))
 	http.HandleFunc(util.AddBase("api/state/activity/"), handleWithDB(api.GetStateActivity, database))
-	http.HandleFunc(util.AddBase("api/history/"), api.GetHistory)
 	http.HandleFunc(util.AddBase("api/search/attribute"), handleWithDB(api.SearchAttribute, database))
 	http.HandleFunc(util.AddBase("api/resource/types"), handleWithDB(api.ListResourceTypes, database))
 	http.HandleFunc(util.AddBase("api/resource/names"), handleWithDB(api.ListResourceNames, database))
