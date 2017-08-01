@@ -23,7 +23,6 @@
 @media (min-width: 992px) {
   body, html, #mainrow, #leftcol {
     margin: 0;
-    overflow: hidden;
     height:100%;
   }
   .container{
@@ -31,7 +30,6 @@
   }
   #maincont, #leftcol .panel-group {
     overflow: hidden;
-    height:100%;
   }
   #nodes, #node {
     overflow-y: auto;
@@ -179,10 +177,6 @@ pre.sh_sourceCode .sh_oldfile {
 }
 .navbar-brand img {
   height: 50px;
-}
-#results {
-  height: 70vh;
-  overflow-y: auto;
 }
 #pages {
     margin: 0 auto;
