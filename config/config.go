@@ -22,7 +22,8 @@ type Config struct {
 	} `group:"Database Options"`
 
 	S3 struct {
-		Bucket string `long:"s3-bucket" env:"AWS_BUCKET" description:"AWS S3 bucket."`
+		Bucket        string `long:"s3-bucket" env:"AWS_BUCKET" description:"AWS S3 bucket."`
+		DynamoDBTable string `long:"dynamodb-table" env:"AWS_DYNAMODB_TABLE" description:"AWS DynamoDB table for locks."`
 	} `group:"AWS S3 Options"`
 }
 
