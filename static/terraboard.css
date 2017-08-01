@@ -194,3 +194,8 @@ pre.sh_sourceCode .sh_oldfile {
 .overview-chart {
   text-align: center;
 }
+.jqstooltip {
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}
