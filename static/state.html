@@ -3,7 +3,10 @@
         <div class="panel-group">
             <div class="panel panel-info">
                 <div class="panel-heading">
-                    <h4 class="panel-title">General Information</h4>
+                    <h4 class="panel-title">
+                        General Information
+                        <span ng-if="isLocked(path)" ng-init="lock=locks[path]" class="pull-right glyphicon glyphicon-lock" title="Locked by {{lock.Who}} on {{lock.Created | date:'medium'}} ({{lock.Operation}})"></span>
+                    </h4>
                 </div>
                 <ul class="list-group">
                     <li class="list-group-item">Terraform version: {{details.terraform_version}}</li>

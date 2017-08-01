@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/camptocamp/terraboard/db"
+	"github.com/camptocamp/terraboard/s3"
 	"github.com/camptocamp/terraboard/util"
 )
 
@@ -78,6 +79,20 @@ func GetStateActivity(w http.ResponseWriter, r *http.Request, d *db.Database) {
 		JSONError(w, "Failed to marshal state activity", err)
 	}
 	io.WriteString(w, string(jActivity))
+}
+
+func GetLocks(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	locks, err := s3.GetLocks()
+	if err != nil {
+		JSONError(w, "Failed to get locks", err)
+	}
+
+	j, err := json.Marshal(locks)
+	if err != nil {
+		JSONError(w, "Failed to marshal locks", err)
+	}
+	io.WriteString(w, string(j))
 }
 
 func SearchAttribute(w http.ResponseWriter, r *http.Request, d *db.Database) {

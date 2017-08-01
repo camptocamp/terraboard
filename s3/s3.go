@@ -6,22 +6,80 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strings"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/camptocamp/terraboard/config"
 	"github.com/hashicorp/terraform/terraform"
 )
 
 var svc *s3.S3
+var dynamoSvc *dynamodb.DynamoDB
 var bucket string
+var dynamoTable string
 
 func Setup(c *config.Config) {
 	sess := session.Must(session.NewSession())
 	svc = s3.New(sess, &aws.Config{})
 	bucket = c.S3.Bucket
+
+	dynamoSvc = dynamodb.New(sess, &aws.Config{})
+	dynamoTable = c.S3.DynamoDBTable
+}
+
+type LockInfo struct {
+	ID        string
+	Operation string
+	Info      string
+	Who       string
+	Version   string
+	Created   *time.Time
+	Path      string
+}
+
+type Lock struct {
+	LockID string
+	Info   string
+}
+
+func GetLocks() (locks map[string]LockInfo, err error) {
+	if dynamoTable == "" {
+		err = fmt.Errorf("No dynamoDB table provided. Not getting locks.")
+		return
+	}
+
+	results, err := dynamoSvc.Scan(&dynamodb.ScanInput{
+		TableName: &dynamoTable,
+	})
+	if err != nil {
+		return locks, err
+	}
+
+	var lockList []Lock
+	err = dynamodbattribute.UnmarshalListOfMaps(results.Items, &lockList)
+	if err != nil {
+		return locks, err
+	}
+
+	locks = make(map[string]LockInfo)
+	infoPrefix := fmt.Sprintf("%s/", bucket)
+	for _, lock := range lockList {
+		if lock.Info != "" {
+			var info LockInfo
+			err = json.Unmarshal([]byte(lock.Info), &info)
+			if err != nil {
+				return locks, err
+			}
+
+			locks[strings.TrimPrefix(info.Path, infoPrefix)] = info
+		}
+	}
+	return
 }
 
 func GetStates() (states []string, err error) {

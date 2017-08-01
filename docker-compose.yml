@@ -16,6 +16,7 @@ services:
       AWS_BUCKET: ${AWS_BUCKET}
       BASE_URL: /
       DB_PASSWORD: mypassword
+      AWS_DYNAMODB_TABLE: ${AWS_DYNAMODB_TABLE}
     links:
       - db
     volumes:
