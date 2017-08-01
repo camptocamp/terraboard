@@ -97,11 +97,11 @@ app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, 
     $scope.selectedVersion = $location.search().versionid;
 
     var key = $location.url().replace('/state/', '');
-    $http.get('api/history/'+key).then(function(response){
+    $http.get('api/state/activity/'+key).then(function(response){
         $scope.history = response.data;
         $scope.versions = {};
         for (i=0; i<response.data.length; i++) {
-            $scope.versions[response.data[i].VersionId] = new Date(response.data[i].LastModified).toLocaleString();
+            $scope.versions[response.data[i].version_id] = new Date(response.data[i].last_modified).toLocaleString();
         }
         $scope.$watch('selectedVersion', function(ver) {
             $location.search('versionid', ver);
