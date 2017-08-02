@@ -209,3 +209,22 @@ pre.sh_sourceCode .sh_oldfile {
   position: absolute;
   right: 10px;
 }
+
+
+/*
+ * Node attribute table
+ */
+#node {
+    overflow-x: hidden;
+}
+
+#node td.attr-val {
+    white-space: pre;
+    text-overflow: ellipsis;
+    max-width: 30vw;
+    overflow: hidden;
+}
+#node td:hover {
+    text-overflow: clip;
+    overflow: auto;
+}

@@ -52,7 +52,8 @@
                     <thead><th>Attribute</th><th>Value</th></thead>
                     <tbody>
                         <tr ng-repeat="attr in details.modules[selectedmod].resources[selectedres].attributes">
-                            <td>{{attr.key}}</td><td>{{attr.value}}</td>
+                            <td class="attr-key">{{attr.key}}</td>
+                            <td class="attr-val">{{attr.value}}</td>
                         </tr>
                     </tbody>
                 </table>
