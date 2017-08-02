@@ -59,7 +59,11 @@ func refreshDB(d *db.Database) {
 		log.Infof("Refreshing DB from S3")
 		states, err := s3.GetStates()
 		if err != nil {
-			log.Errorf("Failed to build cache: %s", err)
+			log.WithFields(log.Fields{
+				"error": err,
+			}).Error("Failed to retrieve states from S3. Retrying in 1 minute.")
+			time.Sleep(1 * time.Minute)
+			continue
 		}
 
 		statesVersions := d.ListStatesVersions()
@@ -67,19 +71,28 @@ func refreshDB(d *db.Database) {
 			versions, _ := s3.GetVersions(st)
 			for _, v := range versions {
 				if _, ok := statesVersions[*v.VersionId]; ok {
-					log.Debugf("Version %s is already in the DB", *v.VersionId)
+					log.WithFields(log.Fields{
+						"version_id": *v.VersionId,
+					}).Debug("Version is already in the database, skipping")
 				} else {
 					d.InsertVersion(v)
 				}
 
 				if isKnownStateVersion(statesVersions, *v.VersionId, st) {
-					log.Debugf("State %s/%s is already in the DB, skipping", st, *v.VersionId)
+					log.WithFields(log.Fields{
+						"path":       st,
+						"version_id": *v.VersionId,
+					}).Debug("State is already in the database, skipping")
 					continue
 				}
 				state, _ := s3.GetState(st, *v.VersionId)
 				d.InsertState(st, *v.VersionId, state)
 				if err != nil {
-					log.Errorf("Failed to insert state %s/%s: %v", st, *v.VersionId, err)
+					log.WithFields(log.Fields{
+						"path":       st,
+						"version_id": *v.VersionId,
+						"error":      err,
+					}).Error("Failed to insert state in the database")
 				}
 			}
 		}
