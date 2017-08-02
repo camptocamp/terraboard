@@ -96,6 +96,10 @@ func (db *Database) stateS3toDB(state *terraform.State, path string, versionId s
 			}
 
 			for k, v := range r.Primary.Attributes {
+				if !isASCII(v) {
+					log.Infof("Attribute %s has non-ASCII value %v, skipping", k, v)
+					continue
+				}
 				res.Attributes = append(res.Attributes, Attribute{
 					Key:   k,
 					Value: v,
@@ -107,6 +111,15 @@ func (db *Database) stateS3toDB(state *terraform.State, path string, versionId s
 		st.Modules = append(st.Modules, mod)
 	}
 	return
+}
+
+func isASCII(s string) bool {
+	for _, c := range s {
+		if c > 127 {
+			return false
+		}
+	}
+	return true
 }
 
 func (db *Database) InsertState(path string, versionId string, state *terraform.State) error {
