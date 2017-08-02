@@ -299,7 +299,7 @@ func (db *Database) ListStateStats(query url.Values) (states []types.StateStat, 
 }
 
 func (db *Database) listField(table, field string) (results []string, err error) {
-	rows, err := db.Table(table).Select("DISTINCT ?", field).Rows()
+	rows, err := db.Table(table).Select(fmt.Sprintf("DISTINCT %s", field)).Rows()
 	defer rows.Close()
 	if err != nil {
 		return results, err
