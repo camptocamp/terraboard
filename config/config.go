@@ -1,9 +1,11 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/jessevdk/go-flags"
 )
 
@@ -12,6 +14,11 @@ type Config struct {
 	Version bool `short:"V" long:"version" description:"Display version."`
 
 	Port int `short:"p" long:"port" description:"Port to listen on." default:"8080"`
+
+	Log struct {
+		Level  string `short:"l" long:"log-level" description:"Set log level ('debug', 'info', 'warn', 'error', 'fatal', 'panic')." env:"TERRABOARD_LOG_LEVEL" default:"info"`
+		Format string `long:"log-format" description:"Set log format ('plain', 'json')." env:"TERRABOARD_LOG_FORMAT" default:"plain"`
+	} `group:"Logging Options"`
 
 	DB struct {
 		Host     string `long:"db-host" env:"DB_HOST" description:"Database host." default:"db"`
@@ -41,4 +48,35 @@ func LoadConfig(version string) *Config {
 	}
 
 	return &c
+}
+
+func (c Config) SetupLogging() (err error) {
+	switch c.Log.Level {
+	case "debug":
+		log.SetLevel(log.DebugLevel)
+	case "info":
+		log.SetLevel(log.InfoLevel)
+	case "warn":
+		log.SetLevel(log.WarnLevel)
+	case "error":
+		log.SetLevel(log.ErrorLevel)
+	case "fatal":
+		log.SetLevel(log.FatalLevel)
+	case "panic":
+		log.SetLevel(log.PanicLevel)
+	default:
+		errMsg := fmt.Sprintf("Wrong log level '%v'", c.Log.Level)
+		return errors.New(errMsg)
+	}
+
+	switch c.Log.Format {
+	case "plain":
+	case "json":
+		log.SetFormatter(&log.JSONFormatter{})
+	default:
+		errMsg := fmt.Sprintf("Wrong log format '%v'", c.Log.Format)
+		return errors.New(errMsg)
+	}
+
+	return
 }

@@ -60,7 +60,7 @@ type Attribute struct {
 
 var pageSize = 20
 
-func Init(host, user, dbname, password string) *Database {
+func Init(host, user, dbname, password, logLevel string) *Database {
 	var err error
 	connString := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", host, user, dbname, password)
 	db, err := gorm.Open("postgres", connString)
@@ -71,7 +71,9 @@ func Init(host, user, dbname, password string) *Database {
 	log.Infof("Automigrate")
 	db.AutoMigrate(&Version{}, &State{}, &Module{}, &Resource{}, &Attribute{})
 
-	//db.LogMode(true)
+	if logLevel == "debug" {
+		db.LogMode(true)
+	}
 	return &Database{db}
 }
 

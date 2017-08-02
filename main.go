@@ -96,13 +96,19 @@ func main() {
 
 	log.Infof("Terraboard v%s is starting...", version)
 
+	err := c.SetupLogging()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Set up S3
 	s3.Setup(c)
 
 	// Set up the DB and start S3->DB sync
 	database := db.Init(
 		c.DB.Host, c.DB.User,
-		c.DB.Name, c.DB.Password)
+		c.DB.Name, c.DB.Password,
+		c.Log.Level)
 	if c.DB.NoSync {
 		log.Infof("Not syncing database, as requested.")
 	} else {
