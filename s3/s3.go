@@ -113,7 +113,10 @@ func GetVersions(prefix string) (versions []*s3.ObjectVersion, err error) {
 }
 
 func GetState(st, versionId string) (state *terraform.State, err error) {
-	log.Infof("Retrieving %s/%s from S3", st, versionId)
+	log.WithFields(log.Fields{
+		"path":       st,
+		"version_id": versionId,
+	}).Info("Retrieving state from S3")
 	input := &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(st),
@@ -123,7 +126,11 @@ func GetState(st, versionId string) (state *terraform.State, err error) {
 	}
 	result, err := svc.GetObjectWithContext(context.Background(), input)
 	if err != nil {
-		log.Errorf("Error retrieving %s/%s from S3: %v", st, versionId, err)
+		log.WithFields(log.Fields{
+			"path":       st,
+			"version_id": versionId,
+			"error":      err,
+		}).Error("Error retrieving state from S3")
 		errObj := make(map[string]string)
 		errObj["error"] = fmt.Sprintf("State file not found: %v", st)
 		errObj["details"] = fmt.Sprintf("%v", err)
@@ -134,7 +141,11 @@ func GetState(st, versionId string) (state *terraform.State, err error) {
 
 	content, err := ioutil.ReadAll(result.Body)
 	if err != nil {
-		log.Errorf("Error reading %s/%s from S3: %v", st, versionId, err)
+		log.WithFields(log.Fields{
+			"path":       st,
+			"version_id": versionId,
+			"error":      err,
+		}).Error("Error reading state from S3")
 		errObj := make(map[string]string)
 		errObj["error"] = fmt.Sprintf("Failed to read S3 response: %v", st)
 		errObj["details"] = fmt.Sprintf("%v", err)

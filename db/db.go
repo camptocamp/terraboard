@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"encoding/base64"
 	"fmt"
 	"net/url"
 	"strconv"
@@ -99,7 +100,10 @@ func (db *Database) stateS3toDB(state *terraform.State, path string, versionId s
 
 			for k, v := range r.Primary.Attributes {
 				if !isASCII(v) {
-					log.Infof("Attribute %s has non-ASCII value %v, skipping", k, v)
+					log.WithFields(log.Fields{
+						"key":          k,
+						"value_base64": base64.StdEncoding.EncodeToString([]byte(v)),
+					}).Info("Attribute has non-ASCII value, skipping")
 					continue
 				}
 				res.Attributes = append(res.Attributes, Attribute{
@@ -183,7 +187,9 @@ type SearchResult struct {
 }
 
 func (db *Database) SearchAttribute(query url.Values) (results []SearchResult, page int, total int) {
-	log.Infof("Searching for attribute with query=%v", query)
+	log.WithFields(log.Fields{
+		"query": query,
+	}).Info("Searching for attribute with query")
 
 	targetVersion := string(query.Get("versionid"))
 
