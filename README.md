@@ -115,10 +115,5 @@ $ docker-compose build && docker-compose up -d
 
 ### Contributing
 
-Please report bugs on the [GitHub project
-page](https://github.com/camptocamp/terraboard/issues).
 
-We welcome contributions in the form of [Pull
-Requests](https://github.com/camptocamp/terraboard/pulls).
-
-
+See [CONTRIBUTING.md](CONTRIBUTING.md)
