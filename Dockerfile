@@ -4,7 +4,8 @@ RUN go get github.com/aws/aws-sdk-go \
            github.com/Sirupsen/logrus \
 		   github.com/hashicorp/terraform \
 		   github.com/jinzhu/gorm github.com/lib/pq \
-		   github.com/jessevdk/go-flags
+		   github.com/jessevdk/go-flags \
+		   github.com/pmezard/go-difflib || echo
 WORKDIR /go/src/github.com/camptocamp/terraboard
 COPY . .
 RUN CGO_ENABLED=1 GOOS=linux go build \
