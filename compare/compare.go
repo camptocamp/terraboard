@@ -20,6 +20,7 @@ type StateCompare struct {
 	Differences struct {
 		OnlyInOld    []string          `json:"only_in_old"`
 		OnlyInNew    []string          `json:"only_in_new"`
+		InBoth       []string          `json:"in_both"`
 		ResourceDiff map[string]string `json:"resource_diff"`
 	} `json:"differences"`
 }
@@ -34,7 +35,7 @@ func stateResources(state db.State) (res []string) {
 	return
 }
 
-// Returns elements only in st1
+// Returns elements only in s1
 func sliceDiff(s1, s2 []string) (diff []string) {
 	for _, e1 := range s1 {
 		found := false
@@ -47,6 +48,19 @@ func sliceDiff(s1, s2 []string) (diff []string) {
 
 		if !found {
 			diff = append(diff, e1)
+		}
+	}
+	return
+}
+
+// Returns elements in both s1 and s2
+func sliceInter(s1, s2 []string) (inter []string) {
+	for _, e1 := range s1 {
+		for _, e2 := range s2 {
+			if e1 == e2 {
+				inter = append(inter, e1)
+				break
+			}
 		}
 	}
 	return
@@ -75,6 +89,7 @@ func Compare(from, to db.State) (comp StateCompare, err error) {
 
 	comp.Differences.OnlyInOld = sliceDiff(fromResources, toResources)
 	comp.Differences.OnlyInNew = sliceDiff(toResources, fromResources)
+	comp.Differences.InBoth = sliceInter(toResources, fromResources)
 
 	log.WithFields(log.Fields{
 		"path": from.Path,
