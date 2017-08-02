@@ -7,8 +7,11 @@ package types
  *******************************************************/
 
 type StateInfo struct {
+	Path          string `json:"path"`
 	VersionID     string `json:"version_id"`
 	ResourceCount int    `json:"resource_count"`
+	TFVersion     string `json:"terraform_version"`
+	Serial        int64  `json:"serial"`
 }
 
 type ResourceDiff struct {
@@ -23,8 +26,8 @@ type StateCompare struct {
 		To   StateInfo `json:"to"`
 	} `json:"stats"`
 	Differences struct {
-		OnlyInOld    []string                `json:"only_in_old"`
-		OnlyInNew    []string                `json:"only_in_new"`
+		OnlyInOld    map[string]string       `json:"only_in_old"`
+		OnlyInNew    map[string]string       `json:"only_in_new"`
 		InBoth       []string                `json:"in_both"`
 		ResourceDiff map[string]ResourceDiff `json:"resource_diff"`
 	} `json:"differences"`
