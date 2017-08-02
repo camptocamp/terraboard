@@ -26,7 +26,7 @@
     height:100%;
   }
   .container{
-      width: 80vw;
+      width: 85vw;
   }
   #maincont, #leftcol .panel-group {
     overflow: hidden;
@@ -220,7 +220,7 @@ pre.sh_sourceCode .sh_oldfile {
 
 #node td.attr-val {
     white-space: pre;
-    max-width: 20vw;
+    max-width: 25vw;
 }
 
 #node td.attr-val, #nodes li.list-group-item {
