@@ -351,6 +351,10 @@ func (db *Database) ListResourceNames() ([]string, error) {
 	return db.listField("resources", "name")
 }
 
+func (db *Database) ListTfVersions() ([]string, error) {
+	return db.listField("states", "tf_version")
+}
+
 func (db *Database) ListAttributeKeys(resourceType string) (results []string, err error) {
 	query := db.Table("attributes").
 		Select(fmt.Sprintf("DISTINCT %s", "key")).

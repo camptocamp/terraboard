@@ -149,6 +149,7 @@ func main() {
 	http.HandleFunc(util.AddBase("api/resource/types/count"), handleWithDB(api.ListResourceTypesWithCount, database))
 	http.HandleFunc(util.AddBase("api/resource/names"), handleWithDB(api.ListResourceNames, database))
 	http.HandleFunc(util.AddBase("api/attribute/keys"), handleWithDB(api.ListAttributeKeys, database))
+	http.HandleFunc(util.AddBase("api/tf_versions"), handleWithDB(api.ListTfVersions, database))
 
 	// Start server
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", c.Port), nil))

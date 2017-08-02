@@ -202,3 +202,14 @@ func ListAttributeKeys(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	}
 	io.WriteString(w, string(j))
 }
+
+func ListTfVersions(w http.ResponseWriter, r *http.Request, d *db.Database) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	result, _ := d.ListTfVersions()
+	j, err := json.Marshal(result)
+	if err != nil {
+		JSONError(w, "Failed to marshal json", err)
+		return
+	}
+	io.WriteString(w, string(j))
+}
