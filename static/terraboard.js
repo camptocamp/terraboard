@@ -287,7 +287,9 @@ app.directive("hlcode", ['$timeout', function($timeout) {
     }
 }]);
 
-app.controller("tbCompareCtrl", ['$scope', '$http', '$location', '$routeParams', function($scope, $http, $location, $routeParams) {
+app.controller("tbCompareCtrl",
+        ['$scope', '$http', '$location', '$routeParams',
+        function($scope, $http, $location, $routeParams) {
     $http.get('api'+$location.url()).then(function(response){
         $scope.compare = response.data;
 
@@ -325,7 +327,9 @@ app.controller("tbCompareCtrl", ['$scope', '$http', '$location', '$routeParams',
 
 }]);
 
-app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', function($scope, $http, $location) {
+app.controller("tbSearchCtrl",
+        ['$scope', '$http', '$location', '$routeParams',
+        function($scope, $http, $location) {
     $http.get('api/resource/types').then(function(response){
         $scope.resource_keys = response.data;
     });
