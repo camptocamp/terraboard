@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/camptocamp/terraboard/compare"
 	"github.com/camptocamp/terraboard/db"
 	"github.com/camptocamp/terraboard/s3"
 	"github.com/camptocamp/terraboard/util"
@@ -28,6 +29,7 @@ func ListStates(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	j, err := json.Marshal(states)
 	if err != nil {
 		JSONError(w, "Failed to marshal states", err)
+		return
 	}
 	io.WriteString(w, string(j))
 }
@@ -40,6 +42,7 @@ func ListTerraformVersionsWithCount(w http.ResponseWriter, r *http.Request, d *d
 	j, err := json.Marshal(versions)
 	if err != nil {
 		JSONError(w, "Failed to marshal states", err)
+		return
 	}
 	io.WriteString(w, string(j))
 }
@@ -57,6 +60,7 @@ func ListStateStats(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	j, err := json.Marshal(response)
 	if err != nil {
 		JSONError(w, "Failed to marshal states", err)
+		return
 	}
 	io.WriteString(w, string(j))
 }
@@ -70,6 +74,7 @@ func GetState(w http.ResponseWriter, r *http.Request, d *db.Database) {
 		versionId, err = d.DefaultVersion(st)
 		if err != nil {
 			JSONError(w, "Failed to retrieve default version", err)
+			return
 		}
 	}
 	state := d.GetState(st, versionId)
@@ -77,6 +82,7 @@ func GetState(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	jState, err := json.Marshal(state)
 	if err != nil {
 		JSONError(w, "Failed to marshal state", err)
+		return
 	}
 	io.WriteString(w, string(jState))
 }
@@ -89,8 +95,32 @@ func GetStateActivity(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	jActivity, err := json.Marshal(activity)
 	if err != nil {
 		JSONError(w, "Failed to marshal state activity", err)
+		return
 	}
 	io.WriteString(w, string(jActivity))
+}
+
+func StateCompare(w http.ResponseWriter, r *http.Request, d *db.Database) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	st := util.TrimBase(r, "api/state/compare/")
+	query := r.URL.Query()
+	fromVersion := query.Get("from")
+	toVersion := query.Get("to")
+
+	from := d.GetState(st, fromVersion)
+	to := d.GetState(st, toVersion)
+	compare, err := compare.Compare(from, to)
+	if err != nil {
+		JSONError(w, "Failed to compare state versions", err)
+		return
+	}
+
+	jCompare, err := json.Marshal(compare)
+	if err != nil {
+		JSONError(w, "Failed to marshal state compare", err)
+		return
+	}
+	io.WriteString(w, string(jCompare))
 }
 
 func GetLocks(w http.ResponseWriter, r *http.Request) {
@@ -98,11 +128,13 @@ func GetLocks(w http.ResponseWriter, r *http.Request) {
 	locks, err := s3.GetLocks()
 	if err != nil {
 		JSONError(w, "Failed to get locks", err)
+		return
 	}
 
 	j, err := json.Marshal(locks)
 	if err != nil {
 		JSONError(w, "Failed to marshal locks", err)
+		return
 	}
 	io.WriteString(w, string(j))
 }
@@ -121,6 +153,7 @@ func SearchAttribute(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	j, err := json.Marshal(response)
 	if err != nil {
 		JSONError(w, "Failed to marshal json", err)
+		return
 	}
 	io.WriteString(w, string(j))
 }
@@ -131,6 +164,7 @@ func ListResourceTypes(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	j, err := json.Marshal(result)
 	if err != nil {
 		JSONError(w, "Failed to marshal json", err)
+		return
 	}
 	io.WriteString(w, string(j))
 }
@@ -141,6 +175,7 @@ func ListResourceTypesWithCount(w http.ResponseWriter, r *http.Request, d *db.Da
 	j, err := json.Marshal(result)
 	if err != nil {
 		JSONError(w, "Failed to marshal json", err)
+		return
 	}
 	io.WriteString(w, string(j))
 }
@@ -151,6 +186,7 @@ func ListResourceNames(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	j, err := json.Marshal(result)
 	if err != nil {
 		JSONError(w, "Failed to marshal json", err)
+		return
 	}
 	io.WriteString(w, string(j))
 }
@@ -162,6 +198,7 @@ func ListAttributeKeys(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	j, err := json.Marshal(result)
 	if err != nil {
 		JSONError(w, "Failed to marshal json", err)
+		return
 	}
 	io.WriteString(w, string(j))
 }

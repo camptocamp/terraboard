@@ -142,6 +142,7 @@ func main() {
 	http.HandleFunc(util.AddBase("api/states/tfversion/count"), handleWithDB(api.ListTerraformVersionsWithCount, database))
 	http.HandleFunc(util.AddBase("api/state/"), handleWithDB(api.GetState, database))
 	http.HandleFunc(util.AddBase("api/state/activity/"), handleWithDB(api.GetStateActivity, database))
+	http.HandleFunc(util.AddBase("api/state/compare/"), handleWithDB(api.StateCompare, database))
 	http.HandleFunc(util.AddBase("api/locks"), api.GetLocks)
 	http.HandleFunc(util.AddBase("api/search/attribute"), handleWithDB(api.SearchAttribute, database))
 	http.HandleFunc(util.AddBase("api/resource/types"), handleWithDB(api.ListResourceTypes, database))
