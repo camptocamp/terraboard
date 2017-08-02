@@ -176,7 +176,9 @@ func Compare(from, to types.State) (comp types.StateCompare, err error) {
 	comp.Differences.ResourceDiff = make(map[string]types.ResourceDiff)
 
 	for _, r := range comp.Differences.InBoth {
-		comp.Differences.ResourceDiff[r] = compareResource(to, from, r)
+		if c := compareResource(to, from, r); c.UnifiedDiff != "" {
+			comp.Differences.ResourceDiff[r] = c
+		}
 	}
 
 	log.WithFields(log.Fields{
