@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/camptocamp/terraboard/compare"
 	"github.com/camptocamp/terraboard/db"
 	"github.com/camptocamp/terraboard/s3"
 	"github.com/camptocamp/terraboard/util"
@@ -97,9 +98,15 @@ func StateCompare(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	st := util.TrimBase(r, "api/state/compare/")
 	query := r.URL.Query()
-	from := query.Get("from")
-	to := query.Get("to")
-	compare := d.StateCompare(st, from, to)
+	fromVersion := query.Get("from")
+	toVersion := query.Get("to")
+
+	from := d.GetState(st, fromVersion)
+	to := d.GetState(st, toVersion)
+	compare, err := compare.Compare(from, to)
+	if err != nil {
+		JSONError(w, "Failed to compare state versions", err)
+	}
 
 	jCompare, err := json.Marshal(compare)
 	if err != nil {

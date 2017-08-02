@@ -162,15 +162,6 @@ func (db *Database) GetStateActivity(path string) (states []StateStat) {
 	return
 }
 
-func (db *Database) StateCompare(path, from, to string) (states []StateStat) {
-	log.WithFields(log.Fields{
-		"path": path,
-		"from": from,
-		"to":   to,
-	}).Info("Comparing state versions")
-	return
-}
-
 func (db *Database) KnownVersions() (versions []string) {
 	// TODO: err
 	rows, _ := db.Table("versions").Select("DISTINCT version_id").Rows()
