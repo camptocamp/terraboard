@@ -7,9 +7,21 @@ import (
 	"github.com/camptocamp/terraboard/db"
 )
 
+type StateInfo struct {
+	VersionID     string `json:"version_id"`
+	ResourceCount int    `json:"resource_count"`
+}
+
 type StateCompare struct {
-	From string `json:"from"`
-	To   string `json:"to"`
+	Stats struct {
+		From StateInfo `json:"from"`
+		To   StateInfo `json:"to"`
+	} `json:"stats"`
+	Differences struct {
+		OnlyInOld    []string          `json:"only_in_old"`
+		OnlyInNew    []string          `json:"only_in_new"`
+		ResourceDiff map[string]string `json:"resource_diff"`
+	} `json:"differences"`
 }
 
 func Compare(from, to db.State) (comp StateCompare, err error) {
@@ -17,13 +29,19 @@ func Compare(from, to db.State) (comp StateCompare, err error) {
 		err = fmt.Errorf("from version is unknown")
 		return
 	}
-	comp.From = from.Version.VersionID
+	comp.Stats.From = StateInfo{
+		VersionID:     from.Version.VersionID,
+		ResourceCount: 0,
+	}
 
 	if to.Path == "" {
 		err = fmt.Errorf("to version is unknown")
 		return
 	}
-	comp.To = to.Version.VersionID
+	comp.Stats.To = StateInfo{
+		VersionID:     to.Version.VersionID,
+		ResourceCount: 0,
+	}
 
 	log.WithFields(log.Fields{
 		"path": from.Path,
