@@ -220,11 +220,14 @@ pre.sh_sourceCode .sh_oldfile {
 
 #node td.attr-val {
     white-space: pre;
-    text-overflow: ellipsis;
     max-width: 30vw;
+}
+
+#node td.attr-val, #nodes li.list-group-item {
+    text-overflow: ellipsis;
     overflow: hidden;
 }
-#node td:hover {
+#node td:hover, #nodes li.list-group-item:hover {
     text-overflow: clip;
     overflow: auto;
 }
