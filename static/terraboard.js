@@ -131,6 +131,15 @@ app.controller("tbMainCtrl", ['$scope', '$http', '$location', function($scope, $
     $scope.pieResourceTypesData    = pieResourceTypesData;
     $scope.pieResourceTypesLabels  = pieResourceTypesLabels;
     $scope.pieResourceTypesOptions = { legend: { display: false } };
+    $scope.searchType = function(points, ev) {
+        var type = points[0]._chart.data.labels[points[0]._index];
+        if ($.isArray(type)) {
+            console.log("Clicked zone is an array, not searching");
+            return;
+        }
+        $location.url('search/?type='+type);
+        $scope.$apply();
+    };
 
 
 
