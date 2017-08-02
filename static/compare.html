@@ -43,12 +43,10 @@
                 </div>
                 <div id="panel-body-diff" class="panel-collapse collapse in">
                     <div class="panel-body">
-                        <p>
                         <div class="list-group resource" ng-repeat="(resource, diff) in compare.differences.resource_diff">
                             <div class="resource-title">{{resource}}</div>
-                            <pre class="sh_diff sh_sourceCode">{{diff.unified_diff}}</pre>
+                            <hlcode lang="'diff'" code="diff.unified_diff"></hlcode>
                         </div>
-                        </p>
                     </div>
                 </div>
             </div>
@@ -63,12 +61,10 @@
                 </div>
                 <div id="panel-body-in-old" class="panel-collapse collapse in">
                     <div class="panel-body">
-                        <ul id="only-in-old" class="list-group" ng-repeat="(resource, code) in compare.differences.only_in_old">
-                            <li class="list-group-item resource">
-                                <div class="resource-title">{{resource}}</div>
-                                <pre class="sh_ruby sh_sourceCode">{{code}}</pre>
-                            </li>
-                        </ul>
+                        <div class="list-group resource" ng-repeat="(resource, code) in compare.differences.only_in_old">
+                            <div class="resource-title">{{resource}}</div>
+                            <hlcode lang="'ruby'" code="code"></hlcode>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -83,12 +79,10 @@
                 </div>
                 <div id="panel-body-in-new" class="panel-collapse collapse in">
                     <div class="panel-body">
-                        <ul id="only-in-new" class="list-group" ng-repeat="(resource, code) in compare.differences.only_in_new">
-                            <li class="list-group-item resource">
-                                <div class="resource-title">{{resource}}</div>
-                                <pre class="sh_ruby sh_sourceCode">{{code}}</pre>
-                            </li>
-                        </ul>
+                        <div class="list-group resource" ng-repeat="(resource, code) in compare.differences.only_in_new">
+                            <div class="resource-title">{{resource}}</div>
+                            <hlcode lang="'ruby'" code="code"></hlcode>
+                        </div>
                     </div>
                 </div>
             </div>

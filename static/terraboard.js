@@ -259,6 +259,20 @@ app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, 
     });
 }]);
 
+app.directive("hlcode", ['$timeout', function($timeout) {
+    return {
+        restrict: "E",
+        scope: {
+            code: '=code',
+            lang: '=lang'
+        },
+        link: function() {
+            $timeout(sh_highlightDocument, 0, false);
+        },
+        template: "<pre class=\"sh_{{lang}} sh_sourceCode\">{{code}}</pre>"
+    }
+}]);
+
 app.controller("tbCompareCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
     $http.get('api'+$location.url()).then(function(response){
         $scope.compare = response.data;
@@ -295,7 +309,6 @@ app.controller("tbCompareCtrl", ['$scope', '$http', '$location', function($scope
         });
     });
 
-    $scope.$evalAsync(function() { sh_highlightDocument(); } );
 }]);
 
 app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', function($scope, $http, $location) {
