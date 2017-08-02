@@ -293,7 +293,6 @@ app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', 
             params.page = page;
         }
         var query = $.param(params);
-        console.log(params);
         $location.path($location.path()).search(params);
         $http.get('api/search/attribute?'+query).then(function(response){
             $scope.results = response.data;
@@ -319,6 +318,7 @@ app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', 
     if ($location.search().value != undefined) {
         $scope.attrVal = $location.search().value;
     }
+
     $scope.doSearch(1);
 
     $scope.clearForm = function() {

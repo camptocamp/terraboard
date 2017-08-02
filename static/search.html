@@ -13,7 +13,7 @@
     </div>
 </div>
 <div class="row">
-    <form class="form-inline" ng-submit="doSearch()" role="form">
+    <form class="form-inline" role="form">
         <div class="form-group col-xs-2 col-sm-2 col-md-2">
             <ui-select id="resource_type"
                        ng-model="$parent.resType"
@@ -63,7 +63,7 @@
             </ui-select>
         </div>
         <div class="form-group col-xs-2 col-sm-2 col-md-2">
-            <input id="attribute_value" type="text" class="form-control" ng-value="attrVal" placeholder="Attribute Value" ng-model="$parent.attrVal" ng-change="doSearch()" />
+            <input id="attribute_value" type="text" class="form-control" placeholder="Attribute Value" ng-model="attrVal" ng-change="doSearch()" />
         </div>
         <button class="clear btn btn-warning" ng-click="clearForm()">Reset</button>
     </form>
