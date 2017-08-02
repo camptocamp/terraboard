@@ -24,6 +24,13 @@ type StateCompare struct {
 	} `json:"differences"`
 }
 
+func countResources(state db.State) (count int) {
+	for _, m := range state.Modules {
+		count += len(m.Resources)
+	}
+	return
+}
+
 func Compare(from, to db.State) (comp StateCompare, err error) {
 	if from.Path == "" {
 		err = fmt.Errorf("from version is unknown")
@@ -31,7 +38,7 @@ func Compare(from, to db.State) (comp StateCompare, err error) {
 	}
 	comp.Stats.From = StateInfo{
 		VersionID:     from.Version.VersionID,
-		ResourceCount: 0,
+		ResourceCount: countResources(from),
 	}
 
 	if to.Path == "" {
@@ -40,7 +47,7 @@ func Compare(from, to db.State) (comp StateCompare, err error) {
 	}
 	comp.Stats.To = StateInfo{
 		VersionID:     to.Version.VersionID,
-		ResourceCount: 0,
+		ResourceCount: countResources(to),
 	}
 
 	log.WithFields(log.Fields{
