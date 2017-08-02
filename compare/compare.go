@@ -15,9 +15,9 @@ type StateInfo struct {
 }
 
 type ResourceDiff struct {
-	OnlyInOld   []string `json:"only_in_old"`
-	OnlyInNew   []string `json:"only_in_new"`
-	UnifiedDiff string   `json:"unified_diff"`
+	OnlyInOld   map[string]string `json:"only_in_old"`
+	OnlyInNew   map[string]string `json:"only_in_new"`
+	UnifiedDiff string            `json:"unified_diff"`
 }
 
 type StateCompare struct {
@@ -97,6 +97,15 @@ func getResource(state db.State, key string) (res db.Resource) {
 	return
 }
 
+func getResourceAttribute(res db.Resource, key string) (val string) {
+	for _, attr := range res.Attributes {
+		if attr.Key == key {
+			return attr.Value
+		}
+	}
+	return
+}
+
 func formatResource(res db.Resource) (out string) {
 	out = fmt.Sprintf("resource \"%s\" \"%s\" {\n", res.Type, res.Name)
 	for _, attr := range res.Attributes {
@@ -118,8 +127,17 @@ func compareResource(st1, st2 db.State, key string) (comp ResourceDiff) {
 	res2 := getResource(st2, key)
 	attrs2 := resourceAttributes(res2)
 
-	comp.OnlyInOld = sliceDiff(attrs1, attrs2)
-	comp.OnlyInNew = sliceDiff(attrs2, attrs1)
+	// Only in old
+	comp.OnlyInOld = make(map[string]string)
+	for _, attr := range sliceDiff(attrs1, attrs2) {
+		comp.OnlyInOld[attr] = getResourceAttribute(res1, attr)
+	}
+
+	// Only in new
+	comp.OnlyInNew = make(map[string]string)
+	for _, attr := range sliceDiff(attrs2, attrs1) {
+		comp.OnlyInNew[attr] = getResourceAttribute(res2, attr)
+	}
 
 	// Compute unified diff
 	diff := difflib.ContextDiff{
