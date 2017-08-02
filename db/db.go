@@ -113,13 +113,13 @@ func (db *Database) GetState(path, versionId string) (state types.State) {
 
 func (db *Database) GetStateActivity(path string) (states []types.StateStat) {
 	sql := "SELECT t.path, t.serial, t.tf_version, t.version_id, t.last_modified, count(resources.*) as resource_count" +
-		fmt.Sprintf(" FROM (SELECT states.id, states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified FROM states JOIN versions ON versions.id = states.version_id WHERE states.path = '%s' ORDER BY states.path, versions.last_modified ASC) t", path) +
+		" FROM (SELECT states.id, states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified FROM states JOIN versions ON versions.id = states.version_id WHERE states.path = ? ORDER BY states.path, versions.last_modified ASC) t" +
 		" JOIN modules ON modules.state_id = t.id" +
 		" JOIN resources ON resources.module_id = modules.id" +
 		" GROUP BY t.path, t.serial, t.tf_version, t.version_id, t.last_modified" +
 		" ORDER BY last_modified ASC"
 
-	db.Raw(sql).Find(&states)
+	db.Raw(sql, path).Find(&states)
 	return
 }
 
@@ -155,25 +155,31 @@ func (db *Database) SearchAttribute(query url.Values) (results []types.SearchRes
 		" JOIN attributes ON resources.id = attributes.resource_id"
 
 	var where []string
+	var params []interface{}
 	if targetVersion != "" && targetVersion != "*" {
 		// filter by version unless we want all (*) or most recent ("")
-		where = append(where, fmt.Sprintf("states.version_id = '%s'", targetVersion))
+		where = append(where, "states.version_id = ?")
+		params = append(params, targetVersion)
 	}
 
-	if v := query.Get("type"); string(v) != "" {
-		where = append(where, fmt.Sprintf("resources.type LIKE '%s'", fmt.Sprintf("%%%s%%", string(v))))
+	if v := string(query.Get("type")); v != "" {
+		where = append(where, "resources.type LIKE ?")
+		params = append(params, fmt.Sprintf("%%%s%%", v))
 	}
 
-	if v := query.Get("name"); string(v) != "" {
-		where = append(where, fmt.Sprintf("resources.name LIKE '%s'", fmt.Sprintf("%%%s%%", v)))
+	if v := string(query.Get("name")); v != "" {
+		where = append(where, "resources.name LIKE ?")
+		params = append(params, fmt.Sprintf("%%%s%%", v))
 	}
 
-	if v := query.Get("key"); string(v) != "" {
-		where = append(where, fmt.Sprintf("attributes.key LIKE '%s'", fmt.Sprintf("%%%s%%", v)))
+	if v := string(query.Get("key")); v != "" {
+		where = append(where, "attributes.key LIKE ?")
+		params = append(params, fmt.Sprintf("%%%s%%", v))
 	}
 
-	if v := query.Get("value"); string(v) != "" {
-		where = append(where, fmt.Sprintf("attributes.value LIKE '%s'", fmt.Sprintf("%%%s%%", v)))
+	if v := string(query.Get("value")); v != "" {
+		where = append(where, "attributes.value LIKE ?")
+		params = append(params, fmt.Sprintf("%%%s%%", v))
 	}
 
 	if v := query.Get("tf_version"); string(v) != "" {
@@ -185,7 +191,7 @@ func (db *Database) SearchAttribute(query url.Values) (results []types.SearchRes
 	}
 
 	// Count everything
-	row := db.Raw("SELECT count(*)" + sqlQuery).Row()
+	row := db.Raw("SELECT count(*)"+sqlQuery, params...).Row()
 	row.Scan(&total)
 
 	// Now get results
@@ -193,17 +199,20 @@ func (db *Database) SearchAttribute(query url.Values) (results []types.SearchRes
 	sql := "SELECT states.path, states.version_id, states.tf_version, states.serial, modules.path as module_path, resources.type, resources.name, attributes.key, attributes.value" +
 		sqlQuery +
 		" ORDER BY states.path, states.serial, modules.path, resources.type, resources.name, attributes.key" +
-		fmt.Sprintf(" LIMIT %v", pageSize)
+		" LIMIT ?"
+
+	params = append(params, pageSize)
 
 	if v := string(query.Get("page")); v != "" {
 		page, _ = strconv.Atoi(v) // TODO: err
 		o := (page - 1) * pageSize
-		sql += fmt.Sprintf(" OFFSET %v", o)
+		sql += " OFFSET ?"
+		params = append(params, o)
 	} else {
 		page = 1
 	}
 
-	db.Raw(sql).Find(&results)
+	db.Raw(sql, params...).Find(&results)
 
 	return
 }
@@ -236,7 +245,10 @@ func (db *Database) ListStates() (states []string) {
 
 func (db *Database) ListTerraformVersionsWithCount(query url.Values) (results []map[string]string, err error) {
 	orderBy := string(query.Get("orderBy"))
-	sql := "SELECT t.tf_version, COUNT(*) FROM (SELECT DISTINCT ON(states.path) states.id, states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified FROM states JOIN versions ON versions.id = states.version_id ORDER BY states.path, versions.last_modified DESC) t GROUP BY t.tf_version ORDER BY "
+	sql := "SELECT t.tf_version, COUNT(*)" +
+		" FROM (SELECT DISTINCT ON(states.path) states.id, states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified" +
+		" FROM states JOIN versions ON versions.id = states.version_id ORDER BY states.path, versions.last_modified DESC) t" +
+		" GROUP BY t.tf_version ORDER BY "
 
 	if orderBy == "version" {
 		sql += "string_to_array(t.tf_version, '.')::int[] DESC"
@@ -280,9 +292,9 @@ func (db *Database) ListStateStats(query url.Values) (states []types.StateStat, 
 		" GROUP BY t.path, t.serial, t.tf_version, t.version_id, t.last_modified" +
 		" ORDER BY last_modified DESC" +
 		" LIMIT 20" +
-		fmt.Sprintf(" OFFSET %v", offset)
+		" OFFSET ?"
 
-	db.Raw(sql).Find(&states)
+	db.Raw(sql, offset).Find(&states)
 	return
 }
 
@@ -327,7 +339,15 @@ func (db *Database) ListResourceTypes() ([]string, error) {
 }
 
 func (db *Database) ListResourceTypesWithCount() (results []map[string]string, err error) {
-	sql := "SELECT resources.type, COUNT(*) FROM (SELECT DISTINCT ON(states.path) states.id, states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified FROM states JOIN versions ON versions.id = states.version_id ORDER BY states.path, versions.last_modified DESC) t JOIN modules ON modules.state_id = t.id JOIN resources ON resources.module_id = modules.id GROUP BY resources.type ORDER BY count DESC"
+	sql := "SELECT resources.type, COUNT(*)" +
+		" FROM (SELECT DISTINCT ON(states.path) states.id, states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified" +
+		" FROM states" +
+		" JOIN versions ON versions.id = states.version_id" +
+		" ORDER BY states.path, versions.last_modified DESC) t" +
+		" JOIN modules ON modules.state_id = t.id" +
+		" JOIN resources ON resources.module_id = modules.id" +
+		" GROUP BY resources.type" +
+		" ORDER BY count DESC"
 
 	rows, err := db.Raw(sql).Rows()
 	defer rows.Close()
@@ -357,7 +377,7 @@ func (db *Database) ListTfVersions() ([]string, error) {
 
 func (db *Database) ListAttributeKeys(resourceType string) (results []string, err error) {
 	query := db.Table("attributes").
-		Select(fmt.Sprintf("DISTINCT %s", "key")).
+		Select("DISTINCT key").
 		Joins("JOIN resources ON attributes.resource_id = resources.id")
 
 	if resourceType != "" {
@@ -384,9 +404,9 @@ func (db *Database) DefaultVersion(path string) (version string, err error) {
 		" (SELECT states.path, max(states.serial) as mx FROM states GROUP BY states.path) t" +
 		" JOIN states ON t.path = states.path AND t.mx = states.serial" +
 		" JOIN versions on states.version_id=versions.id" +
-		fmt.Sprintf(" WHERE states.path = '%s'", path)
+		" WHERE states.path = ?"
 
-	row := db.Raw(sqlQuery).Row()
+	row := db.Raw(sqlQuery, path).Row()
 	row.Scan(&version)
 	return
 }
