@@ -247,6 +247,21 @@ func (db *Database) SearchAttribute(query url.Values) (results []SearchResult, p
 	return
 }
 
+func (db *Database) ListStatesVersions() (statesVersions map[string][]string) {
+	rows, _ := db.Table("states").
+		Joins("JOIN versions ON versions.id = states.version_id").
+		Select("states.path, versions.version_id").Rows()
+	defer rows.Close()
+	statesVersions = make(map[string][]string)
+	for rows.Next() {
+		var path string
+		var versionId string
+		rows.Scan(&path, &versionId)
+		statesVersions[versionId] = append(statesVersions[versionId], path)
+	}
+	return
+}
+
 func (db *Database) ListStates() (states []string) {
 	rows, _ := db.Table("states").Select("DISTINCT path").Rows()
 	defer rows.Close()

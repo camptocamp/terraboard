@@ -39,6 +39,19 @@ func handleWithDB(apiF func(w http.ResponseWriter, r *http.Request, d *db.Databa
 	})
 }
 
+func isKnownStateVersion(statesVersions map[string][]string, versionId, path string) bool {
+	if v, ok := statesVersions[versionId]; ok {
+		for _, s := range v {
+			if s == path {
+				return true
+			}
+		}
+		return false
+	} else {
+		return false
+	}
+}
+
 // Refresh the DB from S3
 // This should be the only direct bridge between S3 and the DB
 func refreshDB(d *db.Database) {
@@ -49,14 +62,18 @@ func refreshDB(d *db.Database) {
 			log.Errorf("Failed to build cache: %s", err)
 		}
 
+		statesVersions := d.ListStatesVersions()
 		for _, st := range states {
 			versions, _ := s3.GetVersions(st)
 			for _, v := range versions {
-				d.InsertVersion(v)
+				if _, ok := statesVersions[*v.VersionId]; ok {
+					log.Debugf("Version %s is already in the DB", *v.VersionId)
+				} else {
+					d.InsertVersion(v)
+				}
 
-				s := d.GetState(st, *v.VersionId)
-				if s.Path == st {
-					log.Infof("State %s/%s is already in the DB, skipping", st, *v.VersionId)
+				if isKnownStateVersion(statesVersions, *v.VersionId, st) {
+					log.Debugf("State %s/%s is already in the DB, skipping", st, *v.VersionId)
 					continue
 				}
 				state, _ := s3.GetState(st, *v.VersionId)
