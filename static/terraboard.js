@@ -9,7 +9,8 @@ var app = angular.module("terraboard", ['ngRoute', 'ngSanitize', 'ui.select', 'c
         controller: "tbStateCtrl"
     }).when("/search", {
         templateUrl: "static/search.html",
-        controller: "tbSearchCtrl"
+        controller: "tbSearchCtrl",
+        reloadOnSearch: false
     }).otherwise({
         redirectTo: "/"
     });
@@ -255,7 +256,7 @@ app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, 
     });
 }]);
 
-app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', function($scope, $http) {
+app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', function($scope, $http, $location) {
     $http.get('api/resource/types').then(function(response){
         $scope.resource_keys = response.data;
     });
@@ -276,22 +277,23 @@ app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', 
 
     $scope.doSearch = function(page) {
         var params = {};
-        if ($scope.resType != "") {
+        if ($scope.resType != undefined) {
             params.type = $scope.resType;
         }
-        if ($scope.resID != "") {
+        if ($scope.resID != undefined) {
             params.name = $scope.resID;
         }
-        if ($scope.attrKey != "") {
+        if ($scope.attrKey != undefined) {
             params.key = $scope.attrKey;
         }
-        if ($scope.attrVal != "") {
+        if ($scope.attrVal != undefined) {
             params.value = $scope.attrVal;
         }
         if (page != undefined) {
             params.page = page;
         }
         var query = $.param(params);
+        $location.path($location.path()).search(params);
         $http.get('api/search/attribute?'+query).then(function(response){
             $scope.results = response.data;
             $scope.pages = Math.ceil($scope.results.total / $scope.itemsPerPage);
@@ -304,6 +306,19 @@ app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', 
     }
 
     // On page load
+    if ($location.search().type != undefined) {
+        $scope.resType = $location.search().type;
+    }
+    if ($location.search().name != undefined) {
+        $scope.resID = $location.search().name;
+    }
+    if ($location.search().key != undefined) {
+        $scope.attrKey = $location.search().key;
+    }
+    if ($location.search().value != undefined) {
+        $scope.attrVal = $location.search().value;
+    }
+
     $scope.doSearch(1);
 
     $scope.clearForm = function() {
@@ -312,6 +327,6 @@ app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', 
         $scope.attrKey = undefined;
         $scope.attrVal = undefined;
         $scope.results = undefined;
-        $scope.doSearch(1);
+        $location.url($location.path());
     }
 }]);
