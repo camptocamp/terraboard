@@ -4,6 +4,9 @@ var app = angular.module("terraboard", ['ngRoute', 'ngSanitize', 'ui.select', 'c
     $routeProvider.when("/", {
         templateUrl: "static/main.html",
         controller: "tbMainCtrl"
+    }).when("/state/compare/:path*", {
+        templateUrl: "static/compare.html",
+        controller: "tbCompareCtrl"
     }).when("/state/:path*", {
         templateUrl: "static/state.html",
         controller: "tbStateCtrl"
@@ -254,6 +257,14 @@ app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, 
             return false;
         };
     });
+}]);
+
+app.controller("tbCompareCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
+    $http.get('api'+$location.url()).then(function(response){
+        $scope.compare = response.data;
+    });
+
+    $scope.$evalAsync(function() { sh_highlightDocument(); } );
 }]);
 
 app.controller("tbSearchCtrl", ['$scope', '$http', '$location', '$routeParams', function($scope, $http, $location) {
