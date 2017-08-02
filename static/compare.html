@@ -10,7 +10,7 @@
                 <ul class="list-group">
                     <li class="list-group-item">Terraform version: {{compare.stats.from.terraform_version}}</li>
                     <li class="list-group-item">Serial: {{compare.stats.from.serial}}</li>
-                    <li class="list-group-item">Version: <select ng-model="fromVersion" ng-options="version as version.date for version in versions track by version.versionId"></select></li>
+                    <li class="list-group-item">Version: <select class="form-control" ng-model="fromVersion" ng-options="version as version.date for version in versions track by version.versionId"></select></li>
                     <li class="list-group-item">Resource count: {{compare.stats.from.resource_count}}</li>
                 </ul>
             </div>
@@ -23,7 +23,7 @@
                 <ul class="list-group">
                     <li class="list-group-item">Terraform version: {{compare.stats.to.terraform_version}}</li>
                     <li class="list-group-item">Serial: {{compare.stats.to.serial}}</li>
-                    <li class="list-group-item">Version: <select ng-model="toVersion" ng-options="version as version.date for version in versions track by version.versionId"></select></li>
+                    <li class="list-group-item">Version: <select class="form-control" ng-model="toVersion" ng-options="version as version.date for version in versions track by version.versionId"></select></li>
                     <li class="list-group-item">Resource count: {{compare.stats.to.resource_count}}</li>
                 </ul>
             </div>
@@ -38,7 +38,7 @@
                         <a data-toggle="collapse" data-target="#panel-body-diff">
                             Differences
                         </a>
-                        <span id="badge-diff" class="badge">{{compare.differences.in_both.length}}</span>
+                        <span id="badge-diff" class="badge">{{differences}}</span>
                     </h4>
                 </div>
                 <div id="panel-body-diff" class="panel-collapse collapse in">

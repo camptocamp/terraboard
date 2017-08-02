@@ -202,6 +202,10 @@ app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, 
         $scope.$watch('selectedVersion', function(ver) {
             $location.search('versionid', ver.versionId);
         });
+
+        $scope.$watch('compareVersion', function(ver) {
+            $location.url('state/compare/'+$scope.path+'?from='+$scope.selectedVersion.versionId+'&to='+ver.versionId);
+        });
     });
 
     $http.get('api'+$location.url(), {cache: true}).then(function(response){
@@ -279,6 +283,7 @@ app.controller("tbCompareCtrl", ['$scope', '$http', '$location', function($scope
 
         $scope.only_in_old = Object.keys($scope.compare.differences.only_in_old).length;
         $scope.only_in_new = Object.keys($scope.compare.differences.only_in_new).length;
+        $scope.differences = Object.keys($scope.compare.differences.resource_diff).length;
     });
 
     $scope.fromVersion = {
