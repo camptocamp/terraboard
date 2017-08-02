@@ -161,6 +161,15 @@ app.controller("tbMainCtrl", ['$scope', '$http', '$location', function($scope, $
     $scope.pieTfVersionsLabels  = pieTfVersionsLabels;
     $scope.pieTfVersionsData    = pieTfVersionsData;
     $scope.pieTfVersionsOptions = { legend: { display: false } };
+    $scope.searchTfVersion = function(points, ev) {
+        var version = points[0]._chart.data.labels[points[0]._index][0];
+        if ($.isArray(version)) {
+            console.log("Clicked zone is an array, not searching");
+            return;
+        }
+        $location.url('search/?tf_version='+version);
+        $scope.$apply();
+    };
 
 
     $scope.pieLockedStatesLabels = ["Locked", "Unlocked"];
@@ -371,6 +380,9 @@ app.controller("tbSearchCtrl",
         if ($scope.attrVal != undefined) {
             params.value = $scope.attrVal;
         }
+        if ($scope.tfVersion != undefined) {
+            params.tf_version = $scope.tfVersion;
+        }
         if (page != undefined) {
             params.page = page;
         }
@@ -399,6 +411,9 @@ app.controller("tbSearchCtrl",
     }
     if ($location.search().value != undefined) {
         $scope.attrVal = $location.search().value;
+    }
+    if ($location.search().tf_version != undefined) {
+        $scope.tfVersion = $location.search().tf_version;
     }
 
     $scope.doSearch(1);

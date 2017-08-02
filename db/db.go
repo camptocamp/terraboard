@@ -176,6 +176,10 @@ func (db *Database) SearchAttribute(query url.Values) (results []types.SearchRes
 		where = append(where, fmt.Sprintf("attributes.value LIKE '%s'", fmt.Sprintf("%%%s%%", v)))
 	}
 
+	if v := query.Get("tf_version"); string(v) != "" {
+		where = append(where, fmt.Sprintf("states.tf_version LIKE '%s'", fmt.Sprintf("%%%s%%", v)))
+	}
+
 	if len(where) > 0 {
 		sqlQuery += fmt.Sprintf(" WHERE %s", strings.Join(where, " AND "))
 	}
