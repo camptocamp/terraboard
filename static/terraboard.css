@@ -220,7 +220,7 @@ pre.sh_sourceCode .sh_oldfile {
 
 #node td.attr-val {
     white-space: pre;
-    max-width: 30vw;
+    max-width: 20vw;
 }
 
 #node td.attr-val, #nodes li.list-group-item {
