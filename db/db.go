@@ -71,7 +71,7 @@ func Init(host, user, dbname, password string) *Database {
 	log.Infof("Automigrate")
 	db.AutoMigrate(&Version{}, &State{}, &Module{}, &Resource{}, &Attribute{})
 
-	db.LogMode(true)
+	//db.LogMode(true)
 	return &Database{db}
 }
 
@@ -361,7 +361,7 @@ func (db *Database) ListResourceTypes() ([]string, error) {
 
 func (db *Database) ListResourceTypesWithCount() (results []map[string]string, err error) {
 	sql := "SELECT resources.type, COUNT(*) FROM (SELECT DISTINCT ON(states.path) states.id, states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified FROM states JOIN versions ON versions.id = states.version_id ORDER BY states.path, versions.last_modified DESC) t JOIN modules ON modules.state_id = t.id JOIN resources ON resources.module_id = modules.id GROUP BY resources.type ORDER BY count DESC"
-	
+
 	rows, err := db.Raw(sql).Rows()
 	defer rows.Close()
 	if err != nil {
