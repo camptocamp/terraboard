@@ -2,6 +2,7 @@ package compare
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
@@ -15,14 +16,6 @@ func stateResources(state types.State) (res []string) {
 		for _, r := range m.Resources {
 			res = append(res, fmt.Sprintf("%s.%s.%s", m.Path, r.Type, r.Name))
 		}
-	}
-	return
-}
-
-// Return all attributes of a resource
-func resourceAttributes(res types.Resource) (attrs []string) {
-	for _, a := range res.Attributes {
-		attrs = append(attrs, a.Key)
 	}
 	return
 }
@@ -73,6 +66,15 @@ func getResource(state types.State, key string) (res types.Resource) {
 	return
 }
 
+// Return all attributes of a resource
+func resourceAttributes(res types.Resource) (attrs []string) {
+	for _, a := range res.Attributes {
+		attrs = append(attrs, a.Key)
+	}
+	sort.Strings(attrs)
+	return
+}
+
 func getResourceAttribute(res types.Resource, key string) (val string) {
 	for _, attr := range res.Attributes {
 		if attr.Key == key {
@@ -84,8 +86,8 @@ func getResourceAttribute(res types.Resource, key string) (val string) {
 
 func formatResource(res types.Resource) (out string) {
 	out = fmt.Sprintf("resource \"%s\" \"%s\" {\n", res.Type, res.Name)
-	for _, attr := range res.Attributes {
-		out += fmt.Sprintf("  %s = \"%s\"\n", attr.Key, attr.Value)
+	for _, attr := range resourceAttributes(res) {
+		out += fmt.Sprintf("  %s = \"%s\"\n", attr, getResourceAttribute(res, attr))
 	}
 	out += "}\n"
 
@@ -137,8 +139,11 @@ func Compare(from, to types.State) (comp types.StateCompare, err error) {
 	}
 	fromResources := stateResources(from)
 	comp.Stats.From = types.StateInfo{
+		Path:          from.Path,
 		VersionID:     from.Version.VersionID,
 		ResourceCount: len(fromResources),
+		TFVersion:     from.TFVersion,
+		Serial:        from.Serial,
 	}
 
 	if to.Path == "" {
@@ -147,12 +152,26 @@ func Compare(from, to types.State) (comp types.StateCompare, err error) {
 	}
 	toResources := stateResources(to)
 	comp.Stats.To = types.StateInfo{
+		Path:          to.Path,
 		VersionID:     to.Version.VersionID,
 		ResourceCount: len(toResources),
+		TFVersion:     to.TFVersion,
+		Serial:        to.Serial,
 	}
 
-	comp.Differences.OnlyInOld = sliceDiff(fromResources, toResources)
-	comp.Differences.OnlyInNew = sliceDiff(toResources, fromResources)
+	// OnlyInOld
+	onlyInOld := sliceDiff(fromResources, toResources)
+	comp.Differences.OnlyInOld = make(map[string]string)
+	for _, r := range onlyInOld {
+		comp.Differences.OnlyInOld[r] = formatResource(getResource(from, r))
+	}
+
+	// OnlyInNew
+	onlyInNew := sliceDiff(toResources, fromResources)
+	comp.Differences.OnlyInNew = make(map[string]string)
+	for _, r := range onlyInNew {
+		comp.Differences.OnlyInNew[r] = formatResource(getResource(to, r))
+	}
 	comp.Differences.InBoth = sliceInter(toResources, fromResources)
 	comp.Differences.ResourceDiff = make(map[string]types.ResourceDiff)
 
