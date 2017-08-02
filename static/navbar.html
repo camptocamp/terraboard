@@ -15,7 +15,16 @@
         </div>
 
         <ul class="nav navbar-nav navbar-collapse collapse" id="navbar-collapse-menu">
-            <li><a href="./">Overview</a></li>
+            <li>
+                <a href="./"><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> Overview</a>
+            </li>
+
+            <li>
+                <a href="search"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Search</a>
+            </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+
             <li id="states-select" ng-controller="tbListCtrl">
                 <ui-select ng-model="states.selected"
                            theme="bootstrap"
@@ -28,10 +37,6 @@
                         <a href="state/{{state}}" target="_self">{{state}}</a>
                     </ui-select-choices>
                 </ui-select>
-            </li>
-
-            <li>
-                <a href="search"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Search</a>
             </li>
         </ul>
     </div>
