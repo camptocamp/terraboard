@@ -168,18 +168,25 @@ app.controller("tbMainCtrl", ['$scope', '$http', '$location', function($scope, $
 
 }]);
 
-app.controller("tbListCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
-    if ($location.path().startsWith("/state/")) {
-        $scope.placeholder = $location.path().replace('/state/', '');
-    } else {
-        $scope.placeholder = 'Enter a state file path...';
-    }
+app.controller("tbListCtrl",
+        ['$scope', '$http', '$location', '$routeParams',
+        function($scope, $http, $location, $routeParams) {
+    $scope.placeholder = 'Enter a state file path...';
+
+    $scope.$on('$routeChangeSuccess', function() {
+        if ($routeParams.path != undefined) {
+            $scope.placeholder = $routeParams.path;
+        }
+    });
+
     $http.get('api/states').then(function(response){
         $scope.states = response.data;
     });
 }]);
 
-app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
+app.controller("tbStateCtrl",
+        ['$scope', '$http', '$location', '$routeParams',
+        function($scope, $http, $location, $routeParams) {
     $scope.Utils = { keys : Object.keys };
     $scope.display = {};
 
@@ -188,67 +195,70 @@ app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, 
         versionId: $location.search().versionid
     };
 
-    var key = $location.url().replace('/state/', '');
-    $http.get('api/state/activity/'+key).then(function(response){
-        $scope.versions = [];
-        for (i=0; i<response.data.length; i++) {
-            var ver = {
-                versionId: response.data[i].version_id,
-                date: new Date(response.data[i].last_modified.toLocaleString())
-            };
-            $scope.versions.unshift(ver);
-        }
+    $scope.$on('$routeChangeSuccess', function() {
+        $http.get('api/state/activity/'+$routeParams.path).then(function(response){
+            $scope.versions = [];
+            for (i=0; i<response.data.length; i++) {
+                var ver = {
+                    versionId: response.data[i].version_id,
+                    date: new Date(response.data[i].last_modified.toLocaleString())
+                };
+                $scope.versions.unshift(ver);
+            }
 
-        $scope.$watch('selectedVersion', function(ver) {
-            $location.search('versionid', ver.versionId);
-        });
+            $scope.$watch('selectedVersion', function(ver) {
+                $location.search('versionid', ver.versionId);
+            });
 
-        $scope.$watch('compareVersion', function(ver) {
-            $location.url('state/compare/'+$scope.path+'?from='+$scope.selectedVersion.versionId+'&to='+ver.versionId);
+            $scope.$watch('compareVersion', function(ver) {
+                $location.url('state/compare/'+$scope.path+'?from='+$scope.selectedVersion.versionId+'&to='+ver.versionId);
+            });
         });
     });
 
-    $http.get('api'+$location.url(), {cache: true}).then(function(response){
-        $scope.path = $location.path().replace('/state/', '');
-        $scope.details = response.data;
-        $scope.selectedVersion = {
-            versionId: $scope.details.version.version_id
-        };
-        var mods = $scope.details.modules;
+    $scope.$on('$routeChangeSuccess', function() {
+        $http.get('api'+$location.url()).then(function(response){
+            $scope.path = $routeParams.path;
+            $scope.details = response.data;
+            $scope.selectedVersion = {
+                versionId: $scope.details.version.version_id
+            };
+            var mods = $scope.details.modules;
 
-        // Init
-        if ($location.hash() != "") {
-            // Default
-            $scope.selectedmod = 0;
+            // Init
+            if ($location.hash() != "") {
+                // Default
+                $scope.selectedmod = 0;
 
-            // Search for module in selected res
-            var targetRes = $location.hash();
-            for (i=0; i < mods.length; i++) {
-                if (targetRes.startsWith(mods[i].path+'.')) {
-                    $scope.selectedmod = i;
+                // Search for module in selected res
+                var targetRes = $location.hash();
+                for (i=0; i < mods.length; i++) {
+                    if (targetRes.startsWith(mods[i].path+'.')) {
+                        $scope.selectedmod = i;
+                    }
                 }
+
+                targetRes = targetRes.replace(mods[$scope.selectedmod].path+'.', '');
+                var resources = mods[$scope.selectedmod].resources;
+                for (j=0; j < resources.length; j++) {
+                    if (targetRes == resources[j].type+'.'+resources[j].name) {
+                        $scope.selectedres = j;
+                        break;
+                    }
+                }
+
+                // Init display.mod
+                $scope.display.mod = $scope.selectedmod;
             }
 
-            targetRes = targetRes.replace(mods[$scope.selectedmod].path+'.', '');
-            var resources = mods[$scope.selectedmod].resources;
-            for (j=0; j < resources.length; j++) {
-                if (targetRes == resources[j].type+'.'+resources[j].name) {
-                    $scope.selectedres = j;
-                    break;
-                }
-            }
-
-            // Init display.mod
-            $scope.display.mod = $scope.selectedmod;
-        }
-
-        $scope.setSelected = function(m, r) {
-            var mod = $scope.details.modules[m];
-            var res = mod.resources[r];
-            var res_title = res.type+'.'+res.name;
-            var hash = (mod == 0) ? res_title : mod.path+'.'+res_title;
-            $location.hash(hash);
-        };
+            $scope.setSelected = function(m, r) {
+                var mod = $scope.details.modules[m];
+                var res = mod.resources[r];
+                var res_title = res.type+'.'+res.name;
+                var hash = (mod == 0) ? res_title : mod.path+'.'+res_title;
+                $location.hash(hash);
+            };
+        });
     });
 
     $http.get('api/locks').then(function(response){
@@ -277,7 +287,7 @@ app.directive("hlcode", ['$timeout', function($timeout) {
     }
 }]);
 
-app.controller("tbCompareCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
+app.controller("tbCompareCtrl", ['$scope', '$http', '$location', '$routeParams', function($scope, $http, $location, $routeParams) {
     $http.get('api'+$location.url()).then(function(response){
         $scope.compare = response.data;
 
@@ -294,8 +304,7 @@ app.controller("tbCompareCtrl", ['$scope', '$http', '$location', function($scope
         versionId: $location.search().to
     };
 
-    var key = $location.url().replace('/state/compare/', '');
-    $http.get('api/state/activity/'+key).then(function(response){
+    $http.get('api/state/activity/'+$routeParams.path).then(function(response){
         $scope.versions = [];
         for (i=0; i<response.data.length; i++) {
             var ver = {
