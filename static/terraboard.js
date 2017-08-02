@@ -262,6 +262,37 @@ app.controller("tbStateCtrl", ['$scope', '$http', '$location', function($scope, 
 app.controller("tbCompareCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
     $http.get('api'+$location.url()).then(function(response){
         $scope.compare = response.data;
+
+        $scope.only_in_old = Object.keys($scope.compare.differences.only_in_old).length;
+        $scope.only_in_new = Object.keys($scope.compare.differences.only_in_new).length;
+    });
+
+    $scope.fromVersion = {
+        versionId: $location.search().from
+    };
+
+    $scope.toVersion = {
+        versionId: $location.search().to
+    };
+
+    var key = $location.url().replace('/state/compare/', '');
+    $http.get('api/state/activity/'+key).then(function(response){
+        $scope.versions = [];
+        for (i=0; i<response.data.length; i++) {
+            var ver = {
+                versionId: response.data[i].version_id,
+                date: new Date(response.data[i].last_modified.toLocaleString())
+            };
+            $scope.versions.unshift(ver);
+        }
+
+        $scope.$watch('fromVersion', function(ver) {
+            $location.search('from', ver.versionId);
+        });
+
+        $scope.$watch('toVersion', function(ver) {
+            $location.search('to', ver.versionId);
+        });
     });
 
     $scope.$evalAsync(function() { sh_highlightDocument(); } );

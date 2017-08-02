@@ -10,7 +10,7 @@
                 <ul class="list-group">
                     <li class="list-group-item">Terraform version: {{compare.stats.from.terraform_version}}</li>
                     <li class="list-group-item">Serial: {{compare.stats.from.serial}}</li>
-                    <li class="list-group-item">VersionID: {{compare.stats.from.version_id}}</li>
+                    <li class="list-group-item">Version: <select ng-model="fromVersion" ng-options="version as version.date for version in versions track by version.versionId"></select></li>
                     <li class="list-group-item">Resource count: {{compare.stats.from.resource_count}}</li>
                 </ul>
             </div>
@@ -23,7 +23,7 @@
                 <ul class="list-group">
                     <li class="list-group-item">Terraform version: {{compare.stats.to.terraform_version}}</li>
                     <li class="list-group-item">Serial: {{compare.stats.to.serial}}</li>
-                    <li class="list-group-item">VersionID: {{compare.stats.to.version_id}}</li>
+                    <li class="list-group-item">Version: <select ng-model="toVersion" ng-options="version as version.date for version in versions track by version.versionId"></select></li>
                     <li class="list-group-item">Resource count: {{compare.stats.to.resource_count}}</li>
                 </ul>
             </div>
@@ -58,7 +58,7 @@
                         <a data-toggle="collapse" data-target="#panel-body-in-old">
                             Only in serial {{compare.stats.from.serial}}
                         </a>
-                        <span id="badge-diff" class="badge">{{compare.differences.only_in_old.length || 0}}</span>
+                        <span id="badge-diff" class="badge">{{only_in_old}}</span>
                     </h4>
                 </div>
                 <div id="panel-body-in-old" class="panel-collapse collapse in">
@@ -78,7 +78,7 @@
                         <a data-toggle="collapse" data-target="#panel-body-in-new">
                             Only in serial {{compare.stats.to.serial}}
                         </a>
-                        <span id="badge-diff" class="badge">{{compare.differences.only_in_new.length || 0}}</span>
+                        <span id="badge-diff" class="badge">{{only_in_new}}</span>
                     </h4>
                 </div>
                 <div id="panel-body-in-new" class="panel-collapse collapse in">

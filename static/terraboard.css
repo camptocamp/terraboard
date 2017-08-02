@@ -161,7 +161,7 @@ body { padding-top: 60px; }
   float: right;
 }
 pre.sh_sourceCode .sh_oldfile {
-  color: red;
+  color: red !important;
 }
 .resource-title {
   white-space: nowrap;
