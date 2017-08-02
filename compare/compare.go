@@ -5,36 +5,12 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/camptocamp/terraboard/db"
+	"github.com/camptocamp/terraboard/types"
 	"github.com/pmezard/go-difflib/difflib"
 )
 
-type StateInfo struct {
-	VersionID     string `json:"version_id"`
-	ResourceCount int    `json:"resource_count"`
-}
-
-type ResourceDiff struct {
-	OnlyInOld   map[string]string `json:"only_in_old"`
-	OnlyInNew   map[string]string `json:"only_in_new"`
-	UnifiedDiff string            `json:"unified_diff"`
-}
-
-type StateCompare struct {
-	Stats struct {
-		From StateInfo `json:"from"`
-		To   StateInfo `json:"to"`
-	} `json:"stats"`
-	Differences struct {
-		OnlyInOld    []string                `json:"only_in_old"`
-		OnlyInNew    []string                `json:"only_in_new"`
-		InBoth       []string                `json:"in_both"`
-		ResourceDiff map[string]ResourceDiff `json:"resource_diff"`
-	} `json:"differences"`
-}
-
 // Return all resources of a state
-func stateResources(state db.State) (res []string) {
+func stateResources(state types.State) (res []string) {
 	for _, m := range state.Modules {
 		for _, r := range m.Resources {
 			res = append(res, fmt.Sprintf("%s.%s.%s", m.Path, r.Type, r.Name))
@@ -44,7 +20,7 @@ func stateResources(state db.State) (res []string) {
 }
 
 // Return all attributes of a resource
-func resourceAttributes(res db.Resource) (attrs []string) {
+func resourceAttributes(res types.Resource) (attrs []string) {
 	for _, a := range res.Attributes {
 		attrs = append(attrs, a.Key)
 	}
@@ -82,7 +58,7 @@ func sliceInter(s1, s2 []string) (inter []string) {
 	return
 }
 
-func getResource(state db.State, key string) (res db.Resource) {
+func getResource(state types.State, key string) (res types.Resource) {
 	for _, m := range state.Modules {
 		if strings.HasPrefix(key, m.Path) {
 			for _, r := range m.Resources {
@@ -97,7 +73,7 @@ func getResource(state db.State, key string) (res db.Resource) {
 	return
 }
 
-func getResourceAttribute(res db.Resource, key string) (val string) {
+func getResourceAttribute(res types.Resource, key string) (val string) {
 	for _, attr := range res.Attributes {
 		if attr.Key == key {
 			return attr.Value
@@ -106,7 +82,7 @@ func getResourceAttribute(res db.Resource, key string) (val string) {
 	return
 }
 
-func formatResource(res db.Resource) (out string) {
+func formatResource(res types.Resource) (out string) {
 	out = fmt.Sprintf("resource \"%s\" \"%s\" {\n", res.Type, res.Name)
 	for _, attr := range res.Attributes {
 		out += fmt.Sprintf("  %s = \"%s\"\n", attr.Key, attr.Value)
@@ -116,12 +92,12 @@ func formatResource(res db.Resource) (out string) {
 	return
 }
 
-func stateInfo(state db.State) (info string) {
+func stateInfo(state types.State) (info string) {
 	return fmt.Sprintf("%s (%s)", state.Path, state.Version.LastModified)
 }
 
 // Compare a resource in two states
-func compareResource(st1, st2 db.State, key string) (comp ResourceDiff) {
+func compareResource(st1, st2 types.State, key string) (comp types.ResourceDiff) {
 	res1 := getResource(st1, key)
 	attrs1 := resourceAttributes(res1)
 	res2 := getResource(st2, key)
@@ -154,13 +130,13 @@ func compareResource(st1, st2 db.State, key string) (comp ResourceDiff) {
 	return
 }
 
-func Compare(from, to db.State) (comp StateCompare, err error) {
+func Compare(from, to types.State) (comp types.StateCompare, err error) {
 	if from.Path == "" {
 		err = fmt.Errorf("from version is unknown")
 		return
 	}
 	fromResources := stateResources(from)
-	comp.Stats.From = StateInfo{
+	comp.Stats.From = types.StateInfo{
 		VersionID:     from.Version.VersionID,
 		ResourceCount: len(fromResources),
 	}
@@ -170,7 +146,7 @@ func Compare(from, to db.State) (comp StateCompare, err error) {
 		return
 	}
 	toResources := stateResources(to)
-	comp.Stats.To = StateInfo{
+	comp.Stats.To = types.StateInfo{
 		VersionID:     to.Version.VersionID,
 		ResourceCount: len(toResources),
 	}
@@ -178,7 +154,7 @@ func Compare(from, to db.State) (comp StateCompare, err error) {
 	comp.Differences.OnlyInOld = sliceDiff(fromResources, toResources)
 	comp.Differences.OnlyInNew = sliceDiff(toResources, fromResources)
 	comp.Differences.InBoth = sliceInter(toResources, fromResources)
-	comp.Differences.ResourceDiff = make(map[string]ResourceDiff)
+	comp.Differences.ResourceDiff = make(map[string]types.ResourceDiff)
 
 	for _, r := range comp.Differences.InBoth {
 		comp.Differences.ResourceDiff[r] = compareResource(to, from, r)

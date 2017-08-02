@@ -1,0 +1,30 @@
+package types
+
+import "time"
+
+/**********************************************
+ * Search types
+ *
+ * Used to cast DB requests as search results
+ **********************************************/
+
+type SearchResult struct {
+	Path           string `gorm:"column:path" json:"path"`
+	VersionId      string `gorm:"column:version_id" json:"version_id"`
+	TFVersion      string `gorm:"column:tf_version" json:"tf_version"`
+	Serial         int64  `gorm:"column:serial" json:"serial"`
+	ModulePath     string `gorm:"column:module_path" json:"module_path"`
+	ResourceType   string `gorm:"column:type" json:"resource_type"`
+	ResourceName   string `gorm:"column:name" json:"resource_name"`
+	AttributeKey   string `gorm:"column:key" json:"attribute_key"`
+	AttributeValue string `gorm:"column:value" json:"attribute_value"`
+}
+
+type StateStat struct {
+	Path          string    `json:"path"`
+	TFVersion     string    `json:"terraform_version"`
+	Serial        int64     `json:"serial"`
+	VersionID     string    `json:"version_id"`
+	LastModified  time.Time `json:"last_modified"`
+	ResourceCount int       `json:"resource_count"`
+}

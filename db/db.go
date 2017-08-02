@@ -1,16 +1,15 @@
 package db
 
 import (
-	"database/sql"
 	"encoding/base64"
 	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
-	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/camptocamp/terraboard/types"
 	"github.com/hashicorp/terraform/terraform"
 
 	"github.com/jinzhu/gorm"
@@ -19,44 +18,6 @@ import (
 
 type Database struct {
 	*gorm.DB
-}
-
-type Version struct {
-	ID           uint      `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
-	VersionID    string    `gorm:"index" json:"version_id"`
-	LastModified time.Time `json:"last_modified"`
-}
-
-type State struct {
-	gorm.Model `json:"-"`
-	Path       string        `gorm:"index" json:"path"`
-	Version    Version       `json:"version"`
-	VersionID  sql.NullInt64 `gorm:"index" json:"-"`
-	TFVersion  string        `json:"terraform_version"`
-	Serial     int64         `json:"serial"`
-	Modules    []Module      `json:"modules"`
-}
-
-type Module struct {
-	ID        uint          `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
-	StateID   sql.NullInt64 `gorm:"index" json:"-"`
-	Path      string        `json:"path"`
-	Resources []Resource    `json:"resources"`
-}
-
-type Resource struct {
-	ID         uint          `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
-	ModuleID   sql.NullInt64 `gorm:"index" json:"-"`
-	Type       string        `gorm:"index" json:"type"`
-	Name       string        `gorm:"index" json:"name"`
-	Attributes []Attribute   `json:"attributes"`
-}
-
-type Attribute struct {
-	ID         uint          `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
-	ResourceID sql.NullInt64 `gorm:"index" json:"-"`
-	Key        string        `gorm:"index" json:"key"`
-	Value      string        `gorm:"index" json:"value"`
 }
 
 var pageSize = 20
@@ -70,7 +31,7 @@ func Init(host, user, dbname, password, logLevel string) *Database {
 	}
 
 	log.Infof("Automigrate")
-	db.AutoMigrate(&Version{}, &State{}, &Module{}, &Resource{}, &Attribute{})
+	db.AutoMigrate(&types.Version{}, &types.State{}, &types.Module{}, &types.Resource{}, &types.Attribute{})
 
 	if logLevel == "debug" {
 		db.LogMode(true)
@@ -78,10 +39,10 @@ func Init(host, user, dbname, password, logLevel string) *Database {
 	return &Database{db}
 }
 
-func (db *Database) stateS3toDB(state *terraform.State, path string, versionId string) (st State) {
-	var version Version
-	db.First(&version, Version{VersionID: versionId})
-	st = State{
+func (db *Database) stateS3toDB(state *terraform.State, path string, versionId string) (st types.State) {
+	var version types.Version
+	db.First(&version, types.Version{VersionID: versionId})
+	st = types.State{
 		Path:      path,
 		Version:   version,
 		TFVersion: state.TFVersion,
@@ -89,11 +50,11 @@ func (db *Database) stateS3toDB(state *terraform.State, path string, versionId s
 	}
 
 	for _, m := range state.Modules {
-		mod := Module{
+		mod := types.Module{
 			Path: strings.Join(m.Path, "/"),
 		}
 		for n, r := range m.Resources {
-			res := Resource{
+			res := types.Resource{
 				Type: r.Type,
 				Name: n,
 			}
@@ -106,7 +67,7 @@ func (db *Database) stateS3toDB(state *terraform.State, path string, versionId s
 					}).Info("Attribute has non-ASCII value, skipping")
 					continue
 				}
-				res.Attributes = append(res.Attributes, Attribute{
+				res.Attributes = append(res.Attributes, types.Attribute{
 					Key:   k,
 					Value: v,
 				})
@@ -135,22 +96,22 @@ func (db *Database) InsertState(path string, versionId string, state *terraform.
 }
 
 func (db *Database) InsertVersion(version *s3.ObjectVersion) error {
-	var v Version
-	db.FirstOrCreate(&v, Version{
+	var v types.Version
+	db.FirstOrCreate(&v, types.Version{
 		VersionID:    *version.VersionId,
 		LastModified: *version.LastModified,
 	})
 	return nil
 }
 
-func (db *Database) GetState(path, versionId string) (state State) {
+func (db *Database) GetState(path, versionId string) (state types.State) {
 	db.Joins("JOIN versions on states.version_id=versions.id").
 		Preload("Version").Preload("Modules").Preload("Modules.Resources").Preload("Modules.Resources.Attributes").
 		Find(&state, "states.path = ? AND versions.version_id = ?", path, versionId)
 	return
 }
 
-func (db *Database) GetStateActivity(path string) (states []StateStat) {
+func (db *Database) GetStateActivity(path string) (states []types.StateStat) {
 	sql := "SELECT t.path, t.serial, t.tf_version, t.version_id, t.last_modified, count(resources.*) as resource_count" +
 		fmt.Sprintf(" FROM (SELECT states.id, states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified FROM states JOIN versions ON versions.id = states.version_id WHERE states.path = '%s' ORDER BY states.path, versions.last_modified ASC) t", path) +
 		" JOIN modules ON modules.state_id = t.id" +
@@ -174,19 +135,7 @@ func (db *Database) KnownVersions() (versions []string) {
 	return
 }
 
-type SearchResult struct {
-	Path           string `gorm:"column:path" json:"path"`
-	VersionId      string `gorm:"column:version_id" json:"version_id"`
-	TFVersion      string `gorm:"column:tf_version" json:"tf_version"`
-	Serial         int64  `gorm:"column:serial" json:"serial"`
-	ModulePath     string `gorm:"column:module_path" json:"module_path"`
-	ResourceType   string `gorm:"column:type" json:"resource_type"`
-	ResourceName   string `gorm:"column:name" json:"resource_name"`
-	AttributeKey   string `gorm:"column:key" json:"attribute_key"`
-	AttributeValue string `gorm:"column:value" json:"attribute_value"`
-}
-
-func (db *Database) SearchAttribute(query url.Values) (results []SearchResult, page int, total int) {
+func (db *Database) SearchAttribute(query url.Values) (results []types.SearchResult, page int, total int) {
 	log.WithFields(log.Fields{
 		"query": query,
 	}).Info("Searching for attribute with query")
@@ -309,16 +258,7 @@ func (db *Database) ListTerraformVersionsWithCount(query url.Values) (results []
 	return
 }
 
-type StateStat struct {
-	Path          string    `json:"path"`
-	TFVersion     string    `json:"terraform_version"`
-	Serial        int64     `json:"serial"`
-	VersionID     string    `json:"version_id"`
-	LastModified  time.Time `json:"last_modified"`
-	ResourceCount int       `json:"resource_count"`
-}
-
-func (db *Database) ListStateStats(query url.Values) (states []StateStat, page int, total int) {
+func (db *Database) ListStateStats(query url.Values) (states []types.StateStat, page int, total int) {
 	row := db.Table("states").Select("count(DISTINCT path)").Row()
 	row.Scan(&total)
 
