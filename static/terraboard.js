@@ -348,6 +348,9 @@ app.controller("tbCompareCtrl",
 app.controller("tbSearchCtrl",
         ['$scope', '$http', '$location', '$routeParams',
         function($scope, $http, $location) {
+    $http.get('api/tf_versions').then(function(response){
+        $scope.tf_versions = response.data;
+    });
     $http.get('api/resource/types').then(function(response){
         $scope.resource_keys = response.data;
     });
@@ -419,6 +422,7 @@ app.controller("tbSearchCtrl",
     $scope.doSearch(1);
 
     $scope.clearForm = function() {
+        $scope.tfVersion = undefined;
         $scope.resType = undefined;
         $scope.resID = undefined;
         $scope.attrKey = undefined;

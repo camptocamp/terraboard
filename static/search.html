@@ -1,5 +1,8 @@
 <div class="row">
     <div class="col-xs-2 col-sm-2 col-md-2">
+        <label for="resource_type">Terraform Version</label>
+    </div>
+    <div class="col-xs-2 col-sm-2 col-md-2">
         <label for="resource_type">Resource Type</label>
     </div>
     <div class="col-xs-2 col-sm-2 col-md-2">
@@ -14,6 +17,21 @@
 </div>
 <div class="row">
     <form class="form-inline" role="form">
+        <div class="form-group col-xs-2 col-sm-2 col-md-2">
+            <ui-select id="tf_version"
+                       ng-model="$parent.tfVersion"
+                       theme="bootstrap"
+                       ng-disabled="disabled"
+                       ng-change="doSearch()"
+                       style="min-width: 200px;"
+                       reset-search-input="false"
+                       title="Terraform Version">
+                <ui-select-match placeholder="Terraform Version">{{$parent.tfVersion}}</ui-select-match>
+                <ui-select-choices repeat="k in tf_versions | filter: $select.search | orderBy">
+                    {{k}}
+                </ui-select-choices>
+            </ui-select>
+        </div>
         <div class="form-group col-xs-2 col-sm-2 col-md-2">
             <ui-select id="resource_type"
                        ng-model="$parent.resType"
