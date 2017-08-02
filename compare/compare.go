@@ -118,7 +118,7 @@ func compareResource(st1, st2 types.State, key string) (comp types.ResourceDiff)
 	}
 
 	// Compute unified diff
-	diff := difflib.ContextDiff{
+	diff := difflib.UnifiedDiff{
 		A:        difflib.SplitLines(formatResource(res1)),
 		B:        difflib.SplitLines(formatResource(res2)),
 		FromFile: stateInfo(st1),
@@ -126,7 +126,7 @@ func compareResource(st1, st2 types.State, key string) (comp types.ResourceDiff)
 		Context:  3,
 		Eol:      "\n",
 	}
-	result, _ := difflib.GetContextDiffString(diff)
+	result, _ := difflib.GetUnifiedDiffString(diff)
 	comp.UnifiedDiff = result
 
 	return
