@@ -93,6 +93,21 @@ func GetStateActivity(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	io.WriteString(w, string(jActivity))
 }
 
+func StateCompare(w http.ResponseWriter, r *http.Request, d *db.Database) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	st := util.TrimBase(r, "api/state/compare/")
+	query := r.URL.Query()
+	from := query.Get("from")
+	to := query.Get("to")
+	compare := d.StateCompare(st, from, to)
+
+	jCompare, err := json.Marshal(compare)
+	if err != nil {
+		JSONError(w, "Failed to marshal state compare", err)
+	}
+	io.WriteString(w, string(jCompare))
+}
+
 func GetLocks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	locks, err := s3.GetLocks()
