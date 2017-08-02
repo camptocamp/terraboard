@@ -183,7 +183,7 @@ func (db *Database) SearchAttribute(query url.Values) (results []types.SearchRes
 	}
 
 	if len(where) > 0 {
-		sqlQuery += fmt.Sprintf(" WHERE %s", strings.Join(where, " AND "))
+		sqlQuery += " WHERE " + strings.Join(where, " AND ")
 	}
 
 	// Count everything
@@ -295,7 +295,7 @@ func (db *Database) ListStateStats(query url.Values) (states []types.StateStat, 
 }
 
 func (db *Database) listField(table, field string) (results []string, err error) {
-	rows, err := db.Table(table).Select(fmt.Sprintf("DISTINCT %s", field)).Rows()
+	rows, err := db.Table(table).Select("DISTINCT ?", field).Rows()
 	defer rows.Close()
 	if err != nil {
 		return results, err
@@ -311,7 +311,8 @@ func (db *Database) listField(table, field string) (results []string, err error)
 }
 
 func (db *Database) listFieldWithCount(table, field string) (results []map[string]string, err error) {
-	rows, err := db.Table(table).Select(fmt.Sprintf("%s, COUNT(*)", field)).Group(field).Order("count DESC").Rows()
+	rows, err := db.Table(table).Select("?, COUNT(*)", field).
+		Group(field).Order("count DESC").Rows()
 	defer rows.Close()
 	if err != nil {
 		return results, err
