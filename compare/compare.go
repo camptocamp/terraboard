@@ -24,9 +24,30 @@ type StateCompare struct {
 	} `json:"differences"`
 }
 
-func countResources(state db.State) (count int) {
+// Return all resources of a state
+func stateResources(state db.State) (res []string) {
 	for _, m := range state.Modules {
-		count += len(m.Resources)
+		for _, r := range m.Resources {
+			res = append(res, fmt.Sprintf("%s.%s.%s", m.Path, r.Type, r.Name))
+		}
+	}
+	return
+}
+
+// Returns elements only in st1
+func sliceDiff(s1, s2 []string) (diff []string) {
+	for _, e1 := range s1 {
+		found := false
+		for _, e2 := range s2 {
+			if e1 == e2 {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			diff = append(diff, e1)
+		}
 	}
 	return
 }
@@ -36,19 +57,24 @@ func Compare(from, to db.State) (comp StateCompare, err error) {
 		err = fmt.Errorf("from version is unknown")
 		return
 	}
+	fromResources := stateResources(from)
 	comp.Stats.From = StateInfo{
 		VersionID:     from.Version.VersionID,
-		ResourceCount: countResources(from),
+		ResourceCount: len(fromResources),
 	}
 
 	if to.Path == "" {
 		err = fmt.Errorf("to version is unknown")
 		return
 	}
+	toResources := stateResources(to)
 	comp.Stats.To = StateInfo{
 		VersionID:     to.Version.VersionID,
-		ResourceCount: countResources(to),
+		ResourceCount: len(toResources),
 	}
+
+	comp.Differences.OnlyInOld = sliceDiff(fromResources, toResources)
+	comp.Differences.OnlyInNew = sliceDiff(toResources, fromResources)
 
 	log.WithFields(log.Fields{
 		"path": from.Path,
