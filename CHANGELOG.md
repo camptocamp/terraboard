@@ -1,3 +1,42 @@
+## 0.12.0 (August 3, 2017)
+
+FEATURES:
+
+- Server:
+
+  * Check versions and path existence in memory to limit DB queries
+  * Add log-level and log-format options
+  * Log with fields [GH #19]
+  * Add a compare API point [GH #20]
+  * Split types into a types package
+  * Add tf_versions API point
+  * Add version API point
+  * Sanitize raw SQL queries
+
+- UI:
+
+  * Remove sb-admin theme
+  * Make charts in overview clickable, linking to search view
+  * Fix display bugs in state view [GH #18]
+  * Select first resource of first module on state view load
+  * Add a compare function to state view [GH #21]
+  * Use $routeParams instead of parsing $location.url()
+  * Make state view work without reloading the page
+  * Order resource attributes in state view
+  * Display long resource attributes and titles with ellipsis
+  * Support permalinks and fix form in search view [GH #16]
+  * Add tf_version filtering to search view
+  * Allow to clear filters in search view
+  * Remove unused sorting in tables
+
+FIXES:
+
+- Server:
+
+  * Do not import non-ASCII attribute values [GH #17]
+  * Remove --no-sync from docker-compose.yml
+
+
 ## 0.11.0 (August 1, 2017)
 
 FEATURES:
