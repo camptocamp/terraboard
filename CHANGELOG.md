@@ -1,3 +1,12 @@
+## 0.13.0 (X X, 2017)
+
+FEATURES:
+
+- Server:
+
+  * Add S3 key prefix [GH #25]
+
+
 ## 0.12.0 (August 3, 2017)
 
 FEATURES:
