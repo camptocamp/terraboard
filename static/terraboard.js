@@ -488,5 +488,6 @@ app.controller("tbSearchCtrl",
         $scope.attrVal = undefined;
         $scope.results = undefined;
         $location.url($location.path());
+        $scope.doSearch();
     }
 }]);
