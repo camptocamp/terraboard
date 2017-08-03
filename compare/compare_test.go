@@ -27,7 +27,7 @@ var fakeState = types.State{
 	Path: "myfakepath/terraform.tfstate",
 	Version: types.Version{
 		VersionID:    "h8qExjo2Blk3S37CiWm7ljKxEJPuYCZw",
-		LastModified: time.Unix(1501782443, 0),
+		LastModified: time.Unix(1501782443, 0).UTC(),
 	},
 	TFVersion: "0.9.8",
 	Serial:    182,
@@ -114,7 +114,7 @@ func TestFormatResource(t *testing.T) {
 }
 
 func TestStateInfo(t *testing.T) {
-	expectedResult := "myfakepath/terraform.tfstate (2017-08-03 19:47:23 +0200 CEST)"
+	expectedResult := "myfakepath/terraform.tfstate (2017-08-03 17:47:23 +0000 UTC)"
 
 	result := stateInfo(fakeState)
 
@@ -127,8 +127,8 @@ func TestCompareResource(t *testing.T) {
 	expectedResult := types.ResourceDiff{
 		OnlyInOld: map[string]string{"fakeKey": "fakeValue"},
 		OnlyInNew: map[string]string{"fakeNewKey": "fakeNewValue"},
-		UnifiedDiff: `--- myfakepath/terraform.tfstate (2017-08-03 19:47:23 +0200 CEST)
-+++ myfakepath/terraform.tfstate (2017-08-03 19:47:23 +0200 CEST)
+		UnifiedDiff: `--- myfakepath/terraform.tfstate (2017-08-03 17:47:23 +0000 UTC)
++++ myfakepath/terraform.tfstate (2017-08-03 17:47:23 +0000 UTC)
 @@ -1,4 +1,4 @@
  resource "fakeType" "fakeName" {
 -  fakeKey = "fakeValue"
@@ -158,7 +158,7 @@ func TestCompareResource(t *testing.T) {
 		Path: "myfakepath/terraform.tfstate",
 		Version: types.Version{
 			VersionID:    "h8qExjo2Blk3S37CiWm7ljKxEJPuYCZw",
-			LastModified: time.Unix(1501782443, 0),
+			LastModified: time.Unix(1501782443, 0).UTC(),
 		},
 		TFVersion: "0.9.8",
 		Serial:    182,
@@ -203,8 +203,8 @@ func TestCompare_Result(t *testing.T) {
 				"root.fakeType.fakeName": types.ResourceDiff{
 					OnlyInOld: map[string]string{"fakeKey": "fakeValue"},
 					OnlyInNew: map[string]string{"fakeNewKey": "fakeNewValue"},
-					UnifiedDiff: `--- myfakepath/terraform.tfstate (2017-08-03 19:47:23 +0200 CEST)
-+++ myfakepath/terraform.tfstate (2017-08-03 19:47:23 +0200 CEST)
+					UnifiedDiff: `--- myfakepath/terraform.tfstate (2017-08-03 17:47:23 +0000 UTC)
++++ myfakepath/terraform.tfstate (2017-08-03 17:47:23 +0000 UTC)
 @@ -1,4 +1,4 @@
  resource "fakeType" "fakeName" {
 -  fakeKey = "fakeValue"
@@ -237,7 +237,7 @@ func TestCompare_Result(t *testing.T) {
 		Path: "myfakepath/terraform.tfstate",
 		Version: types.Version{
 			VersionID:    "h8qExjo2Blk3SUYGBniWm7ljKxEJPuYCZw",
-			LastModified: time.Unix(1501782443, 0),
+			LastModified: time.Unix(1501782443, 0).UTC(),
 		},
 		TFVersion: "0.9.8",
 		Serial:    183,
