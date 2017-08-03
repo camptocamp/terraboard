@@ -6,7 +6,8 @@ var app = angular.module("terraboard", ['ngRoute', 'ngSanitize', 'ui.select', 'c
         controller: "tbMainCtrl"
     }).when("/state/:path*", {
         templateUrl: "static/state.html",
-        controller: "tbStateCtrl"
+        controller: "tbStateCtrl",
+        reloadOnSearch: false
     }).when("/search", {
         templateUrl: "static/search.html",
         controller: "tbSearchCtrl",
@@ -243,10 +244,6 @@ app.controller("tbStateCtrl",
                 $scope.versions.unshift(ver);
             }
 
-            $scope.$watch('selectedVersion', function(ver) {
-                $location.search('versionid', ver.versionId);
-            });
-
             $scope.$watch('compareVersion', function(ver) {
                 if (ver != undefined && ver.versionId != undefined) {
                     $location.search('compare', ver.versionId);
@@ -269,13 +266,10 @@ app.controller("tbStateCtrl",
         });
     });
 
-    $scope.$on('$routeChangeSuccess', function() {
-        $http.get('api'+$location.url()).then(function(response){
+    $scope.getDetails = function(versionId) {
+        $http.get('api/state/'+$routeParams.path+'?versionid='+versionId+'#'+$location.hash()).then(function(response){
             $scope.path = $routeParams.path;
             $scope.details = response.data;
-            $scope.selectedVersion = {
-                versionId: $scope.details.version.version_id
-            };
             var mods = $scope.details.modules;
 
             // Init
@@ -306,6 +300,8 @@ app.controller("tbStateCtrl",
             }
 
             $scope.setSelected = function(m, r) {
+                $scope.selectedmod = m;
+                $scope.selectedres = r;
                 var mod = $scope.details.modules[m];
                 var res = mod.resources[r];
                 var res_title = res.type+'.'+res.name;
@@ -313,6 +309,15 @@ app.controller("tbStateCtrl",
                 $location.hash(hash);
             };
         });
+    };
+
+    $scope.$on('$routeChangeSuccess', function() {
+        $scope.getDetails($location.search().version_id);
+    });
+
+    $scope.$watch('selectedVersion', function(ver) {
+        $scope.getDetails(ver.versionId);
+        $location.search('versionid', ver.versionId);
     });
 
     $http.get('api/locks').then(function(response){
