@@ -16,7 +16,6 @@ services:
       BASE_URL: /
       DB_PASSWORD: mypassword
       AWS_DYNAMODB_TABLE: ${AWS_DYNAMODB_TABLE}
-      AWS_KEY_PREFIX: tf-state
     links:
       - "db:database"
     volumes:
