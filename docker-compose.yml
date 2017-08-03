@@ -16,8 +16,10 @@ services:
       BASE_URL: /
       DB_PASSWORD: mypassword
       AWS_DYNAMODB_TABLE: ${AWS_DYNAMODB_TABLE}
+      AWS_KEY_PREFIX: ${AWS_KEY_PREFIX}
+      TERRABOARD_LOG_LEVEL: ${TERRABOARD_LOG_LEVEL}
     links:
-      - db
+      - "db"
     volumes:
       - ./static:/static:ro
 
@@ -32,3 +34,4 @@ services:
 
 volumes:
   tb-data: {}
+
