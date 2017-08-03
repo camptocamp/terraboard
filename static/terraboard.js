@@ -240,7 +240,6 @@ app.controller("tbStateCtrl",
      * Init display
      */
     $scope.display = {
-      welcome: true,
       details: false,
       compare: false
     };
@@ -299,6 +298,10 @@ app.controller("tbStateCtrl",
                 versionId: $scope.details.version.version_id
             }
 
+            // Init
+            $scope.selectedmod = 0;
+            $scope.selectedres = 0;
+
             $scope.setSelected = function(m, r) {
                 $scope.selectedmod = m;
                 $scope.selectedres = r;
@@ -329,7 +332,6 @@ app.controller("tbStateCtrl",
 
         if ($location.hash() != "") {
             // Default
-            $scope.display.welcome = false;
             $scope.selectedmod = 0;
 
             // Search for module in selected res
@@ -372,7 +374,6 @@ app.controller("tbStateCtrl",
         var compareVersion = versions[1];
         if (compareVersion != undefined && compareVersion.versionId != undefined) {
             $location.search('compare', compareVersion.versionId);
-            $scope.display.welcome = false;
             $scope.display.details = false;
             $scope.display.compare = true;
             $http.get('api/state/compare/'+$routeParams.path+'?from='+selectedVersion.versionId+'&to='+compareVersion.versionId).then(function(response){
