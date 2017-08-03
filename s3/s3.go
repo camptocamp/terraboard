@@ -22,11 +22,13 @@ var svc *s3.S3
 var dynamoSvc *dynamodb.DynamoDB
 var bucket string
 var dynamoTable string
+var keyPrefix string
 
 func Setup(c *config.Config) {
 	sess := session.Must(session.NewSession())
 	svc = s3.New(sess, &aws.Config{})
 	bucket = c.S3.Bucket
+    keyPrefix = c.S3.KeyPrefix
 
 	dynamoSvc = dynamodb.New(sess, &aws.Config{})
 	dynamoTable = c.S3.DynamoDBTable
@@ -85,6 +87,7 @@ func GetLocks() (locks map[string]LockInfo, err error) {
 func GetStates() (states []string, err error) {
 	result, err := svc.ListObjects(&s3.ListObjectsInput{
 		Bucket: aws.String(bucket),
+        Prefix: &keyPrefix,
 	})
 	if err != nil {
 		return states, err

@@ -31,6 +31,7 @@ type Config struct {
 	S3 struct {
 		Bucket        string `long:"s3-bucket" env:"AWS_BUCKET" description:"AWS S3 bucket."`
 		DynamoDBTable string `long:"dynamodb-table" env:"AWS_DYNAMODB_TABLE" description:"AWS DynamoDB table for locks."`
+		KeyPrefix     string `long:"key-prefix" env:"AWS_KEY_PREFIX" description:"AWS Key Prefix."`
 	} `group:"AWS S3 Options"`
 }
 
