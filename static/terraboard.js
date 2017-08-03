@@ -336,13 +336,15 @@ app.controller("tbStateCtrl",
     /*
      * Compare versions
      */
-    $scope.$watch('compareVersion', function(ver) {
-        if (ver != undefined && ver.versionId != undefined) {
-            $location.search('compare', ver.versionId);
+    $scope.$watch('[selectedVersion, compareVersion]', function(versions) {
+        var selectedVersion = versions[0];
+        var compareVersion = versions[1];
+        if (compareVersion != undefined && compareVersion.versionId != undefined) {
+            $location.search('compare', compareVersion.versionId);
             $scope.display.welcome = false;
             $scope.display.details = false;
             $scope.display.compare = true;
-            $http.get('api/state/compare/'+$routeParams.path+'?from='+$scope.selectedVersion.versionId+'&to='+ver.versionId).then(function(response){
+            $http.get('api/state/compare/'+$routeParams.path+'?from='+selectedVersion.versionId+'&to='+compareVersion.versionId).then(function(response){
                 $scope.compare = response.data;
 
                 $scope.only_in_old = Object.keys($scope.compare.differences.only_in_old).length;
@@ -354,7 +356,7 @@ app.controller("tbStateCtrl",
             $scope.display.compare = false;
             $scope.display.details = true;
         }
-    });
+    }, true);
 
     /*
      * Lock management
