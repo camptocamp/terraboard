@@ -198,7 +198,7 @@ app.controller("tbMainCtrl", ['$scope', '$http', '$location', function($scope, $
 
 }]);
 
-app.controller("tbListCtrl",
+app.controller("tbNavCtrl",
         ['$scope', '$http', '$location', '$routeParams',
         function($scope, $http, $location, $routeParams) {
     $scope.placeholder = 'Enter a state file path...';
@@ -206,6 +206,15 @@ app.controller("tbListCtrl",
     $scope.$on('$routeChangeSuccess', function() {
         if ($routeParams.path != undefined) {
             $scope.placeholder = $routeParams.path;
+        }
+
+        switch ($location.path()) {
+            case '/':
+                $scope.page = 'overview';
+                break;
+            case '/search':
+                $scope.page = 'search';
+                break;
         }
     });
 

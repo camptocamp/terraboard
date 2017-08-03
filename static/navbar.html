@@ -1,4 +1,4 @@
-<div class="navbar navbar-default navbar-fixed-top">
+<div class="navbar navbar-default navbar-fixed-top" ng-controller="tbNavCtrl">
     <div class="container">
 
         <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
@@ -9,23 +9,21 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="http://www.camptocamp.com">
-                <img alt="Camptocamp" src="static/c2c-logo.png">
-            </a>
+            <a class="navbar-brand" href="#">Terraboard</a>
         </div>
 
         <ul class="nav navbar-nav navbar-collapse collapse" id="navbar-collapse-menu">
-            <li>
+            <li ng-class="{active: page == 'overview'}">
                 <a href="./"><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> Overview</a>
             </li>
 
-            <li>
+            <li ng-class="{active: page == 'search'}">
                 <a href="search"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Search</a>
             </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
 
-            <li id="states-select" ng-controller="tbListCtrl">
+            <li id="states-select">
                 <ui-select ng-model="states.selected"
                            theme="bootstrap"
                            ng-disabled="disabled"
