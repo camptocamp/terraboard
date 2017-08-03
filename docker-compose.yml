@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: camptocamp/terraboard:latest
+    image: camptocamp/terraboard:devel
     ports:
       - 80:8080
     environment:
@@ -16,6 +16,8 @@ services:
       BASE_URL: /
       DB_PASSWORD: mypassword
       AWS_DYNAMODB_TABLE: ${AWS_DYNAMODB_TABLE}
+      AWS_KEY_PREFIX: ${AWS_KEY_PREFIX}
+      TERRABOARD_LOG_LEVEL: ${TERRABOARD_LOG_LEVEL}
     links:
       - "db:database"
     volumes:
