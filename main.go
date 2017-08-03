@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -103,6 +104,20 @@ func refreshDB(d *db.Database) {
 
 var version = "undefined"
 
+func getVersion(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	j, err := json.Marshal(map[string]string{
+		"version":   version,
+		"copyright": "Copyright © 2017 Camptocamp",
+	})
+	if err != nil {
+		api.JSONError(w, "Failed to marshal version", err)
+		return
+	}
+	io.WriteString(w, string(j))
+}
+
 // Main
 func main() {
 	c := config.LoadConfig(version)
@@ -137,6 +152,7 @@ func main() {
 	http.Handle(util.AddBase("static/"), http.StripPrefix(util.AddBase("static"), staticFs))
 
 	// Handle API points
+	http.HandleFunc(util.AddBase("api/version"), getVersion)
 	http.HandleFunc(util.AddBase("api/states"), handleWithDB(api.ListStates, database))
 	http.HandleFunc(util.AddBase("api/states/stats"), handleWithDB(api.ListStateStats, database))
 	http.HandleFunc(util.AddBase("api/states/tfversion/count"), handleWithDB(api.ListTerraformVersionsWithCount, database))

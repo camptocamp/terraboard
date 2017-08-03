@@ -214,6 +214,14 @@ app.controller("tbListCtrl",
     });
 }]);
 
+app.controller("tbFooterCtrl",
+        ['$scope', '$http',
+        function($scope, $http) {
+    $http.get('api/version').then(function(response){
+        $scope.version = response.data;
+    });
+}]);
+
 app.controller("tbStateCtrl",
         ['$scope', '$http', '$location', '$routeParams',
         function($scope, $http, $location, $routeParams) {

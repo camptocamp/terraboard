@@ -31,6 +31,9 @@
   #maincont, #leftcol .panel-group {
     overflow: hidden;
   }
+  #maincont {
+    margin-bottom: 50px;
+  }
   #nodes, #node {
     overflow-y: auto;
   }
