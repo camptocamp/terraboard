@@ -70,7 +70,7 @@
                     <table class="table">
                         <thead><th>Attribute</th><th>Value</th></thead>
                         <tbody>
-                            <tr ng-repeat="attr in details.modules[selectedmod].resources[selectedres].attributes">
+                            <tr ng-repeat="attr in details.modules[selectedmod].resources[selectedres].attributes | orderBy:'key'">
                                 <td class="attr-key">{{attr.key}}</td>
                                 <td class="attr-val">{{attr.value}}</td>
                             </tr>
