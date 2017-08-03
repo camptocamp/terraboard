@@ -1,4 +1,13 @@
 language: go
 go:
-  - master
+- 1.8
 go_import_path: github.com/camptocamp/terraboard
+install:
+- go get ./...
+- go get github.com/bradfitz/goimports
+- go get github.com/mattn/goveralls
+- go get golang.org/x/tools/cmd/cover
+script:
+- make
+- make coverage
+- "$HOME/gopath/bin/goveralls -service=travis-ci -coverprofile=coverage.out"
