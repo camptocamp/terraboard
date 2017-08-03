@@ -274,11 +274,9 @@ app.controller("tbStateCtrl",
     /*
      * Highlight code, only once
      */
-    $scope.highlighted = false;
     $scope.highlight = function() {
-        if (!$scope.highlighted) {
+        if ($("pre.sh_sourceCode").length != 0 && $("pre.sh_sourceCode > span").length == 0) {
             sh_highlightDocument();
-            $scope.highlighted = true;
         }
     };
 
@@ -290,7 +288,6 @@ app.controller("tbStateCtrl",
             versionId = "";
         }
         $http.get('api/state/'+$routeParams.path+'?versionid='+versionId+'#'+$location.hash()).then(function(response){
-            console.log(response.data);
             $scope.path = $routeParams.path;
             $scope.details = response.data;
 
