@@ -19,6 +19,7 @@ Terraboard is a web dashboard to visualize and query
 - a state page with state file details, including versions and resource
   attributes
 - a search interface to query resources by type, name or attributes
+- a diff interface to compare state between versions
 
 It currently only supports S3 as a remote state backend, and dynamoDB for
 retrieving lock informations.
@@ -27,6 +28,8 @@ retrieving lock informations.
 ![Screenshot Overview](screenshots/main.png)
 
 ![Screenshot State](screenshots/state.png)
+
+![Screenshot Compare](screenshots/compare.png)
 
 
 ### Requirements
