@@ -26,7 +26,7 @@
                        style="min-width: 200px;"
                        reset-search-input="false"
                        title="Terraform Version">
-                <ui-select-match placeholder="Terraform Version">{{$parent.tfVersion}}</ui-select-match>
+                <ui-select-match placeholder="Terraform Version" allow-clear="true">{{$parent.tfVersion}}</ui-select-match>
                 <ui-select-choices repeat="k in tf_versions | filter: $select.search | orderBy">
                     {{k}}
                 </ui-select-choices>
@@ -41,7 +41,7 @@
                        style="min-width: 200px;"
                        reset-search-input="false"
                        title="Resource Type">
-                <ui-select-match placeholder="Resource Type">{{$parent.resType}}</ui-select-match>
+                <ui-select-match placeholder="Resource Type" allow-clear="true">{{$parent.resType}}</ui-select-match>
                 <ui-select-choices repeat="k in resource_keys | filter: $select.search | orderBy">
                     {{k}}
                 </ui-select-choices>
@@ -56,7 +56,7 @@
                        style="min-width: 200px;"
                        reset-search-input="false"
                        title="Resource ID">
-                <ui-select-match placeholder="Resource ID">{{$parent.resID}}</ui-select-match>
+                <ui-select-match placeholder="Resource ID" allow-clear="true">{{$parent.resID}}</ui-select-match>
                 <ui-select-choices repeat="k in resource_names | filter: $parent.resType | filter: $select.search | orderBy">
                     {{k}}
                 </ui-select-choices>
@@ -71,7 +71,7 @@
                        style="min-width: 200px;"
                        reset-search-input="false"
                        title="Attribute Key">
-                <ui-select-match placeholder="Attribute Key">{{$parent.attrKey}}</ui-select-match>
+                <ui-select-match placeholder="Attribute Key" allow-clear="true">{{$parent.attrKey}}</ui-select-match>
                 <ui-select-choices
                     repeat="k in attribute_keys | filter: $select.search | orderBy"
                     refresh="refreshAttrKeys()"
