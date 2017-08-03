@@ -25,9 +25,32 @@ It currently only supports S3 as a remote state backend, and dynamoDB for
 retrieving lock informations.
 
 
+### Overview
+
+The overview presents all the state files in the S3 bucket, by most recent
+modification date.
+
 ![Screenshot Overview](screenshots/main.png)
 
+
+### Search
+
+The search view allow to find resources by various criteria.
+
+![Screenshot Search](screenshots/search.png)
+
+
+### State
+
+The state view presents details of a Terraform state at a given version.
+
 ![Screenshot State](screenshots/state.png)
+
+
+### Compare
+
+From the state view, you can compare the current state version with another
+version.
 
 ![Screenshot Compare](screenshots/compare.png)
 
