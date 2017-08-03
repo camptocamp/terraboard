@@ -97,50 +97,29 @@
         <thead>
             <th></th>
             <th>
-                <a href="#" ng-click="sortType = 'path'">
-                    Path
-                    <span ng-show="sortType == 'path'" class="glyphicon glyphicon-chevron-down"></span>
-                </a>
+                Path
             </th>
             <th>
-                <a href="#" ng-click="sortType = 'tf_version'">
-                    TF Version
-                    <span ng-show="sortType == 'tf_version'" class="glyphicon glyphicon-chevron-down"></span>
-                </a>
+                TF Version
             </th>
             <th>
-                <a href="#" ng-click="sortType = 'serial'">
-                    Serial
-                    <span ng-show="sortType == 'serial'" class="glyphicon glyphicon-chevron-down"></span>
-                </a>
+                Serial
             </th>
             <th>
-                <a href="#" ng-click="sortType = 'module_path'">
-                    Module Path
-                    <span ng-show="sortType == 'module_path'" class="glyphicon glyphicon-chevron-down"></span>
-                </a>
+                Module Path
             </th>
             <th>
-                <a href="#" ng-click="sortType = 'resource_name'">
-                    Resource ID
-                    <span ng-show="sortType == 'resource_name'" class="glyphicon glyphicon-chevron-down"></span>
-                </a>
+                Resource ID
             </th>
             <th>
-                <a href="#" ng-click="sortType = 'attribute_key'">
-                    Key
-                    <span ng-show="sortType == 'attribute_key'" class="glyphicon glyphicon-chevron-down"></span>
-                </a>
+                Key
             </th>
             <th>
-                <a href="#" ng-click="sortType = 'attribute_value'">
-                    Value
-                    <span ng-show="sortType == 'attribute_value'" class="glyphicon glyphicon-chevron-down"></span>
-                </a>
+                Value
             </th>
         </thead>
         <tbody>
-            <tr ng-repeat="r in results.results | orderBy:sortType:sortReverse">
+            <tr ng-repeat="r in results.results">
                 <td><a href="state/{{r.path}}?versionid={{r.version_id}}#{{r.module_path}}.{{r.resource_type}}.{{r.resource_name}}"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></td>
                 <td>{{r.path}}</td>
                 <td>{{r.tf_version}}</td>
