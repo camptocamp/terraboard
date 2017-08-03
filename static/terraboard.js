@@ -270,9 +270,17 @@ app.controller("tbStateCtrl",
      * Retrieve details from API
      */
     $scope.getDetails = function(versionId) {
+        if (versionId == undefined) {
+            versionId = "";
+        }
         $http.get('api/state/'+$routeParams.path+'?versionid='+versionId+'#'+$location.hash()).then(function(response){
+            console.log(response.data);
             $scope.path = $routeParams.path;
             $scope.details = response.data;
+
+            $scope.selectedVersion = {
+                versionId: $scope.details.version.version_id
+            }
 
             $scope.setSelected = function(m, r) {
                 $scope.selectedmod = m;
@@ -332,9 +340,11 @@ app.controller("tbStateCtrl",
     /*
      * Load details on version change
      */
-    $scope.$watch('selectedVersion', function(ver) {
-        $scope.getDetails(ver.versionId);
-        $location.search('versionid', ver.versionId);
+    $scope.$watch('selectedVersion', function(nv, ov) {
+        $location.search('versionid', nv.versionId);
+        if (nv.versionId != ov.versionId) {
+            $scope.getDetails(nv.versionId);
+        }
     });
 
     /*
