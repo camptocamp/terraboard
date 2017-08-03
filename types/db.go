@@ -13,12 +13,14 @@ import (
  * Each type corresponds to a table in the DB
  *********************************************/
 
+// Version is an S3 bucket version
 type Version struct {
 	ID           uint      `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
 	VersionID    string    `gorm:"index" json:"version_id"`
 	LastModified time.Time `json:"last_modified"`
 }
 
+// State is a Terraform State
 type State struct {
 	gorm.Model `json:"-"`
 	Path       string        `gorm:"index" json:"path"`
@@ -29,6 +31,7 @@ type State struct {
 	Modules    []Module      `json:"modules"`
 }
 
+// Module is a Terraform module in a State
 type Module struct {
 	ID        uint          `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
 	StateID   sql.NullInt64 `gorm:"index" json:"-"`
@@ -36,6 +39,7 @@ type Module struct {
 	Resources []Resource    `json:"resources"`
 }
 
+// Resource is a Terraform resource in a Module
 type Resource struct {
 	ID         uint          `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
 	ModuleID   sql.NullInt64 `gorm:"index" json:"-"`
@@ -44,6 +48,7 @@ type Resource struct {
 	Attributes []Attribute   `json:"attributes"`
 }
 
+// Attribute is a Terraform attribute in a Resource
 type Attribute struct {
 	ID         uint          `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
 	ResourceID sql.NullInt64 `gorm:"index" json:"-"`

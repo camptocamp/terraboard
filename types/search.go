@@ -8,6 +8,7 @@ import "time"
  * Used to cast DB requests as search results
  **********************************************/
 
+// SearchResult returns a single search result
 type SearchResult struct {
 	Path           string `gorm:"column:path" json:"path"`
 	VersionId      string `gorm:"column:version_id" json:"version_id"`
@@ -20,6 +21,8 @@ type SearchResult struct {
 	AttributeValue string `gorm:"column:value" json:"attribute_value"`
 }
 
+// StateStat stores State stats
+// NOTE: do we want to merge this with StateInfo?
 type StateStat struct {
 	Path          string    `json:"path"`
 	TFVersion     string    `json:"terraform_version"`

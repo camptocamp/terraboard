@@ -6,6 +6,7 @@ package types
  * Used to compute the diff between two state versions
  *******************************************************/
 
+// StateInfo stores general information and stats for a State
 type StateInfo struct {
 	Path          string `json:"path"`
 	VersionID     string `json:"version_id"`
@@ -14,12 +15,14 @@ type StateInfo struct {
 	Serial        int64  `json:"serial"`
 }
 
+// ResourceDiff represents a diff between two versions of a Resource
 type ResourceDiff struct {
 	OnlyInOld   map[string]string `json:"only_in_old"`
 	OnlyInNew   map[string]string `json:"only_in_new"`
 	UnifiedDiff string            `json:"unified_diff"`
 }
 
+// StateCompare represents a diff between two versions of a State
 type StateCompare struct {
 	Stats struct {
 		From StateInfo `json:"from"`
