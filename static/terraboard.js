@@ -218,13 +218,19 @@ app.controller("tbStateCtrl",
         ['$scope', '$http', '$location', '$routeParams',
         function($scope, $http, $location, $routeParams) {
     $scope.Utils = { keys : Object.keys };
+
+    /*
+     * Init display
+     */
     $scope.display = {
       welcome: true,
       details: false,
       compare: false
     };
 
-    // Init
+    /*
+     * Init versions
+     */
     $scope.selectedVersion = {
         versionId: $location.search().versionid
     };
@@ -233,6 +239,9 @@ app.controller("tbStateCtrl",
         versionId: $location.search().compare
     };
 
+    /*
+     * Get versions when URL is loaded
+     */
     $scope.$on('$routeChangeSuccess', function() {
         $http.get('api/state/activity/'+$routeParams.path).then(function(response){
             $scope.versions = [];
@@ -243,29 +252,12 @@ app.controller("tbStateCtrl",
                 };
                 $scope.versions.unshift(ver);
             }
-
-            $scope.$watch('compareVersion', function(ver) {
-                if (ver != undefined && ver.versionId != undefined) {
-                    $location.search('compare', ver.versionId);
-                    $scope.display.welcome = false;
-                    $scope.display.details = false;
-                    $scope.display.compare = true;
-                    $http.get('api/state/compare/'+$routeParams.path+'?from='+$scope.selectedVersion.versionId+'&to='+ver.versionId).then(function(response){
-                        $scope.compare = response.data;
-
-                        $scope.only_in_old = Object.keys($scope.compare.differences.only_in_old).length;
-                        $scope.only_in_new = Object.keys($scope.compare.differences.only_in_new).length;
-                        $scope.differences = Object.keys($scope.compare.differences.resource_diff).length;
-                    });
-                } else {
-                    $location.search('compare', null);
-                    $scope.display.compare = false;
-                    $scope.display.details = true;
-                }
-            });
         });
     });
 
+    /*
+     * Highlight code, only once
+     */
     $scope.highlighted = false;
     $scope.highlight = function() {
         if (!$scope.highlighted) {
@@ -274,12 +266,37 @@ app.controller("tbStateCtrl",
         }
     };
 
+    /*
+     * Retrieve details from API
+     */
     $scope.getDetails = function(versionId) {
         $http.get('api/state/'+$routeParams.path+'?versionid='+versionId+'#'+$location.hash()).then(function(response){
             $scope.path = $routeParams.path;
             $scope.details = response.data;
-            var mods = $scope.details.modules;
 
+            $scope.setSelected = function(m, r) {
+                $scope.selectedmod = m;
+                $scope.selectedres = r;
+                var mod = $scope.details.modules[m];
+                var res = mod.resources[r];
+                var res_title = res.type+'.'+res.name;
+                var hash = (mod == 0) ? res_title : mod.path+'.'+res_title;
+                $location.hash(hash);
+            };
+        });
+    };
+
+    /*
+     * Load details on page load
+     */
+    $scope.$on('$routeChangeSuccess', function() {
+        $scope.getDetails($location.search().version_id);
+    });
+
+    /*
+     * Compute default resource when modules are loaded
+     */
+    $scope.$watch('details.modules', function(mods) {
             // Init
             if ($location.hash() != "") {
                 // Default
@@ -306,28 +323,42 @@ app.controller("tbStateCtrl",
                 // Init display.mod
                 $scope.display.mod = $scope.selectedmod;
             }
-
-            $scope.setSelected = function(m, r) {
-                $scope.selectedmod = m;
-                $scope.selectedres = r;
-                var mod = $scope.details.modules[m];
-                var res = mod.resources[r];
-                var res_title = res.type+'.'+res.name;
-                var hash = (mod == 0) ? res_title : mod.path+'.'+res_title;
-                $location.hash(hash);
-            };
-        });
-    };
-
-    $scope.$on('$routeChangeSuccess', function() {
-        $scope.getDetails($location.search().version_id);
     });
 
+    /*
+     * Load details on version change
+     */
     $scope.$watch('selectedVersion', function(ver) {
         $scope.getDetails(ver.versionId);
         $location.search('versionid', ver.versionId);
     });
 
+    /*
+     * Compare versions
+     */
+    $scope.$watch('compareVersion', function(ver) {
+        if (ver != undefined && ver.versionId != undefined) {
+            $location.search('compare', ver.versionId);
+            $scope.display.welcome = false;
+            $scope.display.details = false;
+            $scope.display.compare = true;
+            $http.get('api/state/compare/'+$routeParams.path+'?from='+$scope.selectedVersion.versionId+'&to='+ver.versionId).then(function(response){
+                $scope.compare = response.data;
+
+                $scope.only_in_old = Object.keys($scope.compare.differences.only_in_old).length;
+                $scope.only_in_new = Object.keys($scope.compare.differences.only_in_new).length;
+                $scope.differences = Object.keys($scope.compare.differences.resource_diff).length;
+            });
+        } else {
+            $location.search('compare', null);
+            $scope.display.compare = false;
+            $scope.display.details = true;
+        }
+    });
+
+    /*
+     * Lock management
+     */
     $http.get('api/locks').then(function(response){
         $scope.locks = response.data;
 
