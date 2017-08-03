@@ -35,7 +35,7 @@ modification date.
 
 ### Search
 
-The search view allow to find resources by various criteria.
+The search view allows to find resources by various criteria.
 
 ![Screenshot Search](screenshots/search.png)
 
