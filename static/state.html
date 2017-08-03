@@ -3,27 +3,40 @@
         <div class="panel-group">
             <div class="panel panel-info">
                 <div class="panel-heading">
-                    <h4 class="panel-title">
+                    <h3 class="panel-title">
                         General Information
                         <span ng-if="isLocked(path)" ng-init="lock=locks[path]" class="pull-right glyphicon glyphicon-lock" title="Locked by {{lock.Who}} on {{lock.Created | date:'medium'}} ({{lock.Operation}})"></span>
-                    </h4>
+                    </h3>
                 </div>
                 <ul class="list-group">
-                    <li class="list-group-item">Terraform version: {{details.terraform_version}}</li>
-                    <li class="list-group-item">Serial: {{details.serial}}</li>
-                    <li class="list-group-item">Version: <select class="form-control" ng-model="selectedVersion" ng-options="version as version.date for version in versions track by version.versionId"></select></li>
-                    <li class="list-group-item">Compare with: <select class="form-control" ng-model="compareVersion" ng-options="version as version.date for version in versions track by version.versionId"></select>
-                        <input type="button" class="btn btn-default" value="Reset" data-ng-click="compareVersion=undefined"/>
+                    <li class="list-group-item">
+                        <h4>Version</h4>
+                        <select class="form-control" ng-model="selectedVersion" ng-options="version as version.date for version in versions track by version.versionId"></select>
+
+                        <ul>
+                            <li class="list-group-item">Terraform version: {{details.terraform_version}}</li>
+                            <li class="list-group-item">Serial: {{details.serial}}</li>
+                        </ul>
+                    </li>
+                    <li class="list-group-item">
+                        <h4>Compare with version</h4>
+                        <button type="button" class="btn btn-warning pull-right" data-ng-click="compareVersion=undefined">Reset</button>
+                        <select class="form-control" ng-model="compareVersion" ng-options="version as version.date for version in versions track by version.versionId"></select>
+
+                        <ul ng-if="display.compare">
+                            <li class="list-group-item">Terraform version: {{compare.stats.to.terraform_version}}</li>
+                            <li class="list-group-item">Serial: {{compare.stats.to.serial}}</li>
+                        </ul>
                     </li>
                 </ul>
             </div>
             <div id="nodes" class="panel panel-info" ng-if="display.details">
                 <div class="panel-heading">
-                    <h4 class="panel-title">Modules</h4>
+                    <h3 class="panel-title">Modules</h3>
                 </div>
                 <ul id="nodeslist" class="list-group" ng-init="display.mod=0">
                     <li class="list-group-item" ng-repeat="mod in details.modules track by $index" ng-init="modname = mod.path" ng-class="{selected: mod == selectedmod}">
-                        <div ng-click="display.mod = (display.mod != $index) ? $index : undefined" class="node-name">{{modname}} <span class="badge pull-right" ng-cloak>{{Utils.keys(details.modules[$index].resources).length}}</span></div>
+                        <h4 ng-click="display.mod = (display.mod != $index) ? $index : undefined" class="node-name">{{modname}}</h4> <span class="badge pull-right" ng-cloak>{{Utils.keys(details.modules[$index].resources).length}}</span>
                         <ul ng-show="display.mod==$index" class="list-group" ng-init="indexmod=$index">
                             <li ng-repeat="r in details.modules[$index].resources" ng-class="{selected: $index == selectedres && indexmod == selectedmod}" ng-click="setSelected(indexmod, $index)" class="list-group-item resource">{{r.type}}.{{r.name}}</li>
                         </ul>
