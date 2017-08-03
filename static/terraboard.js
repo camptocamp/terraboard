@@ -297,32 +297,36 @@ app.controller("tbStateCtrl",
      * Compute default resource when modules are loaded
      */
     $scope.$watch('details.modules', function(mods) {
-            // Init
-            if ($location.hash() != "") {
-                // Default
-                $scope.display.welcome = false;
-                $scope.selectedmod = 0;
+        if (mods == undefined) {
+            // Do not compute resource if no mods are known
+            return;
+        }
 
-                // Search for module in selected res
-                var targetRes = $location.hash();
-                for (i=0; i < mods.length; i++) {
-                    if (targetRes.startsWith(mods[i].path+'.')) {
-                        $scope.selectedmod = i;
-                    }
+        if ($location.hash() != "") {
+            // Default
+            $scope.display.welcome = false;
+            $scope.selectedmod = 0;
+
+            // Search for module in selected res
+            var targetRes = $location.hash();
+            for (i=0; i < mods.length; i++) {
+                if (targetRes.startsWith(mods[i].path+'.')) {
+                    $scope.selectedmod = i;
                 }
-
-                targetRes = targetRes.replace(mods[$scope.selectedmod].path+'.', '');
-                var resources = mods[$scope.selectedmod].resources;
-                for (j=0; j < resources.length; j++) {
-                    if (targetRes == resources[j].type+'.'+resources[j].name) {
-                        $scope.selectedres = j;
-                        break;
-                    }
-                }
-
-                // Init display.mod
-                $scope.display.mod = $scope.selectedmod;
             }
+
+            targetRes = targetRes.replace(mods[$scope.selectedmod].path+'.', '');
+            var resources = mods[$scope.selectedmod].resources;
+            for (j=0; j < resources.length; j++) {
+                if (targetRes == resources[j].type+'.'+resources[j].name) {
+                    $scope.selectedres = j;
+                    break;
+                }
+            }
+
+            // Init display.mod
+            $scope.display.mod = $scope.selectedmod;
+        }
     });
 
     /*
