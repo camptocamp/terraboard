@@ -13,10 +13,11 @@
                     <li class="list-group-item">Serial: {{details.serial}}</li>
                     <li class="list-group-item">Version: <select class="form-control" ng-model="selectedVersion" ng-options="version as version.date for version in versions track by version.versionId"></select></li>
                     <li class="list-group-item">Compare with: <select class="form-control" ng-model="compareVersion" ng-options="version as version.date for version in versions track by version.versionId"></select>
+                        <input type="button" class="btn btn-default" value="Reset" data-ng-click="compareVersion=undefined"/>
                     </li>
                 </ul>
             </div>
-            <div id="nodes" class="panel panel-info">
+            <div id="nodes" class="panel panel-info" ng-if="display.details">
                 <div class="panel-heading">
                     <h4 class="panel-title">Modules</h4>
                 </div>
@@ -45,7 +46,7 @@
         <div class="row">
             <h1>{{path}}</h1>
         </div>
-        <div class="row" ng-if="details.modules[selectedmod].resources[selectedres]">
+        <div class="row" ng-if="display.details && details.modules[selectedmod].resources[selectedres]">
             <h2 class="node-title">{{(details.modules[selectedmod].path == 'root') ? "" : details.modules[selectedmod].path.replace('root/', '') + "."}}{{details.modules[selectedmod].resources[selectedres].type}}.{{details.modules[selectedmod].resources[selectedres].name}}</h2>
             <div class="panel-group">
                 <div class="panel panel-info">
@@ -61,6 +62,64 @@
                             </tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+        <div class="row" ng-if="display.compare">
+            <div class="panel-group">
+                <div class="panel panel-warning">
+                    <div class="panel-heading">
+                        <h4 id="panel-title-diff" class="panel-title">
+                            <a data-toggle="collapse" data-target="#panel-body-diff">
+                                Differences
+                            </a>
+                            <span id="badge-diff" class="badge">{{differences}}</span>
+                        </h4>
+                    </div>
+                    <div id="panel-body-diff" class="panel-collapse collapse in">
+                        <div class="panel-body">
+                            <div class="list-group resource" ng-repeat="(resource, diff) in compare.differences.resource_diff">
+                                <div class="resource-title">{{resource}}</div>
+                                <hlcode lang="'diff'" code="diff.unified_diff"></hlcode>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-danger">
+                    <div class="panel-heading">
+                        <h4 id="panel-title-in-old" class="panel-title">
+                            <a data-toggle="collapse" data-target="#panel-body-in-old">
+                                Only in serial {{compare.stats.from.serial}}
+                            </a>
+                            <span id="badge-diff" class="badge">{{only_in_old}}</span>
+                        </h4>
+                    </div>
+                    <div id="panel-body-in-old" class="panel-collapse collapse in">
+                        <div class="panel-body">
+                            <div class="list-group resource" ng-repeat="(resource, code) in compare.differences.only_in_old">
+                                <div class="resource-title">{{resource}}</div>
+                                <hlcode lang="'ruby'" code="code"></hlcode>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-success">
+                    <div class="panel-heading">
+                        <h4 id="panel-title-in-new" class="panel-title">
+                            <a data-toggle="collapse" data-target="#panel-body-in-new">
+                                Only in serial {{compare.stats.to.serial}}
+                            </a>
+                            <span id="badge-diff" class="badge">{{only_in_new}}</span>
+                        </h4>
+                    </div>
+                    <div id="panel-body-in-new" class="panel-collapse collapse in">
+                        <div class="panel-body">
+                            <div class="list-group resource" ng-repeat="(resource, code) in compare.differences.only_in_new">
+                                <div class="resource-title">{{resource}}</div>
+                                <hlcode lang="'ruby'" code="code"></hlcode>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

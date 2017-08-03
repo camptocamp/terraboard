@@ -206,11 +206,18 @@ app.controller("tbStateCtrl",
         ['$scope', '$http', '$location', '$routeParams',
         function($scope, $http, $location, $routeParams) {
     $scope.Utils = { keys : Object.keys };
-    $scope.display = {};
+    $scope.display = {
+      details: true,
+      compare: false
+    };
 
     // Init
     $scope.selectedVersion = {
         versionId: $location.search().versionid
+    };
+
+    $scope.compareVersion = {
+        versionId: $location.search().compare
     };
 
     $scope.$on('$routeChangeSuccess', function() {
@@ -229,7 +236,20 @@ app.controller("tbStateCtrl",
             });
 
             $scope.$watch('compareVersion', function(ver) {
-                $location.url('state/compare/'+$scope.path+'?from='+$scope.selectedVersion.versionId+'&to='+ver.versionId);
+                if (ver != undefined && ver.versionId != undefined) {
+                    $scope.display.details = false;
+                    $scope.display.compare = true;
+                    $http.get('api/state/compare/'+$routeParams.path+'?from='+$scope.selectedVersion.versionId+'&to='+ver.versionId).then(function(response){
+                        $scope.compare = response.data;
+
+                        $scope.only_in_old = Object.keys($scope.compare.differences.only_in_old).length;
+                        $scope.only_in_new = Object.keys($scope.compare.differences.only_in_new).length;
+                        $scope.differences = Object.keys($scope.compare.differences.resource_diff).length;
+                    });
+                } else {
+                    $scope.display.compare = false;
+                    $scope.display.details = true;
+                }
             });
         });
     });
