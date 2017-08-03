@@ -19,7 +19,7 @@ services:
       AWS_KEY_PREFIX: ${AWS_KEY_PREFIX}
       TERRABOARD_LOG_LEVEL: ${TERRABOARD_LOG_LEVEL}
     links:
-      - "db:database"
+      - "db"
     volumes:
       - ./static:/static:ro
 
