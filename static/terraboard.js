@@ -218,7 +218,8 @@ app.controller("tbStateCtrl",
         function($scope, $http, $location, $routeParams) {
     $scope.Utils = { keys : Object.keys };
     $scope.display = {
-      details: true,
+      welcome: true,
+      details: false,
       compare: false
     };
 
@@ -249,6 +250,7 @@ app.controller("tbStateCtrl",
             $scope.$watch('compareVersion', function(ver) {
                 if (ver != undefined && ver.versionId != undefined) {
                     $location.search('compare', ver.versionId);
+                    $scope.display.welcome = false;
                     $scope.display.details = false;
                     $scope.display.compare = true;
                     $http.get('api/state/compare/'+$routeParams.path+'?from='+$scope.selectedVersion.versionId+'&to='+ver.versionId).then(function(response){
@@ -279,6 +281,7 @@ app.controller("tbStateCtrl",
             // Init
             if ($location.hash() != "") {
                 // Default
+                $scope.display.welcome = false;
                 $scope.selectedmod = 0;
 
                 // Search for module in selected res

@@ -59,6 +59,12 @@
         <div class="row">
             <h1>{{path}}</h1>
         </div>
+        <!-- Jumbotrom -->
+        <div class="row jumbotron" ng-if="display.welcome">
+            <h3>Select a resource from the menu</h3>
+        </div>
+
+        <!-- Resource details view -->
         <div class="row" ng-if="display.details && details.modules[selectedmod].resources[selectedres]">
             <h2 class="node-title">{{(details.modules[selectedmod].path == 'root') ? "" : details.modules[selectedmod].path.replace('root/', '') + "."}}{{details.modules[selectedmod].resources[selectedres].type}}.{{details.modules[selectedmod].resources[selectedres].name}}</h2>
             <div class="panel-group">
@@ -78,6 +84,8 @@
                 </div>
             </div>
         </div>
+
+        <!-- Compare view -->
         <div class="row" ng-if="display.compare">
             <div class="panel-group">
                 <div class="panel panel-warning">
