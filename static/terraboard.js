@@ -61,8 +61,8 @@ app.directive("hlcode", ['$timeout', function($timeout) {
             code: '=code',
             lang: '=lang'
         },
-        link: function() {
-            $timeout(sh_highlightDocument, 0, false);
+        link: function(scope) {
+            $timeout(scope.$parent.$parent.highlight, 0, false);
         },
         template: "<pre class=\"sh_{{lang}} sh_sourceCode\">{{code}}</pre>"
     }
@@ -265,6 +265,14 @@ app.controller("tbStateCtrl",
             });
         });
     });
+
+    $scope.highlighted = false;
+    $scope.highlight = function() {
+        if (!$scope.highlighted) {
+            sh_highlightDocument();
+            $scope.highlighted = true;
+        }
+    };
 
     $scope.getDetails = function(versionId) {
         $http.get('api/state/'+$routeParams.path+'?versionid='+versionId+'#'+$location.hash()).then(function(response){
