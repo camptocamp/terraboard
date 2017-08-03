@@ -231,3 +231,10 @@ pre.sh_sourceCode .sh_oldfile {
     text-overflow: clip;
     overflow: auto;
 }
+
+/*
+ * General information versions
+ */
+#leftcol h4 {
+    display: inline-block;
+}

@@ -4,12 +4,10 @@ var app = angular.module("terraboard", ['ngRoute', 'ngSanitize', 'ui.select', 'c
     $routeProvider.when("/", {
         templateUrl: "static/main.html",
         controller: "tbMainCtrl"
-    }).when("/state/compare/:path*", {
-        templateUrl: "static/compare.html",
-        controller: "tbCompareCtrl"
     }).when("/state/:path*", {
         templateUrl: "static/state.html",
-        controller: "tbStateCtrl"
+        controller: "tbStateCtrl",
+        reloadOnSearch: false
     }).when("/search", {
         templateUrl: "static/search.html",
         controller: "tbSearchCtrl",
@@ -55,6 +53,20 @@ app.directive("sparklinechart", function () {
         }
     };
 });
+
+app.directive("hlcode", ['$timeout', function($timeout) {
+    return {
+        restrict: "E",
+        scope: {
+            code: '=code',
+            lang: '=lang'
+        },
+        link: function(scope) {
+            $timeout(scope.$parent.$parent.highlight, 0, false);
+        },
+        template: "<pre class=\"sh_{{lang}} sh_sourceCode\">{{code}}</pre>"
+    }
+}]);
 
 app.controller("tbMainCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
     $scope.itemsPerPage = 20;
@@ -206,13 +218,30 @@ app.controller("tbStateCtrl",
         ['$scope', '$http', '$location', '$routeParams',
         function($scope, $http, $location, $routeParams) {
     $scope.Utils = { keys : Object.keys };
-    $scope.display = {};
 
-    // Init
+    /*
+     * Init display
+     */
+    $scope.display = {
+      welcome: true,
+      details: false,
+      compare: false
+    };
+
+    /*
+     * Init versions
+     */
     $scope.selectedVersion = {
         versionId: $location.search().versionid
     };
 
+    $scope.compareVersion = {
+        versionId: $location.search().compare
+    };
+
+    /*
+     * Get versions when URL is loaded
+     */
     $scope.$on('$routeChangeSuccess', function() {
         $http.get('api/state/activity/'+$routeParams.path).then(function(response){
             $scope.versions = [];
@@ -223,29 +252,55 @@ app.controller("tbStateCtrl",
                 };
                 $scope.versions.unshift(ver);
             }
-
-            $scope.$watch('selectedVersion', function(ver) {
-                $location.search('versionid', ver.versionId);
-            });
-
-            $scope.$watch('compareVersion', function(ver) {
-                $location.url('state/compare/'+$scope.path+'?from='+$scope.selectedVersion.versionId+'&to='+ver.versionId);
-            });
         });
     });
 
-    $scope.$on('$routeChangeSuccess', function() {
-        $http.get('api'+$location.url()).then(function(response){
+    /*
+     * Highlight code, only once
+     */
+    $scope.highlighted = false;
+    $scope.highlight = function() {
+        if (!$scope.highlighted) {
+            sh_highlightDocument();
+            $scope.highlighted = true;
+        }
+    };
+
+    /*
+     * Retrieve details from API
+     */
+    $scope.getDetails = function(versionId) {
+        $http.get('api/state/'+$routeParams.path+'?versionid='+versionId+'#'+$location.hash()).then(function(response){
             $scope.path = $routeParams.path;
             $scope.details = response.data;
-            $scope.selectedVersion = {
-                versionId: $scope.details.version.version_id
-            };
-            var mods = $scope.details.modules;
 
+            $scope.setSelected = function(m, r) {
+                $scope.selectedmod = m;
+                $scope.selectedres = r;
+                var mod = $scope.details.modules[m];
+                var res = mod.resources[r];
+                var res_title = res.type+'.'+res.name;
+                var hash = (mod == 0) ? res_title : mod.path+'.'+res_title;
+                $location.hash(hash);
+            };
+        });
+    };
+
+    /*
+     * Load details on page load
+     */
+    $scope.$on('$routeChangeSuccess', function() {
+        $scope.getDetails($location.search().version_id);
+    });
+
+    /*
+     * Compute default resource when modules are loaded
+     */
+    $scope.$watch('details.modules', function(mods) {
             // Init
             if ($location.hash() != "") {
                 // Default
+                $scope.display.welcome = false;
                 $scope.selectedmod = 0;
 
                 // Search for module in selected res
@@ -268,17 +323,44 @@ app.controller("tbStateCtrl",
                 // Init display.mod
                 $scope.display.mod = $scope.selectedmod;
             }
-
-            $scope.setSelected = function(m, r) {
-                var mod = $scope.details.modules[m];
-                var res = mod.resources[r];
-                var res_title = res.type+'.'+res.name;
-                var hash = (mod == 0) ? res_title : mod.path+'.'+res_title;
-                $location.hash(hash);
-            };
-        });
     });
 
+    /*
+     * Load details on version change
+     */
+    $scope.$watch('selectedVersion', function(ver) {
+        $scope.getDetails(ver.versionId);
+        $location.search('versionid', ver.versionId);
+    });
+
+    /*
+     * Compare versions
+     */
+    $scope.$watch('[selectedVersion, compareVersion]', function(versions) {
+        var selectedVersion = versions[0];
+        var compareVersion = versions[1];
+        if (compareVersion != undefined && compareVersion.versionId != undefined) {
+            $location.search('compare', compareVersion.versionId);
+            $scope.display.welcome = false;
+            $scope.display.details = false;
+            $scope.display.compare = true;
+            $http.get('api/state/compare/'+$routeParams.path+'?from='+selectedVersion.versionId+'&to='+compareVersion.versionId).then(function(response){
+                $scope.compare = response.data;
+
+                $scope.only_in_old = Object.keys($scope.compare.differences.only_in_old).length;
+                $scope.only_in_new = Object.keys($scope.compare.differences.only_in_new).length;
+                $scope.differences = Object.keys($scope.compare.differences.resource_diff).length;
+            });
+        } else {
+            $location.search('compare', null);
+            $scope.display.compare = false;
+            $scope.display.details = true;
+        }
+    }, true);
+
+    /*
+     * Lock management
+     */
     $http.get('api/locks').then(function(response){
         $scope.locks = response.data;
 
@@ -289,60 +371,6 @@ app.controller("tbStateCtrl",
             return false;
         };
     });
-}]);
-
-app.directive("hlcode", ['$timeout', function($timeout) {
-    return {
-        restrict: "E",
-        scope: {
-            code: '=code',
-            lang: '=lang'
-        },
-        link: function() {
-            $timeout(sh_highlightDocument, 0, false);
-        },
-        template: "<pre class=\"sh_{{lang}} sh_sourceCode\">{{code}}</pre>"
-    }
-}]);
-
-app.controller("tbCompareCtrl",
-        ['$scope', '$http', '$location', '$routeParams',
-        function($scope, $http, $location, $routeParams) {
-    $http.get('api'+$location.url()).then(function(response){
-        $scope.compare = response.data;
-
-        $scope.only_in_old = Object.keys($scope.compare.differences.only_in_old).length;
-        $scope.only_in_new = Object.keys($scope.compare.differences.only_in_new).length;
-        $scope.differences = Object.keys($scope.compare.differences.resource_diff).length;
-    });
-
-    $scope.fromVersion = {
-        versionId: $location.search().from
-    };
-
-    $scope.toVersion = {
-        versionId: $location.search().to
-    };
-
-    $http.get('api/state/activity/'+$routeParams.path).then(function(response){
-        $scope.versions = [];
-        for (i=0; i<response.data.length; i++) {
-            var ver = {
-                versionId: response.data[i].version_id,
-                date: new Date(response.data[i].last_modified.toLocaleString())
-            };
-            $scope.versions.unshift(ver);
-        }
-
-        $scope.$watch('fromVersion', function(ver) {
-            $location.search('from', ver.versionId);
-        });
-
-        $scope.$watch('toVersion', function(ver) {
-            $location.search('to', ver.versionId);
-        });
-    });
-
 }]);
 
 app.controller("tbSearchCtrl",
