@@ -10,7 +10,7 @@
                 </div>
                 <ul class="list-group">
                     <li class="list-group-item">
-                        <h4>Version</h4>
+                        <h4><span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span> Version</h4>
                         <select class="form-control" ng-model="selectedVersion" ng-options="version as version.date for version in versions track by version.versionId"></select>
 
                         <ul>
@@ -19,7 +19,7 @@
                         </ul>
                     </li>
                     <li class="list-group-item">
-                        <h4>Compare with version</h4>
+                        <h4><span class="glyphicon glyphicon-transfer" aria-hidden="true"></span>  Compare with version</h4>
                         <button type="button" class="btn btn-warning pull-right" data-ng-click="compareVersion=undefined">Reset</button>
                         <select class="form-control" ng-model="compareVersion" ng-options="version as version.date for version in versions track by version.versionId"></select>
 
