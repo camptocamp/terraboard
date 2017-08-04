@@ -40,17 +40,15 @@ func handleWithDB(apiF func(w http.ResponseWriter, r *http.Request, d *db.Databa
 	})
 }
 
-func isKnownStateVersion(statesVersions map[string][]string, versionId, path string) bool {
-	if v, ok := statesVersions[versionId]; ok {
+func isKnownStateVersion(statesVersions map[string][]string, versionID, path string) bool {
+	if v, ok := statesVersions[versionID]; ok {
 		for _, s := range v {
 			if s == path {
 				return true
 			}
 		}
-		return false
-	} else {
-		return false
 	}
+	return false
 }
 
 // Refresh the DB from S3
