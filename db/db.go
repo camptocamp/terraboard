@@ -13,15 +13,18 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 
 	"github.com/jinzhu/gorm"
+	// Use postgres as a DB backend
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
+// Database is a wrapping structure to *gorm.DB
 type Database struct {
 	*gorm.DB
 }
 
 var pageSize = 20
 
+// Init setups up the Database and a pointer to it
 func Init(host, user, dbname, password, logLevel string) *Database {
 	var err error
 	connString := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", host, user, dbname, password)
@@ -39,9 +42,9 @@ func Init(host, user, dbname, password, logLevel string) *Database {
 	return &Database{db}
 }
 
-func (db *Database) stateS3toDB(state *terraform.State, path string, versionId string) (st types.State) {
+func (db *Database) stateS3toDB(state *terraform.State, path string, versionID string) (st types.State) {
 	var version types.Version
-	db.First(&version, types.Version{VersionID: versionId})
+	db.First(&version, types.Version{VersionID: versionID})
 	st = types.State{
 		Path:      path,
 		Version:   version,
@@ -89,8 +92,8 @@ func isASCII(s string) bool {
 	return true
 }
 
-func (db *Database) InsertState(path string, versionId string, state *terraform.State) error {
-	st := db.stateS3toDB(state, path, versionId)
+func (db *Database) InsertState(path string, versionID string, state *terraform.State) error {
+	st := db.stateS3toDB(state, path, versionID)
 	db.Create(&st)
 	return nil
 }
@@ -104,10 +107,10 @@ func (db *Database) InsertVersion(version *s3.ObjectVersion) error {
 	return nil
 }
 
-func (db *Database) GetState(path, versionId string) (state types.State) {
+func (db *Database) GetState(path, versionID string) (state types.State) {
 	db.Joins("JOIN versions on states.version_id=versions.id").
 		Preload("Version").Preload("Modules").Preload("Modules.Resources").Preload("Modules.Resources.Attributes").
-		Find(&state, "states.path = ? AND versions.version_id = ?", path, versionId)
+		Find(&state, "states.path = ? AND versions.version_id = ?", path, versionID)
 	return
 }
 
@@ -225,9 +228,9 @@ func (db *Database) ListStatesVersions() (statesVersions map[string][]string) {
 	statesVersions = make(map[string][]string)
 	for rows.Next() {
 		var path string
-		var versionId string
-		rows.Scan(&path, &versionId)
-		statesVersions[versionId] = append(statesVersions[versionId], path)
+		var versionID string
+		rows.Scan(&path, &versionID)
+		statesVersions[versionID] = append(statesVersions[versionID], path)
 	}
 	return
 }
