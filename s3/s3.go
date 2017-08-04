@@ -24,6 +24,7 @@ var bucket string
 var dynamoTable string
 var keyPrefix string
 
+// Setup sets up AWS S3 connection
 func Setup(c *config.Config) {
 	sess := session.Must(session.NewSession())
 	svc = s3.New(sess, &aws.Config{})
@@ -34,6 +35,7 @@ func Setup(c *config.Config) {
 	dynamoTable = c.S3.DynamoDBTable
 }
 
+// LockInfo stores information on a State Lock
 type LockInfo struct {
 	ID        string
 	Operation string
@@ -44,11 +46,13 @@ type LockInfo struct {
 	Path      string
 }
 
+// Lock is a single State Lock
 type Lock struct {
 	LockID string
 	Info   string
 }
 
+// GetLocks returns a map of locks by State path
 func GetLocks() (locks map[string]LockInfo, err error) {
 	if dynamoTable == "" {
 		err = fmt.Errorf("No dynamoDB table provided. Not getting locks.")
@@ -84,6 +88,7 @@ func GetLocks() (locks map[string]LockInfo, err error) {
 	return
 }
 
+// GetStates returns a slice of State files in the S3 bucket
 func GetStates() (states []string, err error) {
 	result, err := svc.ListObjects(&s3.ListObjectsInput{
 		Bucket: aws.String(bucket),
@@ -103,6 +108,7 @@ func GetStates() (states []string, err error) {
 	return states, nil
 }
 
+// GetVersions returns a slice of AWS S3 Versions in the bucket
 func GetVersions(prefix string) (versions []*s3.ObjectVersion, err error) {
 	result, err := svc.ListObjectVersions(&s3.ListObjectVersionsInput{
 		Bucket: aws.String(bucket),
@@ -115,23 +121,24 @@ func GetVersions(prefix string) (versions []*s3.ObjectVersion, err error) {
 	return result.Versions, nil
 }
 
-func GetState(st, versionId string) (state *terraform.State, err error) {
+// GetState retrieves a single State from the S3 bucket
+func GetState(st, versionID string) (state *terraform.State, err error) {
 	log.WithFields(log.Fields{
 		"path":       st,
-		"version_id": versionId,
+		"version_id": versionID,
 	}).Info("Retrieving state from S3")
 	input := &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(st),
 	}
-	if versionId != "" {
-		input.VersionId = &versionId
+	if versionID != "" {
+		input.VersionID = &versionID
 	}
 	result, err := svc.GetObjectWithContext(context.Background(), input)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"path":       st,
-			"version_id": versionId,
+			"version_id": versionID,
 			"error":      err,
 		}).Error("Error retrieving state from S3")
 		errObj := make(map[string]string)
@@ -146,7 +153,7 @@ func GetState(st, versionId string) (state *terraform.State, err error) {
 	if err != nil {
 		log.WithFields(log.Fields{
 			"path":       st,
-			"version_id": versionId,
+			"version_id": versionID,
 			"error":      err,
 		}).Error("Error reading state from S3")
 		errObj := make(map[string]string)
