@@ -132,7 +132,7 @@ func GetState(st, versionID string) (state *terraform.State, err error) {
 		Key:    aws.String(st),
 	}
 	if versionID != "" {
-		input.VersionID = &versionID
+		input.VersionId = &versionID
 	}
 	result, err := svc.GetObjectWithContext(context.Background(), input)
 	if err != nil {
