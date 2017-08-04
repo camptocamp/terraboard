@@ -14,6 +14,8 @@ import (
 
 var states []string
 
+// JSONError is a wrapper function for errors
+// which prints them to the http.ResponseWriter as a JSON response
 func JSONError(w http.ResponseWriter, message string, err error) {
 	errObj := make(map[string]string)
 	errObj["error"] = message
@@ -22,6 +24,7 @@ func JSONError(w http.ResponseWriter, message string, err error) {
 	io.WriteString(w, string(j))
 }
 
+// ListStates lists States
 func ListStates(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	states := d.ListStates()
@@ -34,6 +37,8 @@ func ListStates(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	io.WriteString(w, string(j))
 }
 
+// ListTerraformVersionsWithCount lists Terraform versions with their associated
+// counts, sorted by the 'orderBy' parameter (version by default)
 func ListTerraformVersionsWithCount(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	query := r.URL.Query()
@@ -47,6 +52,7 @@ func ListTerraformVersionsWithCount(w http.ResponseWriter, r *http.Request, d *d
 	io.WriteString(w, string(j))
 }
 
+// ListStateStats returns State information for a given path as parameter
 func ListStateStats(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	query := r.URL.Query()
@@ -65,6 +71,7 @@ func ListStateStats(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	io.WriteString(w, string(j))
 }
 
+// GetState provides information on a State
 func GetState(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	st := util.TrimBase(r, "api/state/")
@@ -87,6 +94,7 @@ func GetState(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	io.WriteString(w, string(jState))
 }
 
+// GetStateActivity returns the activity (version history) of a State
 func GetStateActivity(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	st := util.TrimBase(r, "api/state/activity/")
@@ -100,6 +108,7 @@ func GetStateActivity(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	io.WriteString(w, string(jActivity))
 }
 
+// StateCompare compares two versions ('from' and 'to') of a State
 func StateCompare(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	st := util.TrimBase(r, "api/state/compare/")
@@ -123,6 +132,7 @@ func StateCompare(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	io.WriteString(w, string(jCompare))
 }
 
+// GetLocks returns information on locked States
 func GetLocks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	locks, err := s3.GetLocks()
@@ -139,6 +149,8 @@ func GetLocks(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, string(j))
 }
 
+// SearchAttribute performs a search on Resource Attributes
+// by various parameters
 func SearchAttribute(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	query := r.URL.Query()
@@ -158,6 +170,7 @@ func SearchAttribute(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	io.WriteString(w, string(j))
 }
 
+// ListResourceTypes lists all Resource types
 func ListResourceTypes(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	result, _ := d.ListResourceTypes()
@@ -169,6 +182,7 @@ func ListResourceTypes(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	io.WriteString(w, string(j))
 }
 
+// ListResourceTypesWithCount lists all Resource types with their associated count
 func ListResourceTypesWithCount(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	result, _ := d.ListResourceTypesWithCount()
@@ -180,6 +194,7 @@ func ListResourceTypesWithCount(w http.ResponseWriter, r *http.Request, d *db.Da
 	io.WriteString(w, string(j))
 }
 
+// ListResourceNames lists all Resource names
 func ListResourceNames(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	result, _ := d.ListResourceNames()
@@ -191,6 +206,8 @@ func ListResourceNames(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	io.WriteString(w, string(j))
 }
 
+// ListAttributeKeys lists all Resource Attribute Keys,
+// optionally filtered by resource_type
 func ListAttributeKeys(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	resourceType := r.URL.Query().Get("resource_type")
@@ -203,6 +220,7 @@ func ListAttributeKeys(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	io.WriteString(w, string(j))
 }
 
+// ListTfVersions lists all Terraform versions
 func ListTfVersions(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	result, _ := d.ListTfVersions()
