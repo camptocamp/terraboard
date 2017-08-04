@@ -55,7 +55,7 @@ type Lock struct {
 // GetLocks returns a map of locks by State path
 func GetLocks() (locks map[string]LockInfo, err error) {
 	if dynamoTable == "" {
-		err = fmt.Errorf("No dynamoDB table provided. Not getting locks.")
+		err = fmt.Errorf("no dynamoDB table provided, not getting locks")
 		return
 	}
 
