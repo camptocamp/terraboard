@@ -75,16 +75,16 @@ func ListStateStats(w http.ResponseWriter, r *http.Request, d *db.Database) {
 func GetState(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	st := util.TrimBase(r, "api/state/")
-	versionId := r.URL.Query().Get("versionid")
+	versionID := r.URL.Query().Get("versionid")
 	var err error
-	if versionId == "" {
-		versionId, err = d.DefaultVersion(st)
+	if versionID == "" {
+		versionID, err = d.DefaultVersion(st)
 		if err != nil {
 			JSONError(w, "Failed to retrieve default version", err)
 			return
 		}
 	}
-	state := d.GetState(st, versionId)
+	state := d.GetState(st, versionID)
 
 	jState, err := json.Marshal(state)
 	if err != nil {
