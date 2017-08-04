@@ -11,7 +11,7 @@ import "time"
 // SearchResult returns a single search result
 type SearchResult struct {
 	Path           string `gorm:"column:path" json:"path"`
-	VersionId      string `gorm:"column:version_id" json:"version_id"`
+	VersionID      string `gorm:"column:version_id" json:"version_id"`
 	TFVersion      string `gorm:"column:tf_version" json:"tf_version"`
 	Serial         int64  `gorm:"column:serial" json:"serial"`
 	ModulePath     string `gorm:"column:module_path" json:"module_path"`
