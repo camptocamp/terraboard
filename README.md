@@ -144,3 +144,8 @@ $ docker-compose build && docker-compose up -d
 
 
 See [CONTRIBUTING.md](CONTRIBUTING.md)
+
+
+## Terraboard Logo
+
+The Terraboard logo is based [an image by Daniel R. Strebe, CC BY-SA 3.0, 15 August 2011](https://en.wikipedia.org/wiki/Azimuthal_equidistant_projection#/media/File:Azimuthal_equidistant_projection_SW.jpg)
