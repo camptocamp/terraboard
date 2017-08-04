@@ -1,5 +1,7 @@
 # Terraboard
 
+![Terraboard Logo](logo/terraboard_logo.png)
+
 🌍 📋 A web dashboard to inspect Terraform States
 
 
