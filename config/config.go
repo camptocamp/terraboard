@@ -51,6 +51,7 @@ func LoadConfig(version string) *Config {
 	return &c
 }
 
+// SetupLogging sets up logging for Terraboard
 func (c Config) SetupLogging() (err error) {
 	switch c.Log.Level {
 	case "debug":
