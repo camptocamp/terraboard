@@ -132,6 +132,8 @@ func compareResource(st1, st2 types.State, key string) (comp types.ResourceDiff)
 	return
 }
 
+// Compare returns the difference between two versions of a State
+// as a StateCompare structure
 func Compare(from, to types.State) (comp types.StateCompare, err error) {
 	if from.Path == "" {
 		err = fmt.Errorf("from version is unknown")
