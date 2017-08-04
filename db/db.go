@@ -92,12 +92,14 @@ func isASCII(s string) bool {
 	return true
 }
 
+// InsertState inserts a Terraform State in the Database
 func (db *Database) InsertState(path string, versionID string, state *terraform.State) error {
 	st := db.stateS3toDB(state, path, versionID)
 	db.Create(&st)
 	return nil
 }
 
+// InsertVersion inserts an AWS S3 Version in the Database
 func (db *Database) InsertVersion(version *s3.ObjectVersion) error {
 	var v types.Version
 	db.FirstOrCreate(&v, types.Version{
@@ -107,6 +109,7 @@ func (db *Database) InsertVersion(version *s3.ObjectVersion) error {
 	return nil
 }
 
+// GetState retrieves a State from the database by its path and versionID
 func (db *Database) GetState(path, versionID string) (state types.State) {
 	db.Joins("JOIN versions on states.version_id=versions.id").
 		Preload("Version").Preload("Modules").Preload("Modules.Resources").Preload("Modules.Resources.Attributes").
@@ -114,6 +117,8 @@ func (db *Database) GetState(path, versionID string) (state types.State) {
 	return
 }
 
+// GetStateActivity returns a slice of StateStat from the Database
+// for a given State path representing the State activity over time (Versions)
 func (db *Database) GetStateActivity(path string) (states []types.StateStat) {
 	sql := "SELECT t.path, t.serial, t.tf_version, t.version_id, t.last_modified, count(resources.*) as resource_count" +
 		" FROM (SELECT states.id, states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified FROM states JOIN versions ON versions.id = states.version_id WHERE states.path = ? ORDER BY states.path, versions.last_modified ASC) t" +
@@ -126,6 +131,7 @@ func (db *Database) GetStateActivity(path string) (states []types.StateStat) {
 	return
 }
 
+// KnownVersions returns a slice of all known Versions in the Database
 func (db *Database) KnownVersions() (versions []string) {
 	// TODO: err
 	rows, _ := db.Table("versions").Select("DISTINCT version_id").Rows()
@@ -138,6 +144,9 @@ func (db *Database) KnownVersions() (versions []string) {
 	return
 }
 
+// SearchAttribute returns a slice of SearchResult given a query
+// The query might contain parameters 'type', 'name', 'key', 'value' and 'tf_version'
+// SearchAttribute also returns paging information: the page number and the total results
 func (db *Database) SearchAttribute(query url.Values) (results []types.SearchResult, page int, total int) {
 	log.WithFields(log.Fields{
 		"query": query,
@@ -220,6 +229,8 @@ func (db *Database) SearchAttribute(query url.Values) (results []types.SearchRes
 	return
 }
 
+// ListStatesVersions returns a map of Version IDs to a slice of State paths
+// from the Database
 func (db *Database) ListStatesVersions() (statesVersions map[string][]string) {
 	rows, _ := db.Table("states").
 		Joins("JOIN versions ON versions.id = states.version_id").
@@ -235,6 +246,7 @@ func (db *Database) ListStatesVersions() (statesVersions map[string][]string) {
 	return
 }
 
+// ListStates returns a slice of all State paths from the Database
 func (db *Database) ListStates() (states []string) {
 	rows, _ := db.Table("states").Select("DISTINCT path").Rows()
 	defer rows.Close()
@@ -246,6 +258,10 @@ func (db *Database) ListStates() (states []string) {
 	return
 }
 
+// ListTerraformVersionsWithCount returns a slice of maps of Terraform versions
+// mapped to the count of most recent State paths using them.
+// ListTerraformVersionsWithCount also takes a query with possible parameter 'orderBy'
+// to sort results. Default sorting is by descending version number.
 func (db *Database) ListTerraformVersionsWithCount(query url.Values) (results []map[string]string, err error) {
 	orderBy := string(query.Get("orderBy"))
 	sql := "SELECT t.tf_version, COUNT(*)" +
@@ -277,6 +293,7 @@ func (db *Database) ListTerraformVersionsWithCount(query url.Values) (results []
 	return
 }
 
+// ListStateStats returns a slice of StateStat, along with paging information
 func (db *Database) ListStateStats(query url.Values) (states []types.StateStat, page int, total int) {
 	row := db.Table("states").Select("count(DISTINCT path)").Row()
 	row.Scan(&total)
@@ -301,6 +318,7 @@ func (db *Database) ListStateStats(query url.Values) (states []types.StateStat, 
 	return
 }
 
+// listField is a wrapper utility method to list distinct values in Database tables.
 func (db *Database) listField(table, field string) (results []string, err error) {
 	rows, err := db.Table(table).Select(fmt.Sprintf("DISTINCT %s", field)).Rows()
 	defer rows.Close()
@@ -317,6 +335,8 @@ func (db *Database) listField(table, field string) (results []string, err error)
 	return
 }
 
+// listFieldWithCount is a wrapper utility method to list counts of values
+// ordered by descending count from the Database
 func (db *Database) listFieldWithCount(table, field string) (results []map[string]string, err error) {
 	rows, err := db.Table(table).Select("?, COUNT(*)", field).
 		Group(field).Order("count DESC").Rows()
@@ -338,10 +358,13 @@ func (db *Database) listFieldWithCount(table, field string) (results []map[strin
 	return
 }
 
+// ListResourceTypes lists all Resource types from the Database
 func (db *Database) ListResourceTypes() ([]string, error) {
 	return db.listField("resources", "type")
 }
 
+//ListResourceTypesWithCount returns a list of Resource types with associated counts
+//from the Database
 func (db *Database) ListResourceTypesWithCount() (results []map[string]string, err error) {
 	sql := "SELECT resources.type, COUNT(*)" +
 		" FROM (SELECT DISTINCT ON(states.path) states.id, states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified" +
@@ -371,14 +394,18 @@ func (db *Database) ListResourceTypesWithCount() (results []map[string]string, e
 	return
 }
 
+// ListResourceNames lists all Resource names from the Database
 func (db *Database) ListResourceNames() ([]string, error) {
 	return db.listField("resources", "name")
 }
 
+// ListTfVersions lists all Terraform versions from the Database
 func (db *Database) ListTfVersions() ([]string, error) {
 	return db.listField("states", "tf_version")
 }
 
+// ListAttributeKeys lists all Resource Attribute keys for a given Resource type
+// from the Database
 func (db *Database) ListAttributeKeys(resourceType string) (results []string, err error) {
 	query := db.Table("attributes").
 		Select("DISTINCT key").
@@ -403,6 +430,7 @@ func (db *Database) ListAttributeKeys(resourceType string) (results []string, er
 	return
 }
 
+// DefaultVersion returns the detault VersionID for a given State path
 func (db *Database) DefaultVersion(path string) (version string, err error) {
 	sqlQuery := "SELECT versions.version_id FROM" +
 		" (SELECT states.path, max(states.serial) as mx FROM states GROUP BY states.path) t" +
