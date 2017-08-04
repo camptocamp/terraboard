@@ -235,3 +235,7 @@ pre.sh_sourceCode .sh_oldfile {
 #leftcol h4 {
     display: inline-block;
 }
+#leftcol span.badge.pull-right {
+    /* force align with h4 */
+    margin-top: 10px;
+}

@@ -36,7 +36,10 @@
                 </div>
                 <ul id="nodeslist" class="list-group" ng-init="display.mod=0">
                     <li class="list-group-item" ng-repeat="mod in details.modules | orderBy:'path' track by $index" ng-init="modname = mod.path" ng-class="{selected: mod == selectedmod}">
-                        <h4 ng-click="display.mod = (display.mod != $index) ? $index : undefined" class="node-name">{{modname}}</h4> <span class="badge pull-right" ng-cloak>{{Utils.keys(details.modules[$index].resources).length}}</span>
+                        <div ng-click="display.mod = (display.mod != $index) ? $index : undefined" class="node-name">
+                            <h4>{{modname}}</h4>
+                            <span class="badge pull-right">{{Utils.keys(details.modules[$index].resources).length}}</span>
+                        </div>
                         <ul ng-show="display.mod==$index" class="list-group" ng-init="indexmod=$index">
                             <li ng-repeat="r in details.modules[$index].resources | orderBy:'name'" ng-class="{selected: $index == selectedres && indexmod == selectedmod}" ng-click="setSelected(indexmod, $index)" class="list-group-item resource">{{r.type}}.{{r.name}}</li>
                         </ul>
