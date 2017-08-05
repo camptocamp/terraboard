@@ -1,10 +1,11 @@
 package compare
 
 import (
-	"github.com/camptocamp/terraboard/types"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/camptocamp/terraboard/types"
 )
 
 var fakeAttribute = types.Attribute{
@@ -83,10 +84,28 @@ func TestGetResource(t *testing.T) {
 		Attributes: []types.Attribute{fakeAttribute},
 	}
 
-	result := getResource(fakeState, "root.fakeType.fakeName")
+	result, err := getResource(fakeState, "root.fakeType.fakeName")
+
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
 
 	if !reflect.DeepEqual(result, expectedResult) {
 		t.Fatalf("Expected %s, got %s", expectedResult, result)
+	}
+}
+
+func TestGetResource_nomatch(t *testing.T) {
+	_, err := getResource(fakeState, "root.fakeType.wrongName")
+
+	if err == nil {
+		t.Fatalf("Expected an error, got nil")
+	}
+
+	expectedError := "Could not find resource with key root.fakeType.wrongName in state myfakepath/terraform.tfstate"
+
+	if err.Error() != expectedError {
+		t.Fatalf("Expected %s, got %s", expectedError, err.Error())
 	}
 }
 
@@ -244,7 +263,11 @@ func TestCompare_Result(t *testing.T) {
 		Modules:   []types.Module{fakeNewModule},
 	}
 
-	result, _ := Compare(fakeNewState, fakeState)
+	result, err := Compare(fakeNewState, fakeState)
+
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
 
 	if !reflect.DeepEqual(result, expectedResult) {
 		t.Fatalf("Expected %s, got %s", expectedResult, result)

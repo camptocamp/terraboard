@@ -51,19 +51,19 @@ func sliceInter(s1, s2 []string) (inter []string) {
 	return
 }
 
-func getResource(state types.State, key string) (res types.Resource) {
+func getResource(state types.State, key string) (res types.Resource, err error) {
 	for _, m := range state.Modules {
 		if strings.HasPrefix(key, m.Path) {
 			for _, r := range m.Resources {
 				if key == fmt.Sprintf("%s.%s.%s", m.Path, r.Type, r.Name) {
-					return r
+					return r, nil
 				}
 			}
 		} else {
 			continue
 		}
 	}
-	return
+	return res, fmt.Errorf("Could not find resource with key %s in state %s", key, state.Path)
 }
 
 // Return all attributes of a resource
@@ -100,9 +100,9 @@ func stateInfo(state types.State) (info string) {
 
 // Compare a resource in two states
 func compareResource(st1, st2 types.State, key string) (comp types.ResourceDiff) {
-	res1 := getResource(st1, key)
+	res1, _ := getResource(st1, key) // TODO: err
 	attrs1 := resourceAttributes(res1)
-	res2 := getResource(st2, key)
+	res2, _ := getResource(st2, key) // TODO: err
 	attrs2 := resourceAttributes(res2)
 
 	// Only in old
@@ -165,14 +165,16 @@ func Compare(from, to types.State) (comp types.StateCompare, err error) {
 	onlyInOld := sliceDiff(fromResources, toResources)
 	comp.Differences.OnlyInOld = make(map[string]string)
 	for _, r := range onlyInOld {
-		comp.Differences.OnlyInOld[r] = formatResource(getResource(from, r))
+		res, _ := getResource(from, r) // TODO: err
+		comp.Differences.OnlyInOld[r] = formatResource(res)
 	}
 
 	// OnlyInNew
 	onlyInNew := sliceDiff(toResources, fromResources)
 	comp.Differences.OnlyInNew = make(map[string]string)
 	for _, r := range onlyInNew {
-		comp.Differences.OnlyInNew[r] = formatResource(getResource(to, r))
+		res, _ := getResource(to, r) // TODO: err
+		comp.Differences.OnlyInNew[r] = formatResource(res)
 	}
 	comp.Differences.InBoth = sliceInter(toResources, fromResources)
 	comp.Differences.ResourceDiff = make(map[string]types.ResourceDiff)
