@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/camptocamp/terraboard/auth"
 	"github.com/camptocamp/terraboard/compare"
 	"github.com/camptocamp/terraboard/db"
 	"github.com/camptocamp/terraboard/s3"
@@ -227,6 +228,23 @@ func ListTfVersions(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	j, err := json.Marshal(result)
 	if err != nil {
 		JSONError(w, "Failed to marshal json", err)
+		return
+	}
+	io.WriteString(w, string(j))
+}
+
+// GetUser returns information about the logged user
+func GetUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	name := r.Header.Get("X-Forwarded-User")
+	email := r.Header.Get("X-Forwarded-Email")
+
+	user := auth.UserInfo(name, email)
+
+	j, err := json.Marshal(user)
+	if err != nil {
+		JSONError(w, "Failed to marshal user information", err)
 		return
 	}
 	io.WriteString(w, string(j))

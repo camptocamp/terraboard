@@ -102,6 +102,10 @@ an authentication proxy such as [oauth2_proxy](https://github.com/bitly/oauth2_p
 If you need to set a route path for Terraboard, you can set a base URL by
 passing it as the `BASE_URL` environment variable.
 
+When using an authentication proxy, Terraboard will retrieve the logged in
+user and email from the headers passed by the proxy.
+You can also pass a `TERRABOARD_LOGOUT_URL` parameter to allow users to
+sign out of the proxy.
 
 
 ## Install from source

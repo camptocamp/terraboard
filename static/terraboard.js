@@ -221,6 +221,10 @@ app.controller("tbNavCtrl",
     $http.get('api/states').then(function(response){
         $scope.states = response.data;
     });
+
+    $http.get('api/user').then(function(response){
+        $scope.user = response.data;
+    });
 }]);
 
 app.controller("tbFooterCtrl",

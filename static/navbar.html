@@ -36,6 +36,15 @@
                     </ui-select-choices>
                 </ui-select>
             </li>
+            <ul class="nav navbar-nav navbar-collapse collapse" id="navbar-collapse-menu" ng-if="user">
+                <li class="dropdown">
+                    <a data-toggle="dropdown" class="dropdown-toggle" href="#"><img src="{{user.avatar_url}}" height="25px" /></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Logged in as {{user.name}}</a></li>
+                        <li><a href="/oauth2/sign_in">Sign out</a></li>
+                    </ul>
+                </li>
+            </ul>
         </ul>
     </div>
 </div>

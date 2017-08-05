@@ -1,5 +1,4 @@
 FROM golang:1.8.3 as builder
-#FROM tb-builder as builder
 WORKDIR /go/src/github.com/camptocamp/terraboard
 COPY . .
 RUN go get ./...

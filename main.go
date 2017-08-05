@@ -10,6 +10,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/camptocamp/terraboard/api"
+	"github.com/camptocamp/terraboard/auth"
 	"github.com/camptocamp/terraboard/config"
 	"github.com/camptocamp/terraboard/db"
 	"github.com/camptocamp/terraboard/s3"
@@ -130,6 +131,9 @@ func main() {
 	// Set up S3
 	s3.Setup(c)
 
+	// Set up auth
+	auth.Setup(c)
+
 	// Set up the DB and start S3->DB sync
 	database := db.Init(
 		c.DB.Host, c.DB.User,
@@ -151,6 +155,7 @@ func main() {
 
 	// Handle API points
 	http.HandleFunc(util.AddBase("api/version"), getVersion)
+	http.HandleFunc(util.AddBase("api/user"), api.GetUser)
 	http.HandleFunc(util.AddBase("api/states"), handleWithDB(api.ListStates, database))
 	http.HandleFunc(util.AddBase("api/states/stats"), handleWithDB(api.ListStateStats, database))
 	http.HandleFunc(util.AddBase("api/states/tfversion/count"), handleWithDB(api.ListTerraformVersionsWithCount, database))
