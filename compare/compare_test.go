@@ -124,6 +124,20 @@ func TestResourceAttributes(t *testing.T) {
 	}
 }
 
+func TestGetResourceAttribute_nomatch(t *testing.T) {
+	expectedError := "Could not find attribute foo for resource fakeType.fakeName"
+
+	_, err := getResourceAttribute(fakeResource, "foo")
+
+	if err == nil {
+		t.Fatalf("Expected error, got nil")
+	}
+
+	if err.Error() != expectedError {
+		t.Fatalf("Expected %s, got %s", expectedError, err.Error())
+	}
+}
+
 func TestFormatResource(t *testing.T) {
 	expectedResult := `resource "fakeType" "fakeName" {
   fakeKey = "fakeValue"
