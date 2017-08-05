@@ -19,11 +19,6 @@ func TestIsKnownStateVersion(t *testing.T) {
 	}
 }
 
-type testTable struct {
-	A string
-	B string
-}
-
 func handlerWithDB(w http.ResponseWriter, r *http.Request, d *db.Database) {
 }
 
