@@ -13,10 +13,15 @@ var fakeAttribute = types.Attribute{
 	Value: "fakeValue",
 }
 
+var fakeAttribute2 = types.Attribute{
+	Key:   "fakeKey2",
+	Value: "fakeValue2",
+}
+
 var fakeResource = types.Resource{
 	Type:       "fakeType",
 	Name:       "fakeName",
-	Attributes: []types.Attribute{fakeAttribute},
+	Attributes: []types.Attribute{fakeAttribute, fakeAttribute2},
 }
 
 var fakeModule = types.Module{
@@ -86,7 +91,7 @@ func TestGetResource(t *testing.T) {
 	expectedResult := types.Resource{
 		Type:       "fakeType",
 		Name:       "fakeName",
-		Attributes: []types.Attribute{fakeAttribute},
+		Attributes: []types.Attribute{fakeAttribute, fakeAttribute2},
 	}
 
 	result, err := getResource(fakeState, "root.fakeType.fakeName")
@@ -115,7 +120,7 @@ func TestGetResource_nomatch(t *testing.T) {
 }
 
 func TestResourceAttributes(t *testing.T) {
-	expectedResult := []string{"fakeKey"}
+	expectedResult := []string{"fakeKey", "fakeKey2"}
 
 	result := resourceAttributes(fakeResource)
 
@@ -141,6 +146,7 @@ func TestGetResourceAttribute_nomatch(t *testing.T) {
 func TestFormatResource(t *testing.T) {
 	expectedResult := `resource "fakeType" "fakeName" {
   fakeKey = "fakeValue"
+  fakeKey2 = "fakeValue2"
 }
 `
 
@@ -163,14 +169,16 @@ func TestStateInfo(t *testing.T) {
 
 func TestCompareResource(t *testing.T) {
 	expectedResult := types.ResourceDiff{
-		OnlyInOld: map[string]string{"fakeKey": "fakeValue"},
-		OnlyInNew: map[string]string{"fakeNewKey": "fakeNewValue"},
+		OnlyInOld: map[string]string{"fakeKey": "fakeValue", "fakeKey2": "fakeValue2"},
+		OnlyInNew: map[string]string{"fakeNewKey": "fakeNewValue", "fakeNewKey2": "fakeNewValue2"},
 		UnifiedDiff: `--- myfakepath/terraform.tfstate (2017-08-03 17:47:23 +0000 UTC)
 +++ myfakepath/terraform.tfstate (2017-08-03 17:47:23 +0000 UTC)
-@@ -1,4 +1,4 @@
+@@ -1,5 +1,5 @@
  resource "fakeType" "fakeName" {
 -  fakeKey = "fakeValue"
+-  fakeKey2 = "fakeValue2"
 +  fakeNewKey = "fakeNewValue"
++  fakeNewKey2 = "fakeNewValue2"
  }
  
 `,
@@ -181,10 +189,15 @@ func TestCompareResource(t *testing.T) {
 		Value: "fakeNewValue",
 	}
 
+	fakeNewAttribute2 := types.Attribute{
+		Key:   "fakeNewKey2",
+		Value: "fakeNewValue2",
+	}
+
 	fakeNewResource := types.Resource{
 		Type:       "fakeType",
 		Name:       "fakeName",
-		Attributes: []types.Attribute{fakeNewAttribute},
+		Attributes: []types.Attribute{fakeNewAttribute, fakeNewAttribute2},
 	}
 
 	fakeNewModule := types.Module{
@@ -239,13 +252,14 @@ func TestCompare_Result(t *testing.T) {
 			InBoth:    []string{"root.fakeType.fakeName"},
 			ResourceDiff: map[string]types.ResourceDiff{
 				"root.fakeType.fakeName": types.ResourceDiff{
-					OnlyInOld: map[string]string{"fakeKey": "fakeValue"},
+					OnlyInOld: map[string]string{"fakeKey": "fakeValue", "fakeKey2": "fakeValue2"},
 					OnlyInNew: map[string]string{"fakeNewKey": "fakeNewValue"},
 					UnifiedDiff: `--- myfakepath/terraform.tfstate (2017-08-03 17:47:23 +0000 UTC)
 +++ myfakepath/terraform.tfstate (2017-08-03 17:47:23 +0000 UTC)
-@@ -1,4 +1,4 @@
+@@ -1,5 +1,4 @@
  resource "fakeType" "fakeName" {
 -  fakeKey = "fakeValue"
+-  fakeKey2 = "fakeValue2"
 +  fakeNewKey = "fakeNewValue"
  }
  
