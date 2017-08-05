@@ -24,6 +24,11 @@ var fakeModule = types.Module{
 	Resources: []types.Resource{fakeResource},
 }
 
+var fakeModule2 = types.Module{
+	Path:      "root/foo",
+	Resources: []types.Resource{},
+}
+
 var fakeState = types.State{
 	Path: "myfakepath/terraform.tfstate",
 	Version: types.Version{
@@ -32,7 +37,7 @@ var fakeState = types.State{
 	},
 	TFVersion: "0.9.8",
 	Serial:    182,
-	Modules:   []types.Module{fakeModule},
+	Modules:   []types.Module{fakeModule, fakeModule2},
 }
 
 var fakeStateInfo = types.StateInfo{
