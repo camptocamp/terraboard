@@ -292,3 +292,31 @@ func TestCompare_Result(t *testing.T) {
 		t.Fatalf("Expected %s, got %s", expectedResult, result)
 	}
 }
+
+func TestCompare_nofrom(t *testing.T) {
+	expectedError := "from version is unknown"
+
+	_, err := Compare(types.State{}, types.State{})
+
+	if err == nil {
+		t.Fatalf("Expected error, got nil")
+	}
+
+	if err.Error() != expectedError {
+		t.Fatalf("Expected %s, got %s", expectedError, err.Error())
+	}
+}
+
+func TestCompare_noto(t *testing.T) {
+	expectedError := "to version is unknown"
+
+	_, err := Compare(types.State{Path: "path/to/foo.tfstate"}, types.State{})
+
+	if err == nil {
+		t.Fatalf("Expected error, got nil")
+	}
+
+	if err.Error() != expectedError {
+		t.Fatalf("Expected %s, got %s", expectedError, err.Error())
+	}
+}
