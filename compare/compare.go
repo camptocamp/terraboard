@@ -75,19 +75,20 @@ func resourceAttributes(res types.Resource) (attrs []string) {
 	return
 }
 
-func getResourceAttribute(res types.Resource, key string) (val string) {
+func getResourceAttribute(res types.Resource, key string) (val string, err error) {
 	for _, attr := range res.Attributes {
 		if attr.Key == key {
-			return attr.Value
+			return attr.Value, nil
 		}
 	}
-	return
+	return "", fmt.Errorf("Could not find attribute %s for resource %s.%s", key, res.Type, res.Name)
 }
 
 func formatResource(res types.Resource) (out string) {
 	out = fmt.Sprintf("resource \"%s\" \"%s\" {\n", res.Type, res.Name)
 	for _, attr := range resourceAttributes(res) {
-		out += fmt.Sprintf("  %s = \"%s\"\n", attr, getResourceAttribute(res, attr))
+		a, _ := getResourceAttribute(res, attr) // TODO: err
+		out += fmt.Sprintf("  %s = \"%s\"\n", attr, a)
 	}
 	out += "}\n"
 
@@ -108,13 +109,15 @@ func compareResource(st1, st2 types.State, key string) (comp types.ResourceDiff)
 	// Only in old
 	comp.OnlyInOld = make(map[string]string)
 	for _, attr := range sliceDiff(attrs1, attrs2) {
-		comp.OnlyInOld[attr] = getResourceAttribute(res1, attr)
+		a, _ := getResourceAttribute(res1, attr) // TODO: err
+		comp.OnlyInOld[attr] = a
 	}
 
 	// Only in new
 	comp.OnlyInNew = make(map[string]string)
 	for _, attr := range sliceDiff(attrs2, attrs1) {
-		comp.OnlyInNew[attr] = getResourceAttribute(res2, attr)
+		a, _ := getResourceAttribute(res2, attr) // TODO: err
+		comp.OnlyInNew[attr] = a
 	}
 
 	// Compute unified diff
