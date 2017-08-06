@@ -8,7 +8,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func TestIsKnownStateVersion(t *testing.T) {
+func TestIsKnownStateVersion_Match(t *testing.T) {
 
 	statesVersions := map[string][]string{
 		"fakeVersionID": []string{"myfakepath/terraform.tfstate"},
@@ -16,6 +16,17 @@ func TestIsKnownStateVersion(t *testing.T) {
 
 	if !isKnownStateVersion(statesVersions, "fakeVersionID", "myfakepath/terraform.tfstate") {
 		t.Fatalf("Expected %s, got %s", true, false)
+	}
+}
+
+func TestIsKnownStateVersion_NoMatch(t *testing.T) {
+
+	statesVersions := map[string][]string{
+		"fakeVersionID": []string{"myfakepath/terraform.tfstate"},
+	}
+
+	if isKnownStateVersion(statesVersions, "VersionID", "myfakepath/terraform.tfstate") {
+		t.Fatalf("Expected %s, got %s", false, true)
 	}
 }
 
