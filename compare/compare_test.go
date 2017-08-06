@@ -8,7 +8,7 @@ import (
 	"github.com/camptocamp/terraboard/types"
 )
 
-var fakeAttribute = types.Attribute{
+var fakeAttribute1 = types.Attribute{
 	Key:   "fakeKey",
 	Value: "fakeValue",
 }
@@ -18,15 +18,24 @@ var fakeAttribute2 = types.Attribute{
 	Value: "fakeValue2",
 }
 
-var fakeResource = types.Resource{
+var fakeResource1 = types.Resource{
 	Type:       "fakeType",
 	Name:       "fakeName",
-	Attributes: []types.Attribute{fakeAttribute, fakeAttribute2},
+	Attributes: []types.Attribute{fakeAttribute1, fakeAttribute2},
 }
 
-var fakeModule = types.Module{
-	Path:      "root",
-	Resources: []types.Resource{fakeResource},
+var fakeResource2 = types.Resource{
+	Type:       "fakeType2",
+	Name:       "fakeName2",
+	Attributes: []types.Attribute{fakeAttribute2},
+}
+
+var fakeModule1 = types.Module{
+	Path: "root",
+	Resources: []types.Resource{
+		fakeResource1,
+		fakeResource2,
+	},
 }
 
 var fakeModule2 = types.Module{
@@ -42,19 +51,22 @@ var fakeState = types.State{
 	},
 	TFVersion: "0.9.8",
 	Serial:    182,
-	Modules:   []types.Module{fakeModule, fakeModule2},
+	Modules:   []types.Module{fakeModule1, fakeModule2},
 }
 
 var fakeStateInfo = types.StateInfo{
 	Path:          "myfakepath/terraform.tfstate",
 	VersionID:     "h8qExjo2Blk3S37CiWm7ljKxEJPuYCZw",
-	ResourceCount: 1,
+	ResourceCount: 2,
 	TFVersion:     "0.9.8",
 	Serial:        182,
 }
 
 func TestStateResources(t *testing.T) {
-	expectedResult := []string{"root.fakeType.fakeName"}
+	expectedResult := []string{
+		"root.fakeType.fakeName",
+		"root.fakeType2.fakeName2",
+	}
 
 	result := stateResources(fakeState)
 
@@ -87,11 +99,11 @@ func TestSliceInter(t *testing.T) {
 	}
 }
 
-func TestGetResource(t *testing.T) {
+func TestGetResource_Match(t *testing.T) {
 	expectedResult := types.Resource{
 		Type:       "fakeType",
 		Name:       "fakeName",
-		Attributes: []types.Attribute{fakeAttribute, fakeAttribute2},
+		Attributes: []types.Attribute{fakeAttribute1, fakeAttribute2},
 	}
 
 	result, err := getResource(fakeState, "root.fakeType.fakeName")
@@ -122,7 +134,7 @@ func TestGetResource_nomatch(t *testing.T) {
 func TestResourceAttributes(t *testing.T) {
 	expectedResult := []string{"fakeKey", "fakeKey2"}
 
-	result := resourceAttributes(fakeResource)
+	result := resourceAttributes(fakeResource1)
 
 	if !reflect.DeepEqual(result, expectedResult) {
 		t.Fatalf("Expected %s, got %s", expectedResult, result)
@@ -132,7 +144,7 @@ func TestResourceAttributes(t *testing.T) {
 func TestGetResourceAttribute_nomatch(t *testing.T) {
 	expectedError := "Could not find attribute foo for resource fakeType.fakeName"
 
-	_, err := getResourceAttribute(fakeResource, "foo")
+	_, err := getResourceAttribute(fakeResource1, "foo")
 
 	if err == nil {
 		t.Fatalf("Expected error, got nil")
@@ -150,7 +162,7 @@ func TestFormatResource(t *testing.T) {
 }
 `
 
-	result := formatResource(fakeResource)
+	result := formatResource(fakeResource1)
 
 	if result != expectedResult {
 		t.Fatalf("Expected %s, got %s", expectedResult, result)
@@ -228,7 +240,7 @@ func TestCompare_Result(t *testing.T) {
 	fromStateInfo := types.StateInfo{
 		Path:          "myfakepath/terraform.tfstate",
 		VersionID:     "h8qExjo2Blk3SUYGBniWm7ljKxEJPuYCZw",
-		ResourceCount: 1,
+		ResourceCount: 2,
 		TFVersion:     "0.9.8",
 		Serial:        183,
 	}
@@ -247,9 +259,19 @@ func TestCompare_Result(t *testing.T) {
 			InBoth       []string                      `json:"in_both"`
 			ResourceDiff map[string]types.ResourceDiff `json:"resource_diff"`
 		}{
-			OnlyInOld: map[string]string{},
-			OnlyInNew: map[string]string{},
-			InBoth:    []string{"root.fakeType.fakeName"},
+			OnlyInOld: map[string]string{
+				"root.fakeTotoType.fakeTotoName": `resource "fakeTotoType" "fakeTotoName" {
+  fakeTotoKey = "fakeTotoValue"
+}
+`,
+			},
+			OnlyInNew: map[string]string{
+				"root.fakeType2.fakeName2": `resource "fakeType2" "fakeName2" {
+  fakeKey2 = "fakeValue2"
+}
+`,
+			},
+			InBoth: []string{"root.fakeType.fakeName"},
 			ResourceDiff: map[string]types.ResourceDiff{
 				"root.fakeType.fakeName": types.ResourceDiff{
 					OnlyInOld: map[string]string{"fakeKey": "fakeValue", "fakeKey2": "fakeValue2"},
@@ -269,20 +291,34 @@ func TestCompare_Result(t *testing.T) {
 		},
 	}
 
-	fakeNewAttribute := types.Attribute{
+	fakeNewAttribute1 := types.Attribute{
 		Key:   "fakeNewKey",
 		Value: "fakeNewValue",
 	}
 
-	fakeNewResource := types.Resource{
+	fakeNewAttribute2 := types.Attribute{
+		Key:   "fakeTotoKey",
+		Value: "fakeTotoValue",
+	}
+
+	fakeNewResource1 := types.Resource{
 		Type:       "fakeType",
 		Name:       "fakeName",
-		Attributes: []types.Attribute{fakeNewAttribute},
+		Attributes: []types.Attribute{fakeNewAttribute1},
+	}
+
+	fakeNewResource2 := types.Resource{
+		Type:       "fakeTotoType",
+		Name:       "fakeTotoName",
+		Attributes: []types.Attribute{fakeNewAttribute2},
 	}
 
 	fakeNewModule := types.Module{
-		Path:      "root",
-		Resources: []types.Resource{fakeNewResource},
+		Path: "root",
+		Resources: []types.Resource{
+			fakeNewResource1,
+			fakeNewResource2,
+		},
 	}
 
 	fakeNewState := types.State{
