@@ -296,16 +296,13 @@ app.controller("tbStateCtrl",
             }
 
             // Init
-            $scope.selectedmod = 0;
-            $scope.selectedres = 0;
+            $scope.selectedmod = "";
+            $scope.selectedres = "";
 
             $scope.setSelected = function(m, r) {
                 $scope.selectedmod = m;
                 $scope.selectedres = r;
-                var mod = $scope.details.modules[m];
-                var res = mod.resources[r];
-                var res_title = res.type+'.'+res.name;
-                var hash = (mod == 0) ? res_title : mod.path+'.'+res_title;
+                var hash = m.path+'.'+r.name;
                 $location.hash(hash);
             };
         });
@@ -329,21 +326,20 @@ app.controller("tbStateCtrl",
 
         if ($location.hash() != "") {
             // Default
-            $scope.selectedmod = 0;
+            $scope.selectedmod = {};
 
             // Search for module in selected res
             var targetRes = $location.hash();
             for (i=0; i < mods.length; i++) {
                 if (targetRes.startsWith(mods[i].path+'.')) {
-                    $scope.selectedmod = i;
+                    $scope.selectedmod = mods[i];
                 }
             }
 
-            targetRes = targetRes.replace(mods[$scope.selectedmod].path+'.', '');
-            var resources = mods[$scope.selectedmod].resources;
+            var resources = $scope.selectedmod.resources;
             for (j=0; j < resources.length; j++) {
-                if (targetRes == resources[j].type+'.'+resources[j].name) {
-                    $scope.selectedres = j;
+                if (targetRes == $scope.selectedmod.path+'.'+resources[j].name) {
+                    $scope.selectedres = resources[j];
                     break;
                 }
             }
