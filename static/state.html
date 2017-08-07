@@ -35,13 +35,13 @@
                     <h3 class="panel-title">Modules</h3>
                 </div>
                 <ul id="nodeslist" class="list-group" ng-init="display.mod=0">
-                    <li class="list-group-item form-group">
+                    <li class="list-group-item form-group" ng-init="resFilter=''">
                         <input class="form-control" id="resFilter" ng-model="resFilter" placeholder="Filter resources..." />
                     </li>
                     <li class="list-group-item" ng-repeat="mod in details.modules | orderBy:'path' track by $index" ng-init="modname = mod.path" ng-class="{selected: mod == selectedmod}">
                         <div ng-click="display.mod = (display.mod != $index) ? $index : undefined" class="node-name">
                             <h4>{{modname}}</h4>
-                            <span class="badge pull-right">{{resFilter == undefined ? '' : filteredRes.length+'/'}}{{Utils.keys(details.modules[$index].resources).length}}</span>
+                            <span class="badge pull-right">{{resFilter == "" ? '' : filteredRes.length+'/'}}{{Utils.keys(details.modules[$index].resources).length}}</span>
                         </div>
                         <ul ng-show="display.mod==$index" class="list-group" ng-init="indexmod=$index">
                             <li ng-repeat="r in details.modules[$index].resources | orderBy:'name' | filter:{type:resFilter, name:resFilter} as filteredRes"
