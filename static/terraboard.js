@@ -331,6 +331,7 @@ app.controller("tbStateCtrl",
             });
         }
         $scope.selectedmod = mods[0];
+        $scope.display.mod = mods[0];
         $scope.selectedres = $scope.selectedmod.resources[0];
 
         if ($location.hash() != "") {
