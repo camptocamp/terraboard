@@ -44,10 +44,10 @@
                             <span class="badge pull-right">{{resFilter == "" ? '' : filteredRes.length+'/'}}{{Utils.keys(details.modules[$index].resources).length}}</span>
                         </div>
                         <ul ng-show="display.mod==$index" class="list-group" ng-init="indexmod=$index">
-                            <li ng-repeat="r in details.modules[$index].resources | orderBy:'name' | filter:{type:resFilter, name:resFilter} as filteredRes"
+                            <li ng-repeat="r in details.modules[$index].resources | orderBy:'name' | filter:{name:resFilter} as filteredRes"
                                 ng-class="{selected: $index == selectedres && indexmod == selectedmod}"
                                 ng-click="setSelected(indexmod, $index)" class="list-group-item resource">
-                                {{r.type}}.{{r.name}}
+                                {{r.name}}
                             </li>
                         </ul>
                     </li>
