@@ -239,3 +239,18 @@ pre.sh_sourceCode .sh_oldfile {
     /* force align with h4 */
     margin-top: 10px;
 }
+
+/*
+ * Resource filter
+ */
+#resFilterClear {
+    position: absolute;
+    right: 20px;
+    top: 0;
+    bottom: 0;
+    height: 14px;
+    margin: auto;
+    font-size: 14px;
+    cursor: pointer;
+    color: #ccc;
+}

@@ -36,7 +36,8 @@
                 </div>
                 <ul id="nodeslist" class="list-group" ng-init="display.mod=selectedmod">
                     <li class="list-group-item form-group" ng-init="resFilter=''">
-                        <input class="form-control" id="resFilter" ng-model="resFilter" placeholder="Filter resources..." />
+                        <input id="resFilterInput" class="form-control" type="search" id="resFilter" ng-model="resFilter" placeholder="Filter resources..." />
+                        <span id="resFilterClear" class="glyphicon glyphicon-remove-circle" ng-click="resFilter=''"></span>
                     </li>
                     <li class="list-group-item" ng-repeat="mod in details.modules">
                         <div ng-click="display.mod = (display.mod != mod) ? mod : selectedmod" class="node-name" ng-class="{selected: mod == selectedmod}">
