@@ -295,17 +295,10 @@ app.controller("tbStateCtrl",
                 versionId: $scope.details.version.version_id
             }
 
-            // Init
-            $scope.selectedmod = 0;
-            $scope.selectedres = 0;
-
             $scope.setSelected = function(m, r) {
                 $scope.selectedmod = m;
                 $scope.selectedres = r;
-                var mod = $scope.details.modules[m];
-                var res = mod.resources[r];
-                var res_title = res.type+'.'+res.name;
-                var hash = (mod == 0) ? res_title : mod.path+'.'+res_title;
+                var hash = m.path+'.'+r.name;
                 $location.hash(hash);
             };
         });
@@ -327,29 +320,36 @@ app.controller("tbStateCtrl",
             return;
         }
 
-        if ($location.hash() != "") {
-            // Default
-            $scope.selectedmod = 0;
+        // Sort the modules
+        mods.sort(function(a, b) {
+            return a.path.localeCompare(b.path);
+        });
 
+        for (i=0; i < mods.length; i++) {
+            mods[i].resources.sort(function(a, b) {
+                return a.name.localeCompare(b.name);
+            });
+        }
+        $scope.selectedmod = mods[0];
+        $scope.selectedres = $scope.selectedmod.resources[0];
+
+        if ($location.hash() != "") {
             // Search for module in selected res
             var targetRes = $location.hash();
             for (i=0; i < mods.length; i++) {
                 if (targetRes.startsWith(mods[i].path+'.')) {
-                    $scope.selectedmod = i;
+                    $scope.selectedmod = mods[i];
+                    $scope.display.mod = mods[i];
                 }
             }
 
-            targetRes = targetRes.replace(mods[$scope.selectedmod].path+'.', '');
-            var resources = mods[$scope.selectedmod].resources;
+            var resources = $scope.selectedmod.resources;
             for (j=0; j < resources.length; j++) {
-                if (targetRes == resources[j].type+'.'+resources[j].name) {
-                    $scope.selectedres = j;
+                if (targetRes == $scope.selectedmod.path+'.'+resources[j].name) {
+                    $scope.selectedres = resources[j];
                     break;
                 }
             }
-
-            // Init display.mod
-            $scope.display.mod = $scope.selectedmod;
         }
     });
 

@@ -34,28 +34,25 @@
                 <div class="panel-heading">
                     <h3 class="panel-title">Modules</h3>
                 </div>
-                <ul id="nodeslist" class="list-group" ng-init="display.mod=0">
-                    <li class="list-group-item" ng-repeat="mod in details.modules | orderBy:'path' track by $index" ng-init="modname = mod.path" ng-class="{selected: mod == selectedmod}">
-                        <div ng-click="display.mod = (display.mod != $index) ? $index : undefined" class="node-name">
-                            <h4>{{modname}}</h4>
-                            <span class="badge pull-right">{{Utils.keys(details.modules[$index].resources).length}}</span>
+                <ul id="nodeslist" class="list-group" ng-init="display.mod=selectedmod">
+                    <li class="list-group-item form-group" ng-init="resFilter=''">
+                        <input class="form-control" id="resFilter" ng-model="resFilter" placeholder="Filter resources..." />
+                    </li>
+                    <li class="list-group-item" ng-repeat="mod in details.modules">
+                        <div ng-click="display.mod = (display.mod != mod) ? mod : selectedmod" class="node-name" ng-class="{selected: mod == selectedmod}">
+                            <h4>{{mod.path}}</h4>
+                            <span class="badge pull-right">{{resFilter == "" ? '' : filteredRes.length+'/'}}{{Utils.keys(mod.resources).length}}</span>
                         </div>
-                        <ul ng-show="display.mod==$index" class="list-group" ng-init="indexmod=$index">
-                            <li ng-repeat="r in details.modules[$index].resources | orderBy:'name'" ng-class="{selected: $index == selectedres && indexmod == selectedmod}" ng-click="setSelected(indexmod, $index)" class="list-group-item resource">{{r.type}}.{{r.name}}</li>
+                        <ul ng-show="display.mod==mod" class="list-group">
+                            <li ng-repeat="r in mod.resources | filter:{name:resFilter} as filteredRes"
+                                ng-class="{selected: r == selectedres}"
+                                ng-click="setSelected(mod, r)" class="list-group-item resource">
+                                {{r.name}}
+                            </li>
                         </ul>
                     </li>
                 </ul>
             </div>
-            <!--
-                <div class="panel-group">
-                <div class="panel panel-info">
-                <div class="panel-heading">
-                <h4 class="panel-title">Details</h4>
-                </div>
-                <code>{{details}}</code>
-                </div>
-                </div>
-                !-->
         </div>
     </div>
     <div id="node" class="col-md-8">
@@ -63,8 +60,8 @@
             <h1>{{path}}</h1>
         </div>
         <!-- Resource details view -->
-        <div class="row" ng-if="display.details && details.modules[selectedmod].resources[selectedres]">
-            <h2 class="node-title">{{(details.modules[selectedmod].path == 'root') ? "" : details.modules[selectedmod].path.replace('root/', '') + "."}}{{details.modules[selectedmod].resources[selectedres].type}}.{{details.modules[selectedmod].resources[selectedres].name}}</h2>
+        <div class="row" ng-if="display.details && selectedres">
+            <h2 class="node-title">{{(selectedmod.path == 'root') ? "" : selectedmod.path.replace('root/', '') + "."}}{{selectedres.name}}</h2>
             <div class="panel-group">
                 <div class="panel panel-info">
                     <div class="panel-heading">
@@ -73,7 +70,7 @@
                     <table class="table">
                         <thead><th>Attribute</th><th>Value</th></thead>
                         <tbody>
-                            <tr ng-repeat="attr in details.modules[selectedmod].resources[selectedres].attributes | orderBy:'key'">
+                            <tr ng-repeat="attr in selectedres.attributes | orderBy:'key'">
                                 <td class="attr-key">{{attr.key}}</td>
                                 <td class="attr-val">{{attr.value}}</td>
                             </tr>
