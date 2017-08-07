@@ -295,10 +295,6 @@ app.controller("tbStateCtrl",
                 versionId: $scope.details.version.version_id
             }
 
-            // Init
-            $scope.selectedmod = "";
-            $scope.selectedres = "";
-
             $scope.setSelected = function(m, r) {
                 $scope.selectedmod = m;
                 $scope.selectedres = r;
@@ -324,15 +320,26 @@ app.controller("tbStateCtrl",
             return;
         }
 
-        if ($location.hash() != "") {
-            // Default
-            $scope.selectedmod = {};
+        // Sort the modules
+        mods.sort(function(a, b) {
+            return a.path.localeCompare(b.path);
+        });
 
+        for (i=0; i < mods.length; i++) {
+            mods[i].resources.sort(function(a, b) {
+                return a.name.localeCompare(b.name);
+            });
+        }
+        $scope.selectedmod = mods[0];
+        $scope.selectedres = $scope.selectedmod.resources[0];
+
+        if ($location.hash() != "") {
             // Search for module in selected res
             var targetRes = $location.hash();
             for (i=0; i < mods.length; i++) {
                 if (targetRes.startsWith(mods[i].path+'.')) {
                     $scope.selectedmod = mods[i];
+                    $scope.display.mod = mods[i];
                 }
             }
 
@@ -343,9 +350,6 @@ app.controller("tbStateCtrl",
                     break;
                 }
             }
-
-            // Init display.mod
-            $scope.display.mod = $scope.selectedmod;
         }
     });
 
