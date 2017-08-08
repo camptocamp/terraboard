@@ -24,7 +24,7 @@ app.directive("sparklinechart", function () {
             data: "@"
         },
         compile: function (tElement, tAttrs, transclude) {
-            tElement.replaceWith("<span>" + tAttrs.data + "</span>");
+            tElement.replaceWith("<span class='sparkline'>" + tAttrs.data + "</span>");
             return function (scope, element, attrs) {
                 attrs.$observe("data", function (newValue) {
                     element.html(newValue);
