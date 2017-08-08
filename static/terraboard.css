@@ -215,7 +215,7 @@ pre.sh_sourceCode .sh_oldfile {
     overflow-x: hidden;
 }
 
-#node td.attr-val {
+td.attr-val {
     white-space: pre;
     max-width: 25vw;
 }
