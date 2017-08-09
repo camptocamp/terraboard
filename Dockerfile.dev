@@ -1,11 +1,7 @@
 FROM golang:1.8.3
 WORKDIR /go/src/github.com/camptocamp/terraboard
-RUN go get github.com/aws/aws-sdk-go \
-           github.com/Sirupsen/logrus \
-		   github.com/hashicorp/terraform \
-		   github.com/jinzhu/gorm github.com/lib/pq \
-		   github.com/jessevdk/go-flags
 COPY . .
+RUN go get ./...
 RUN go install .
 ENTRYPOINT ["terraboard"]
 CMD [""]
