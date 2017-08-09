@@ -2,9 +2,27 @@
 
 FEATURES:
 
+- General:
+
+  * Integrate in Travis CI and Coveralls
+  * Use go get ./... in Dockerfile
+
 - Server:
 
   * Add S3 key prefix [GH #25]
+  * Add tests [GH #26], [GH #30]
+  * Lint code [GH #28]
+  * Add api/user API point [GH #29]
+
+- UI:
+
+  * Add a logo
+  * Overview: Use pointer cursor on sparklines
+  * State view: make whole module title clickable
+  * State view: add a resource filter
+  * State view: simplify/fix module/resource selection code
+  * Search view: Use pre white-space style for attributes
+  * Navbar: add user authentication info and log out link [GH #29]
 
 
 ## 0.12.0 (August 3, 2017)
