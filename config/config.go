@@ -33,6 +33,10 @@ type Config struct {
 		DynamoDBTable string `long:"dynamodb-table" env:"AWS_DYNAMODB_TABLE" description:"AWS DynamoDB table for locks."`
 		KeyPrefix     string `long:"key-prefix" env:"AWS_KEY_PREFIX" description:"AWS Key Prefix."`
 	} `group:"AWS S3 Options"`
+
+	Authentication struct {
+		LogoutURL string `long:"logout-url" env:"TERRABOARD_LOGOUT_URL" description:"Logout URL."`
+	} `group:"Authentication"`
 }
 
 // LoadConfig loads the config from flags & environment
