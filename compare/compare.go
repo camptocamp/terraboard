@@ -84,6 +84,7 @@ func getResourceAttribute(res types.Resource, key string) (val string, err error
 	return "", fmt.Errorf("Could not find attribute %s for resource %s.%s", key, res.Type, res.Name)
 }
 
+// TODO: use terraform/command/format.State()
 func formatResource(res types.Resource) (out string) {
 	out = fmt.Sprintf("resource \"%s\" \"%s\" {\n", res.Type, res.Name)
 	for _, attr := range resourceAttributes(res) {
