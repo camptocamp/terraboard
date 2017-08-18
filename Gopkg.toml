@@ -1,0 +1,23 @@
+[[constraint]]
+  branch = "master"
+  name = "github.com/Sirupsen/logrus"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/aws/aws-sdk-go"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/hashicorp/terraform"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/jessevdk/go-flags"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/jinzhu/gorm"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/pmezard/go-difflib"
