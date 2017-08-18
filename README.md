@@ -94,7 +94,13 @@ $ docker run -d -p 8080:8080 \
 and point your browser to http://localhost:8080
 
 
-### Authentication and base URL
+## Use with Rancher
+
+[Camptocamp's Rancher Catalog](https://github.com/camptocamp/camptocamp-rancher-catalog)
+contains a Terraboard template to automate its installation in Cattle.
+
+
+## Authentication and base URL
 
 Terraboard does not implement authentication. Instead, it is recommended to use
 an authentication proxy such as [oauth2_proxy](https://github.com/bitly/oauth2_proxy).
