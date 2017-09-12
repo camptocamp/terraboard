@@ -85,7 +85,15 @@ func refreshDB(d *db.Database) {
 					}).Debug("State is already in the database, skipping")
 					continue
 				}
-				state, _ := s3.GetState(st, *v.VersionId)
+				state, err := s3.GetState(st, *v.VersionId)
+				if err != nil {
+					log.WithFields(log.Fields{
+						"path":       st,
+						"version_id": *v.VersionId,
+						"error":      err,
+					}).Error("Failed to fetch state from S3")
+					continue
+				}
 				d.InsertState(st, *v.VersionId, state)
 				if err != nil {
 					log.WithFields(log.Fields{
