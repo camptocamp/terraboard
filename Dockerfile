@@ -1,4 +1,4 @@
-FROM golang:1.8.3 as builder
+FROM golang:1.9 as builder
 WORKDIR /go/src/github.com/camptocamp/terraboard
 COPY . .
 RUN go get -u github.com/golang/dep/cmd/dep && dep ensure
