@@ -7,7 +7,7 @@
   name = "github.com/aws/aws-sdk-go"
 
 [[constraint]]
-  branch = "master"
+  revision = "8b3b678c2fd9d76b194b2f4dc3eb0d1883c95863"
   name = "github.com/hashicorp/terraform"
 
 [[constraint]]
