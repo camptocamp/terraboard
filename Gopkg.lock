@@ -15,12 +15,6 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/armon/go-radix"
-  packages = ["."]
-  revision = "1fca145dffbcaa8fe914309b1ec0cfc67500fe61"
-
-[[projects]]
-  branch = "master"
   name = "github.com/aws/aws-sdk-go"
   packages = ["aws","aws/awserr","aws/awsutil","aws/client","aws/client/metadata","aws/corehandlers","aws/credentials","aws/credentials/ec2rolecreds","aws/credentials/endpointcreds","aws/credentials/stscreds","aws/defaults","aws/ec2metadata","aws/endpoints","aws/request","aws/session","aws/signer/v4","internal/shareddefaults","private/protocol","private/protocol/json/jsonutil","private/protocol/jsonrpc","private/protocol/query","private/protocol/query/queryutil","private/protocol/rest","private/protocol/restxml","private/protocol/xml/xmlutil","service/dynamodb","service/dynamodb/dynamodbattribute","service/s3","service/sts"]
   revision = "ce0ac9c36bff5e2ad4c5fefae43d735fd337f6fb"
@@ -30,12 +24,6 @@
   name = "github.com/bgentry/go-netrc"
   packages = ["netrc"]
   revision = "9fd32a8b3d3d3f9d43c341bfe098430e07609480"
-
-[[projects]]
-  name = "github.com/bgentry/speakeasy"
-  packages = ["."]
-  revision = "4aabc24848ce5fd31929f7d1e4ea74d3709c14cd"
-  version = "v0.1.0"
 
 [[projects]]
   name = "github.com/blang/semver"
@@ -98,10 +86,9 @@
   revision = "fa9f258a92500514cc8e9c67020487709df92432"
 
 [[projects]]
-  branch = "master"
   name = "github.com/hashicorp/terraform"
   packages = ["config","config/module","dag","flatmap","helper/experiment","helper/hilmapstructure","helper/shadow","moduledeps","plugin/discovery","terraform"]
-  revision = "e359930530d656ae715eca4921efe448e5298574"
+  revision = "8b3b678c2fd9d76b194b2f4dc3eb0d1883c95863"
 
 [[projects]]
   branch = "master"
@@ -132,18 +119,6 @@
   name = "github.com/lib/pq"
   packages = [".","hstore","oid"]
   revision = "e42267488fe361b9dc034be7a6bffef5b195bceb"
-
-[[projects]]
-  name = "github.com/mattn/go-isatty"
-  packages = ["."]
-  revision = "fc9e8d8ef48496124e79ae0df75490096eccf6fe"
-  version = "v0.0.2"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/mitchellh/cli"
-  packages = ["."]
-  revision = "b633c78680fa6fb27ac81694f38c28f79602ebd9"
 
 [[projects]]
   branch = "master"
@@ -188,12 +163,6 @@
   version = "v1.0.0"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/posener/complete"
-  packages = [".","cmd","cmd/install","match"]
-  revision = "f4461a52b6329c11190f11fe3384ec8aa964e21c"
-
-[[projects]]
   name = "github.com/satori/go.uuid"
   packages = ["."]
   revision = "879c5887cd475cd7864858769793b2ceb0d44feb"
@@ -226,6 +195,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "cb2df63043a0067cee53e66ed30dc76434e5ff12f4d0a07fea6c6a583f315cad"
+  inputs-digest = "20aab2327474725614b1f8e7df84125540cff832571cce01c5ffce15401f7117"
   solver-name = "gps-cdcl"
   solver-version = 1
