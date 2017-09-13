@@ -1,5 +1,5 @@
 DEPS = $(wildcard */*.go)
-VERSION = $(shell git describe --always --dirty)
+VERSION = $(shell git describe --always)
 
 all: test terraboard
 
