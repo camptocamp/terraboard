@@ -5,7 +5,7 @@
   branch = "master"
   name = "github.com/Sirupsen/logrus"
   packages = ["."]
-  revision = "68806b4b77355d6c8577a2c8bbc6d547a5272491"
+  revision = "89742aefa4b206dcf400792f3bd35b542998eb3b"
 
 [[projects]]
   branch = "master"
@@ -17,7 +17,7 @@
   branch = "master"
   name = "github.com/aws/aws-sdk-go"
   packages = ["aws","aws/awserr","aws/awsutil","aws/client","aws/client/metadata","aws/corehandlers","aws/credentials","aws/credentials/ec2rolecreds","aws/credentials/endpointcreds","aws/credentials/stscreds","aws/defaults","aws/ec2metadata","aws/endpoints","aws/request","aws/session","aws/signer/v4","internal/shareddefaults","private/protocol","private/protocol/json/jsonutil","private/protocol/jsonrpc","private/protocol/query","private/protocol/query/queryutil","private/protocol/rest","private/protocol/restxml","private/protocol/xml/xmlutil","service/dynamodb","service/dynamodb/dynamodbattribute","service/s3","service/sts"]
-  revision = "ce0ac9c36bff5e2ad4c5fefae43d735fd337f6fb"
+  revision = "172115776a23a27149b96ff460b93b09039a2b7a"
 
 [[projects]]
   branch = "master"
@@ -53,7 +53,7 @@
   branch = "master"
   name = "github.com/hashicorp/go-getter"
   packages = [".","helper/url"]
-  revision = "6aae8e4e2dee8131187c6a54b52664796e5a02b0"
+  revision = "a686900cb3753aa644dc4812be91ceaf9fdd3b98"
 
 [[projects]]
   branch = "master"
@@ -71,13 +71,13 @@
   branch = "master"
   name = "github.com/hashicorp/go-version"
   packages = ["."]
-  revision = "03c5bf6be031b6dd45afec16b1cf94fc8938bc77"
+  revision = "fc61389e27c71d120f87031ca8c88a3428f372dd"
 
 [[projects]]
   branch = "master"
   name = "github.com/hashicorp/hcl"
   packages = [".","hcl/ast","hcl/parser","hcl/scanner","hcl/strconv","hcl/token","json/parser","json/scanner","json/token"]
-  revision = "392dba7d905ed5d04a5794ba89f558b27e2ba1ca"
+  revision = "68e816d1c783414e79bc65b3994d9ab6b0a722ab"
 
 [[projects]]
   branch = "master"
@@ -94,13 +94,13 @@
   branch = "master"
   name = "github.com/jessevdk/go-flags"
   packages = ["."]
-  revision = "6cf8f02b4ae8ba723ddc64dcfd403e530c06d927"
+  revision = "f88afde2fa19a30cf50ba4b05b3d13bc6bae3079"
 
 [[projects]]
   branch = "master"
   name = "github.com/jinzhu/gorm"
   packages = [".","dialects/postgres"]
-  revision = "c3bb6aaa828867eec72dd8571d111e442688f85f"
+  revision = "3a9e91ab372120a0e35b518430255308e3d8d5ea"
 
 [[projects]]
   branch = "master"
@@ -111,14 +111,13 @@
 [[projects]]
   name = "github.com/jmespath/go-jmespath"
   packages = ["."]
-  revision = "3433f3ea46d9f8019119e7dd41274e112a2359a9"
-  version = "0.2.2"
+  revision = "0b12d6b5"
 
 [[projects]]
   branch = "master"
   name = "github.com/lib/pq"
   packages = [".","hstore","oid"]
-  revision = "e42267488fe361b9dc034be7a6bffef5b195bceb"
+  revision = "b77235e3890a962fe8a6f8c4c7198679ca7814e7"
 
 [[projects]]
   branch = "master"
@@ -136,7 +135,7 @@
   branch = "master"
   name = "github.com/mitchellh/go-testing-interface"
   packages = ["."]
-  revision = "9a441910b16872f7b8283682619b3761a9aa2222"
+  revision = "7bf6f6eaf1bed2fd3c6c63114b18cb64facb9de2"
 
 [[projects]]
   branch = "master"
@@ -178,19 +177,19 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["bcrypt","blowfish","cast5","openpgp","openpgp/armor","openpgp/elgamal","openpgp/errors","openpgp/packet","openpgp/s2k","ssh/terminal"]
-  revision = "eb71ad9bd329b5ac0fd0148dd99bd62e8be8e035"
+  revision = "9419663f5a44be8b34ca85f08abc5fe1be11f8a3"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
   packages = ["html","html/atom"]
-  revision = "1c05540f6879653db88113bc4a2b70aec4bd491f"
+  revision = "0a9397675ba34b2845f758fe3cd68828369c6517"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix","windows"]
-  revision = "43e60d72a8e2bd92ee98319ba9a384a0e9837c08"
+  revision = "314a259e304ff91bd6985da2a7149bbf91237993"
 
 [solve-meta]
   analyzer-name = "dep"
