@@ -8,13 +8,13 @@ import (
 	"net/http"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/camptocamp/terraboard/api"
 	"github.com/camptocamp/terraboard/auth"
 	"github.com/camptocamp/terraboard/config"
 	"github.com/camptocamp/terraboard/db"
 	"github.com/camptocamp/terraboard/s3"
 	"github.com/camptocamp/terraboard/util"
+	log "github.com/sirupsen/logrus"
 )
 
 // idx serves index.html, always,

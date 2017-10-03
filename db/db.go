@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"strings"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/camptocamp/terraboard/types"
 	"github.com/hashicorp/terraform/terraform"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/jinzhu/gorm"
 	// Use postgres as a DB backend

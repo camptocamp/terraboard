@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -16,6 +15,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/camptocamp/terraboard/config"
 	"github.com/hashicorp/terraform/terraform"
+	log "github.com/sirupsen/logrus"
 )
 
 var svc *s3.S3

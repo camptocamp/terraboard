@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/jessevdk/go-flags"
+	log "github.com/sirupsen/logrus"
 )
 
 // Config stores the handler's configuration and UI interface parameters

@@ -3,12 +3,6 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/Sirupsen/logrus"
-  packages = ["."]
-  revision = "89742aefa4b206dcf400792f3bd35b542998eb3b"
-
-[[projects]]
-  branch = "master"
   name = "github.com/apparentlymart/go-cidr"
   packages = ["cidr"]
   revision = "2bd8b58cf4275aeb086ade613de226773e29e853"
@@ -168,6 +162,12 @@
   version = "v1.1.0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/sirupsen/logrus"
+  packages = ["."]
+  revision = "89742aefa4b206dcf400792f3bd35b542998eb3b"
+
+[[projects]]
   name = "github.com/ulikunitz/xz"
   packages = [".","internal/hash","internal/xlog","lzma"]
   revision = "0c6b41e72360850ca4f98dc341fd999726ea007f"
@@ -194,6 +194,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "20aab2327474725614b1f8e7df84125540cff832571cce01c5ffce15401f7117"
+  inputs-digest = "5548c9eb7aa53b783298f11bad9ed0b35dfa922f6821b713c95c74c6fce2ea9e"
   solver-name = "gps-cdcl"
   solver-version = 1

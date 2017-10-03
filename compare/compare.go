@@ -5,9 +5,9 @@ import (
 	"sort"
 	"strings"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/camptocamp/terraboard/types"
 	"github.com/pmezard/go-difflib/difflib"
+	log "github.com/sirupsen/logrus"
 )
 
 // Return all resources of a state
