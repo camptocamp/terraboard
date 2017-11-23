@@ -32,6 +32,7 @@ type Config struct {
 		Bucket        string `long:"s3-bucket" env:"AWS_BUCKET" description:"AWS S3 bucket."`
 		DynamoDBTable string `long:"dynamodb-table" env:"AWS_DYNAMODB_TABLE" description:"AWS DynamoDB table for locks."`
 		KeyPrefix     string `long:"key-prefix" env:"AWS_KEY_PREFIX" description:"AWS Key Prefix."`
+		FileExtension string `long:"file-extension" env:"AWS_FILE_EXTENSION" description:"File extension of state files." default:".tfstate"`
 	} `group:"AWS S3 Options"`
 
 	Authentication struct {
