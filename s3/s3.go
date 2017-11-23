@@ -23,6 +23,7 @@ var dynamoSvc *dynamodb.DynamoDB
 var bucket string
 var dynamoTable string
 var keyPrefix string
+var fileExtension string
 
 // Setup sets up AWS S3 connection
 func Setup(c *config.Config) {
@@ -30,6 +31,7 @@ func Setup(c *config.Config) {
 	svc = s3.New(sess, &aws.Config{})
 	bucket = c.S3.Bucket
 	keyPrefix = c.S3.KeyPrefix
+	fileExtension = c.S3.FileExtension
 
 	dynamoSvc = dynamodb.New(sess, &aws.Config{})
 	dynamoTable = c.S3.DynamoDBTable
@@ -100,7 +102,7 @@ func GetStates() (states []string, err error) {
 
 	var keys []string
 	for _, obj := range result.Contents {
-		if strings.HasSuffix(*obj.Key, ".tfstate") {
+		if strings.HasSuffix(*obj.Key, fileExtension) {
 			keys = append(keys, *obj.Key)
 		}
 	}
