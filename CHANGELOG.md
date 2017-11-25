@@ -1,3 +1,24 @@
+## 0.14.0 (November 25, 2017)
+
+- Server:
+
+  * Report errors fetching state from S3 [GH #34]
+  * Fix Sirupsen into sirupsen to build on newer go
+  * Add option to change state file extension [GH #38]
+
+- Documentation
+
+  * Add Rancher catalog to README
+
+- Build:
+
+  * Vendor dependencies
+  * Use dep and make in Dockerfile [GH #35]
+  * Use dep in .travis.yml [GH #35]
+  * Do not use --dirty in Makefile [GH #35]
+  * Build with go 1.9 [GH #35]
+
+
 ## 0.13.0 (August 16, 2017)
 
 FEATURES:
