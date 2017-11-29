@@ -53,5 +53,5 @@ type Attribute struct {
 	ID         uint          `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
 	ResourceID sql.NullInt64 `gorm:"index" json:"-"`
 	Key        string        `gorm:"index" json:"key"`
-	Value      string        `gorm:"index" json:"value"`
+	Value      string
 }
