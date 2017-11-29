@@ -1,3 +1,10 @@
+## 0.14.1 (November 29, 2017)
+
+- Server:
+
+  * Remove index for attribute value, fix GH #37 [GH #39]
+
+
 ## 0.14.0 (November 25, 2017)
 
 - Server:
