@@ -1,3 +1,10 @@
+## 0.14.2 (November 30, 2017)
+
+- Server:
+
+  * Detect if state is nil [GH #40]
+
+
 ## 0.14.1 (November 29, 2017)
 
 - Server:
