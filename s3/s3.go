@@ -167,5 +167,9 @@ func GetState(st, versionID string) (state *terraform.State, err error) {
 
 	json.Unmarshal(content, &state)
 
+	if state == nil {
+		return state, fmt.Errorf("Failed to find state")
+	}
+
 	return
 }
