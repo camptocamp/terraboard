@@ -1,3 +1,10 @@
+## 0.14.3 (December 7, 2017)
+
+- Server:
+
+  * Fix json field for value [GH #41]
+
+
 ## 0.14.2 (November 30, 2017)
 
 - Server:
