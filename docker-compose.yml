@@ -18,7 +18,7 @@ services:
       AWS_KEY_PREFIX: ${AWS_KEY_PREFIX}
       TERRABOARD_LOG_LEVEL: ${TERRABOARD_LOG_LEVEL}
       TERRABOARD_LOGOUT_URL: /oauth2/sign_in
-    links:
+    depends_on:
       - "db"
     volumes:
       - ./static:/static:ro
@@ -38,8 +38,6 @@ services:
       OAUTH2_PROXY_COOKIE_SECRET: ${OAUTH_COOKIE_SECRET}
     ports:
       - 80:80
-    links:
-      - terraboard:terraboard
 
   db:
     image: postgres:9.5
@@ -52,4 +50,3 @@ services:
 
 volumes:
   tb-data: {}
-

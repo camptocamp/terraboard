@@ -79,20 +79,35 @@ requires:
 
 ## Use with Docker
 
+Either use the included docker-compose file, or run two containers from the commandline:
+the app itself and a PostgreSQL database for it to store information in.
+
 ```shell
-$ docker run -d -p 8080:8080 \
-   -e AWS_REGION=<AWS_DEFAULT_REGION> \
-   -e AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID> \
-   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
-   -e AWS_BUCKET=<terraform-bucket> \
-   -e AWS_DYNAMODB_TABLE=<terraform-locks-table> \
-   -e DB_PASSWORD="mygreatpasswd" \
-   --link postgres:db \
-   camptocamp/terraboard:latest
+# Set AWS credentials as environment variables:
+export AWS_ACCESS_KEY_ID=<access_key>
+export AWS_SECRET_ACCESS_KEY=<access_secret>
+# Spin up the two containers and a network for them to communciate on:
+docker network create terranet
+docker run --name db \
+  -e POSTGRES_USER=gorm \
+  -e POSTGRES_DB=gorm \
+  -e POSTGRES_PASSWORD="<mypassword>" \
+   --net terranet \
+  --restart=always postgres -d
+docker run -p 8080:8080 \
+ -e AWS_REGION="<region>" \
+ -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" \
+ -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" \
+ -e AWS_BUCKET="<bucket>" \
+ -e AWS_DYNAMODB_TABLE="<table>" \
+ -e DB_PASSWORD="<mypassword>" \
+ --net terranet \
+ camptocamp/terraboard:latest
 ```
 
-and point your browser to http://localhost:8080
+Then point your browser to http://localhost:8080.
 
+To use the included compose file, you will need to configure an [OAuth application](https://developer.github.com/apps/building-oauth-apps/).
 
 ## Use with Rancher
 
