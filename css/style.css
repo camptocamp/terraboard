@@ -473,8 +473,6 @@ h1, h2, h3, h4, h5, h6 {
   display: block;
 }
 #fh5co-intro .fh5co-block {
-  width: 90%;
-  float: center;
   text-align: center;
   font-size: 16px;
   min-height: 300px;
@@ -492,11 +490,6 @@ h1, h2, h3, h4, h5, h6 {
   background-size: cover;
   position: relative;
   backgroun-repeat: no-repeat;
-}
-@media screen and (max-width: 768px) {
-  #fh5co-intro .fh5co-block {
-    width: 100%;
-  }
 }
 #fh5co-intro .fh5co-block > .overlay-darker {
   z-index: 8;
