@@ -1,4 +1,130 @@
-baseURL = "http://example.org/"
+baseURL = "http://camptocamp.github.io/terraboard/"
+title = "Terraboard"
 languageCode = "en-us"
-title = "My New Hugo Site"
 theme = "elate"
+
+[params]
+
+  #custom_css = ["css/custom1.css", "css/custom2.css"]
+
+  # Meta
+  author = "Camptocamp"
+  description = ""
+  email = ""
+  # Navigation
+  [params.navigation]
+    brand = "Terraboard"
+    #home = "<i class='icon-home'></i>Home"
+    #work = "Install"
+    #testimonials = "Testimonials"
+    #services = "Services"
+    #about = "About"
+    #contact = "Contact"
+
+    # You can add custom links before or after the default links
+    # Assign a weight to define the order
+
+    [[menu.postpend]]
+      url = "https://github.com/camptocamp/terraboard"
+      name = "<i class='icon-github'></i>Github"
+      weight = 10
+
+    [[menu.postpend]]
+      url = "http://www.camptocamp.com"
+      name = "<i class='icon-globe'></i>Camptocamp"
+      weight = 10
+
+  # Hero section
+  [params.hero]
+    title = "![Terraboard](images/terraboard_logo_only.png) <p>Terraboard</p>"
+    subtitle = 'A Web dashboard to inspect and query Terraform states'
+
+  # Intro section
+  # Available icons: http://simplelineicons.com/
+  [params.intro]
+
+  [[params.intro.item]]
+    title = "Install from source"
+    description = '''
+```shell
+$ go get github.com/camptocamp/terraboard
+```
+'''
+    #url = "#"
+    #button = "Get In Touch"
+    icon = "icon-bulb"
+    img = "img_7.jpg"
+
+  [[params.intro.item]]
+    title = "Launch with Docker"
+    description = '''
+```shell
+# Set AWS credentials as environment variables:
+export AWS_ACCESS_KEY_ID=<access_key>
+export AWS_SECRET_ACCESS_KEY=<access_secret>
+# Spin up the two containers and a network for them to communciate on:
+docker network create terranet
+docker run --name db \
+  -e POSTGRES_USER=gorm \
+  -e POSTGRES_DB=gorm \
+  -e POSTGRES_PASSWORD="<mypassword>" \
+   --net terranet \
+  --restart=always postgres -d
+docker run -p 8080:8080 \
+ -e AWS_REGION="<region>" \
+ -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" \
+ -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" \
+ -e AWS_BUCKET="<bucket>" \
+ -e AWS_DYNAMODB_TABLE="<table>" \
+ -e DB_PASSWORD="<mypassword>" \
+ --net terranet \
+ camptocamp/terraboard:latest
+```
+'''
+    #url = "#"
+    #button = "Why us?"
+    icon = "icon-rocket"
+  #  img = "img_10.jpg"
+
+  #[params.intro.video]
+  #  enable = true
+  #  title = "Watch the video"
+  #  icon = "icon-play2"
+  #  url = "https://vimeo.com/channels/staffpicks/93951774"
+
+
+  # Services section
+  [params.services]
+    enable = true
+    title = "Features"
+    description = "Conplicity allows to backup Docker volumes using the Duplicity, RClone, and Restic engines."
+
+    [[params.services.item]]
+      title = "Built for Docker"
+      description = "Conplicity plugs onto the Docker socket to detect local volumes, automatically."
+      icon = "icon-anchor"
+
+    [[params.services.item]]
+      title = "Prometheus Ready"
+      description = "Prometheus Support is built-in to easily ship metrics each time conplicity runs."
+      icon = "icon-speedometer"
+
+    [[params.services.item]]
+      title = "Multiple Clouds"
+      description = "Conplicity supports both AWS and Swift as bucket providers."
+      icon = "icon-cloud-upload"
+
+    [[params.services.item]]
+      title = "Multiple Engines"
+      description = "Conplicity uses Duplicity, RClone and Restic as backends to give you full control of your backup mode."
+      icon = "icon-puzzle"
+
+  # Footer section
+  [params.footer]
+    enable = true
+    copyright = '[![Camptocamp](images/camptocamp.png)](https://www.camptocamp.com)'
+    links = [
+        ["icon-globe", "https://www.camptocamp.com"],
+        ["icon-twitter", "https://twitter.com/camptocamp"],
+        ["icon-github", "https://github.com/camptocamp"]
+      ]
