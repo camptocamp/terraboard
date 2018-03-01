@@ -46,10 +46,7 @@ A Web dashboard to inspect and query Terraform states
 $ go get github.com/camptocamp/terraboard
 ```
 '''
-    #url = "#"
-    #button = "Get In Touch"
     icon = "icon-bulb"
-    img = "img_7.jpg"
 
   [[params.intro.item]]
     title = "Launch with Docker"
