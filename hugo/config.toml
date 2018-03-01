@@ -14,7 +14,7 @@ theme = "elate"
   # Navigation
   [params.navigation]
     brand = "Terraboard"
-    #home = "<i class='icon-home'></i>Home"
+    intro = "<i class='icon-home'></i>Install"
     work = "<i class='icon-camera'></i>Screenshots"
     testimonials = "<i class='icon-bubbles'></i>Testimonials"
     services = "<i class='icon-star'></i>Features"
