@@ -18,26 +18,22 @@ theme = "elate"
     work = "<i class='icon-camera'></i>Screenshots"
     testimonials = "<i class='icon-bubbles'></i>Testimonials"
     services = "<i class='icon-star'></i>Features"
-    #about = "About"
+    about = "<i class='icon-bulb'></i>Other projects"
     contact = "<i class='icon-envelope'></i> Contact"
 
     # You can add custom links before or after the default links
     # Assign a weight to define the order
 
-    [[menu.postpend]]
-      url = "https://github.com/camptocamp/terraboard"
-      name = "<i class='icon-github'></i>Github"
-      weight = 10
-
-    [[menu.postpend]]
-      url = "http://www.camptocamp.com"
-      name = "<i class='icon-globe'></i>Camptocamp"
-      weight = 10
-
   # Hero section
   [params.hero]
     title = "![Terraboard](images/terraboard_logo_only.png) <p>Terraboard</p>"
-    subtitle = 'A Web dashboard to inspect and query Terraform states'
+    subtitle = '''
+A Web dashboard to inspect and query Terraform states
+
+[![GitHub stars](https://img.shields.io/github/stars/badges/shields.svg?style=social&logo=github&label=Stars)](https://github.com/camptocamp/terraboard)
+[![Docker Pulls](https://img.shields.io/docker/pulls/camptocamp/terraboard.svg)](https://hub.docker.com/r/camptocamp/terraboard/)
+[![By Camptocamp](https://img.shields.io/badge/by-camptocamp-fb7047.svg)](http://www.camptocamp.com)
+'''
 
   # Intro section
   # Available icons: http://simplelineicons.com/
@@ -178,6 +174,23 @@ docker run -p 8080:8080 \
       title = "Container Ready"
       description = "Terraboard comes packaged as a small container, making it fast and easy to deploy on all container platforms."
       icon = "icon-anchor"
+
+  # About section
+  [params.about]
+    enable = true
+    title = "Other projects"
+    description = "We love to contribute Open Source projects at Camptocamp.<br /> Here is a list of some of our most useful tools"
+
+    [[params.about.item]]
+      name = "Conplicity"
+      position = "Automatic backups for Docker containers"
+      description = ""
+      img = "conplicity.png"
+      alt = "Conplicity"
+      social = [
+        ["icon-globe", "https://camptocamp.github.io/conplicity"],
+        ["icon-github", "https://github.com/camptocamp/conplicity"]
+      ]
 
   # Contact section
   [params.contact]
