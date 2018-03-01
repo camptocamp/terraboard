@@ -17,7 +17,7 @@ theme = "elate"
     #home = "<i class='icon-home'></i>Home"
     #work = "Install"
     #testimonials = "Testimonials"
-    #services = "Services"
+    services = "<i class='icon-star'></i>Features"
     #about = "About"
     #contact = "Contact"
 
