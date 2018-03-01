@@ -106,7 +106,7 @@ docker run -p 8080:8080 \
 
     [[params.services.item]]
       title = "Advanced Search"
-      description = "Ever wonder in which Terraform project your resources are managed? Terraboard's search interface helps you answer that!"
+      description = "Ever wondered in which Terraform project your resources are managed? Terraboard's search interface helps you answer that!"
       icon = "icon-magnifier"
 
     [[params.services.item]]
