@@ -26,7 +26,7 @@ theme = "elate"
 
   # Hero section
   [params.hero]
-    title = "![Terraboard](images/terraboard_logo_only.png) <p>Terraboard</p>"
+    title = "![Terraboard](images/terraboard.png) <p>Terraboard</p>"
     subtitle = '''
 A Web dashboard to inspect and query Terraform states
 
