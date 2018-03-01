@@ -19,7 +19,7 @@ theme = "elate"
     testimonials = "<i class='icon-bubbles'></i>Testimonials"
     services = "<i class='icon-star'></i>Features"
     #about = "About"
-    #contact = "Contact"
+    contact = "<i class='icon-envelope'></i> Contact"
 
     # You can add custom links before or after the default links
     # Assign a weight to define the order
@@ -178,6 +178,13 @@ docker run -p 8080:8080 \
       title = "Container Ready"
       description = "Terraboard comes packaged as a small container, making it very easy to deploy on all container platforms."
       icon = "icon-anchor"
+
+  # Contact section
+  [params.contact]
+    enable = true
+    form = false
+    title = "Contact us!"
+    description = "Are you missing features? Would you like consulting, training or other services? Contact us at [info@camptocamp.com](mailto:info@camptocamp.com?subject=Terraboard)!"
 
   # Footer section
   [params.footer]
