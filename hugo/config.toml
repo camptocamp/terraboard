@@ -97,27 +97,27 @@ docker run -p 8080:8080 \
   [params.services]
     enable = true
     title = "Features"
-    description = "Conplicity allows to backup Docker volumes using the Duplicity, RClone, and Restic engines."
+    description = "Terraboard lets you visualize and query Terraform state informations stored in a versioned S3 bucket."
 
     [[params.services.item]]
-      title = "Built for Docker"
-      description = "Conplicity plugs onto the Docker socket to detect local volumes, automatically."
+      title = "AWS Support"
+      description = "Terraboard gets its data from versioned S3 buckets and DynamoDB databases."
+      icon = "icon-grid"
+
+    [[params.services.item]]
+      title = "Advanced Search"
+      description = "Ever wonder in which Terraform project your resources are managed? Terraboard's search interface helps you answer that!"
+      icon = "icon-magnifier"
+
+    [[params.services.item]]
+      title = "Charts Overview"
+      description = "The dashaboard features charts with useful stats on your Terraform resources."
+      icon = "icon-pie-chart"
+
+    [[params.services.item]]
+      title = "Container Ready"
+      description = "Terraboard comes packaged as a small container, making it very easy to deploy on all container platforms."
       icon = "icon-anchor"
-
-    [[params.services.item]]
-      title = "Prometheus Ready"
-      description = "Prometheus Support is built-in to easily ship metrics each time conplicity runs."
-      icon = "icon-speedometer"
-
-    [[params.services.item]]
-      title = "Multiple Clouds"
-      description = "Conplicity supports both AWS and Swift as bucket providers."
-      icon = "icon-cloud-upload"
-
-    [[params.services.item]]
-      title = "Multiple Engines"
-      description = "Conplicity uses Duplicity, RClone and Restic as backends to give you full control of your backup mode."
-      icon = "icon-puzzle"
 
   # Footer section
   [params.footer]
