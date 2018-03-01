@@ -14,9 +14,9 @@ theme = "elate"
   # Navigation
   [params.navigation]
     brand = "Terraboard"
-    home = "<i class='icon-home'></i>Home"
+    #home = "<i class='icon-home'></i>Home"
     work = "<i class='icon-camera'></i>Screenshots"
-    #testimonials = "Testimonials"
+    testimonials = "<i class='icon-bubbles'></i>Testimonials"
     services = "<i class='icon-star'></i>Features"
     #about = "About"
     #contact = "Contact"
@@ -123,6 +123,18 @@ docker run -p 8080:8080 \
       title = "Search"
       subtitle = "The search view allows to find resources by various criteria."
 
+
+  # Testimonials section
+  [params.testimonials]
+    enable = true
+    title = "Testimonials"
+    description = ""
+
+    [[params.testimonials.item]]
+      quote = "&ldquo;Thanks @camptocamp for the terraboard! It helps managing infra using @HashiCorp's Terraform at @exoscale. #dogfood&rdquo; <br /><span class='subtext'><a href='https://twitter.com/greut/status/967070987958276097'>23 Feb 2018</a></span>"
+      person = 'Yoan Blanc<span class="subtext"><a href="https://twitter.com/greut" target="_blank"><i class="icon-social-twitter"></i> @greut</a></span>'
+      img = "https://pbs.twimg.com/profile_images/57582226/Image_00007_400x400.jpg"
+      alt = "Yoan Blanc"
 
 
   # Services section
