@@ -131,6 +131,14 @@ docker run -p 8080:8080 \
     description = ""
 
     [[params.testimonials.item]]
+      quote = '''&ldquo;Terraboard looks cool! I want it to visualize the infra resources of the Federal Spatial Data Infrastructure @swiss_geoportal  @camptocamp #FSDI #Terraform
+&rdquo; <br />
+	  <span class='subtext'><a href='https://twitter.com/hpchrist/status/934702222105038849'>26 Nov 2017</a></span>'''
+      person = 'Christ Hanspeter<span class="subtext"><a href="https://twitter.com/hpchrist" target="_blank"><i class="icon-social-twitter"></i> @hpchrist</a></span>'
+      img = "https://pbs.twimg.com/profile_images/488320370/portrait_jp_400x400.JPG"
+      alt = "Christ Hanspeter"
+
+    [[params.testimonials.item]]
       quote = '''&ldquo;Terraboard from @raphink a tool for interrogating Terraform remote state looks seriously cool. #cfgmgmtcamp&rdquo; <br />
 	  <span class='subtext'><a href='https://twitter.com/sheriffjackson/status/960549930657034241'>6 Feb 2018</a></span>'''
       person = 'Nic Jackson<span class="subtext"><a href="https://twitter.com/sheriffjackson" target="_blank"><i class="icon-social-twitter"></i> @sheriffjackson</a></span>'
@@ -143,14 +151,6 @@ docker run -p 8080:8080 \
       person = 'Yoan Blanc<span class="subtext"><a href="https://twitter.com/greut" target="_blank"><i class="icon-social-twitter"></i> @greut</a></span>'
       img = "https://pbs.twimg.com/profile_images/57582226/Image_00007_400x400.jpg"
       alt = "Yoan Blanc"
-
-    [[params.testimonials.item]]
-      quote = '''&ldquo;Terraboard looks cool! I want it to visualize the infra resources of the Federal Spatial Data Infrastructure @swiss_geoportal  @camptocamp #FSDI #Terraform
-&rdquo; <br />
-	  <span class='subtext'><a href='https://twitter.com/hpchrist/status/934702222105038849'>26 Nov 2017</a></span>'''
-      person = 'Christ Hanspeter<span class="subtext"><a href="https://twitter.com/hpchrist" target="_blank"><i class="icon-social-twitter"></i> @hpchrist</a></span>'
-      img = "https://pbs.twimg.com/profile_images/488320370/portrait_jp_400x400.JPG"
-      alt = "Christ Hanspeter"
 
 
   # Services section
