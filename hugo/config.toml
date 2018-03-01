@@ -14,8 +14,8 @@ theme = "elate"
   # Navigation
   [params.navigation]
     brand = "Terraboard"
-    #home = "<i class='icon-home'></i>Home"
-    #work = "Install"
+    home = "<i class='icon-home'></i>Home"
+    work = "<i class='icon-camera'></i>Screenshots"
     #testimonials = "Testimonials"
     services = "<i class='icon-star'></i>Features"
     #about = "About"
@@ -91,6 +91,38 @@ docker run -p 8080:8080 \
   #  title = "Watch the video"
   #  icon = "icon-play2"
   #  url = "https://vimeo.com/channels/staffpicks/93951774"
+
+  # Screenshots section
+  [params.work]
+    enable = true
+    title = "Screenshots"
+    description = ""
+    footertext = ''
+
+    [[params.work.row]]
+      img = "screenshots/main.png"
+      alt = "Overview"
+      title = "Overview"
+      subtitle = "The overview presents all the state files in the S3 bucket, by most recent modification date."
+
+    [[params.work.row]]
+      img = "screenshots/state.png"
+      alt = "State"
+      title = "State View"
+      subtitle = "The state view presents details of a Terraform state at a given version."
+
+    [[params.work.row]]
+      img = "screenshots/compare.png"
+      alt = "Compare"
+      title = "Compare View"
+      subtitle = "From the state view, you can compare the current state version with another version."
+
+    [[params.work.row]]
+      img = "screenshots/search.png"
+      alt = "Search"
+      title = "Search"
+      subtitle = "The search view allows to find resources by various criteria."
+
 
 
   # Services section
