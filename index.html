@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+
+
+
+<html>
+    <head>
+	<meta name="generator" content="Hugo 0.38-DEV" />
+            <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title> Terraboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="author" content="Camptocamp">
+    
+    <meta http-equiv="content-language" content="en-us" />
+
+  
+
+    
+    
+    <meta name="og:site_name" content="Terraboard">
+    <meta name="og:title" content="Terraboard">
+    <meta name="og:url" content="http://camptocamp.github.io/terraboard/">
+    <meta name="og:image" content="http://camptocamp.github.io/terraboard/images/">
+    <meta name="twitter:title" content="Terraboard" />
+    <meta name="twitter:url" content="http://camptocamp.github.io/terraboard/" />
+    <meta name="twitter:image" content="http://camptocamp.github.io/terraboard/images/" />
+    <meta name="twitter:card" content="" />
+    
+    
+    
+    <link rel="canonical" href="http://camptocamp.github.io/terraboard/"/>
+
+    
+    <link rel="shortcut icon" href="favicon.ico">
+
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300,600,400italic,700' rel='stylesheet' type='text/css'>
+    
+    
+    <link rel="stylesheet" href="css/animate.css">
+    
+    <link rel="stylesheet" href="css/icomoon.css">
+    
+    <link rel="stylesheet" href="css/simple-line-icons.css">
+    
+    <link rel="stylesheet" href="css/magnific-popup.css">
+    
+    <link rel="stylesheet" href="css/bootstrap.css">
+
+    
+    <link rel="stylesheet" href="css/style.css">
+
+    
+    
+
+    
+    <script src="js/modernizr-2.6.2.min.js"></script>
+    
+    
+
+    </head>
+    <body>
+            <header role="banner" id="fh5co-header">
+        <div class="container">
+            
+            <nav class="navbar navbar-default">
+                <div class="navbar-header">
+                    
+                    <a href="#" class="js-fh5co-nav-toggle fh5co-nav-toggle" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar"><i></i></a>
+                    <a class="navbar-brand" href="index.html">Terraboard</a> 
+                </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                  <ul class="nav navbar-nav navbar-right">
+
+                    
+
+                    <li class="active"><a href="#" data-nav-section="home"><span></span></a></li>
+                    
+                    
+
+                    
+
+                    
+                    <li><a href="#" data-nav-section="services"><span></span></a></li> 
+                    
+
+                    
+
+                    
+
+                    
+                        <li><a class="external" href="https://github.com/camptocamp/terraboard"><span><i class='icon-github'></i>Github</span></a></li>
+                    
+                        <li><a class="external" href="http://www.camptocamp.com"><span><i class='icon-globe'></i>Camptocamp</span></a></li>
+                    
+                </ul>
+            </div>
+        </nav>
+        
+    </div>
+</header>
+
+
+			<section id="fh5co-home" data-section="home" style="background-image: url(images/full_image_2.jpg);" data-stellar-background-ratio="0.5">
+		<div class="gradient"></div>
+		<div class="container">
+			<div class="text-wrap">
+				<div class="text-inner">
+					<div class="row">
+						<div class="col-md-8 col-md-offset-2">
+							<h1 class="to-animate"><p><img src="images/terraboard_logo_only.png" alt="Terraboard" /> <p>Terraboard</p></p>
+</h1>
+							<h2 class="to-animate">A Web dashboard to inspect and query Terraform states</h2>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="slant"></div>
+	</section>
+		
+        	<section id="fh5co-intro">
+		<div class="container">
+			<div class="row row-bottom-padded-lg">
+				
+				<div class="fh5co-block to-animate" style="background-image: url(images/img_7.jpg);">
+					<div class="overlay-darker"></div>
+					<div class="overlay"></div>
+					<div class="fh5co-text">
+						<i class="fh5co-intro-icon icon-bulb"></i>
+						<h2>Install from source</h2>
+                        <p><pre><code class="language-shell">$ go get github.com/camptocamp/terraboard
+</code></pre>
+</p>
+                        
+					</div>
+				</div>
+				
+				<div class="fh5co-block to-animate" style="background-image: url(images/);">
+					<div class="overlay-darker"></div>
+					<div class="overlay"></div>
+					<div class="fh5co-text">
+						<i class="fh5co-intro-icon icon-rocket"></i>
+						<h2>Launch with Docker</h2>
+                        <p><pre><code class="language-shell"># Set AWS credentials as environment variables:
+export AWS_ACCESS_KEY_ID=&lt;access_key&gt;
+export AWS_SECRET_ACCESS_KEY=&lt;access_secret&gt;
+# Spin up the two containers and a network for them to communciate on:
+docker network create terranet
+docker run --name db \
+  -e POSTGRES_USER=gorm \
+  -e POSTGRES_DB=gorm \
+  -e POSTGRES_PASSWORD=&quot;&lt;mypassword&gt;&quot; \
+   --net terranet \
+  --restart=always postgres -d
+docker run -p 8080:8080 \
+ -e AWS_REGION=&quot;&lt;region&gt;&quot; \
+ -e AWS_ACCESS_KEY_ID=&quot;${AWS_ACCESS_KEY_ID}&quot; \
+ -e AWS_SECRET_ACCESS_KEY=&quot;${AWS_SECRET_ACCESS_KEY}&quot; \
+ -e AWS_BUCKET=&quot;&lt;bucket&gt;&quot; \
+ -e AWS_DYNAMODB_TABLE=&quot;&lt;table&gt;&quot; \
+ -e DB_PASSWORD=&quot;&lt;mypassword&gt;&quot; \
+ --net terranet \
+ camptocamp/terraboard:latest
+</code></pre>
+</p>
+                        
+					</div>
+				</div>
+				
+			</div>
+			
+		</div>
+	</section>
+
+
+		
+
+		
+
+		
+        		<section id="fh5co-services" data-section="services">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12 section-heading text-left">
+					<h2 class=" left-border to-animate">Features</h2>
+					<div class="row">
+						<div class="col-md-8 subtext to-animate">
+							<h3>Terraboard lets you visualize and query Terraform state informations stored in a versioned S3 bucket.</h3>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+			
+				<div class="col-md-6 col-sm-6 fh5co-service to-animate">
+					<i class="icon to-animate-2 icon-grid"></i>
+					<h3>AWS Support</h3>
+					<p>Terraboard gets its data from versioned S3 buckets and DynamoDB databases.</p>
+				</div>
+				<div class="clearfix visible-sm-block"></div>
+			
+				<div class="col-md-6 col-sm-6 fh5co-service to-animate">
+					<i class="icon to-animate-2 icon-magnifier"></i>
+					<h3>Advanced Search</h3>
+					<p>Ever wonder in which Terraform project your resources are managed? Terraboard&rsquo;s search interface helps you answer that!</p>
+				</div>
+				<div class="clearfix visible-sm-block"></div>
+			
+				<div class="col-md-6 col-sm-6 fh5co-service to-animate">
+					<i class="icon to-animate-2 icon-pie-chart"></i>
+					<h3>Charts Overview</h3>
+					<p>The dashaboard features charts with useful stats on your Terraform resources.</p>
+				</div>
+				<div class="clearfix visible-sm-block"></div>
+			
+				<div class="col-md-6 col-sm-6 fh5co-service to-animate">
+					<i class="icon to-animate-2 icon-puzzle"></i>
+					<h3>Multiple Engines</h3>
+					<p>Conplicity uses Duplicity, RClone and Restic as backends to give you full control of your backup mode.</p>
+				</div>
+				<div class="clearfix visible-sm-block"></div>
+			
+			</div>
+		</div>
+	</section>
+		
+
+		
+
+		
+
+		
+
+        
+        		<footer id="footer" role="contentinfo">
+		<a href="#" class="gotop js-gotop"><i class="icon-arrow-up2"></i></a>
+		<div class="container">
+			<div class="">
+				<div class="col-md-12 text-center">
+					<p><a href="https://www.camptocamp.com"><img src="images/camptocamp.png" alt="Camptocamp" /></a></p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12 text-center">
+					<ul class="social social-circle">
+					
+						<li><a href="https://www.camptocamp.com"><i class="icon-globe"></i></a></li>
+					
+						<li><a href="https://twitter.com/camptocamp"><i class="icon-twitter"></i></a></li>
+					
+						<li><a href="https://github.com/camptocamp"><i class="icon-github"></i></a></li>
+					
+					</ul>
+				</div>
+			</div>
+		</div>
+	</footer>
+
+        
+
+        	
+	<script src="js/jquery.min.js"></script>
+	
+	<script src="js/jquery.easing.1.3.js"></script>
+	
+	<script src="js/bootstrap.min.js"></script>
+	
+	<script src="js/jquery.waypoints.min.js"></script>
+	
+	<script src="js/jquery.stellar.min.js"></script>
+	
+	<script src="js/jquery.countTo.js"></script>
+	
+	<script src="js/jquery.magnific-popup.min.js"></script>
+	<script src="js/magnific-popup-options.js"></script>
+	
+	
+	
+	<script src="js/main.js"></script>
+
+    </body>
+</html>
