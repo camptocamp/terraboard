@@ -171,12 +171,12 @@ docker run -p 8080:8080 \
 
     [[params.services.item]]
       title = "Charts Overview"
-      description = "The dashaboard features charts with useful stats on your Terraform resources."
+      description = "The dashboard features charts with useful stats on your Terraform resources."
       icon = "icon-pie-chart"
 
     [[params.services.item]]
       title = "Container Ready"
-      description = "Terraboard comes packaged as a small container, making it very easy to deploy on all container platforms."
+      description = "Terraboard comes packaged as a small container, making it fast and easy to deploy on all container platforms."
       icon = "icon-anchor"
 
   # Contact section
