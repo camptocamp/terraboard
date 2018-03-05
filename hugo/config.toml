@@ -30,7 +30,7 @@ theme = "elate"
     subtitle = '''
 A Web dashboard to inspect and query Terraform states
 
-[![GitHub stars](https://img.shields.io/github/stars/badges/shields.svg?style=social&logo=github&label=Stars)](https://github.com/camptocamp/terraboard)
+[![GitHub stars](https://img.shields.io/github/stars/camptocamp/terraboard.svg?style=social&logo=github&label=Stars)](https://github.com/camptocamp/terraboard)
 [![Docker Pulls](https://img.shields.io/docker/pulls/camptocamp/terraboard.svg)](https://hub.docker.com/r/camptocamp/terraboard/)
 [![By Camptocamp](https://img.shields.io/badge/by-camptocamp-fb7047.svg)](http://www.camptocamp.com)
 '''
