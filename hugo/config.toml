@@ -200,6 +200,18 @@ docker run -p 8080:8080 \
         ["icon-home", "https://forge.puppet.com/camptocamp"]
       ]
 
+	[[params.about.item]]
+      name = "FacterDB"
+      position = "A Database of OS facts provided by Facter"
+      description = ""
+      img = "facterdb.png"
+      alt = "FacterDB"
+      social = [
+        ["icon-globe", "https://camptocamp.github.io/facterdb"],
+        ["icon-home", "https://rubygems.org/gems/facterdb"]
+      ]
+
+
   # Contact section
   [params.contact]
     enable = true
