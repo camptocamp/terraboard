@@ -179,14 +179,14 @@ docker run -p 8080:8080 \
     description = "We love to contribute Open Source projects at Camptocamp.<br /> Here is a list of some of our most useful tools"
 
     [[params.about.item]]
-      name = "Conplicity"
-      position = "Automatic backups for Docker containers"
+      name = "Bivac"
+      position = "Backup Interface for Volumes Attached to Containers"
       description = ""
-      img = "conplicity.png"
-      alt = "Conplicity"
+      img = "bivac.png"
+      alt = "Bivac"
       social = [
-        ["icon-globe", "https://camptocamp.github.io/conplicity"],
-        ["icon-github", "https://github.com/camptocamp/conplicity"]
+        ["icon-globe", "https://camptocamp.github.io/bivac"],
+        ["icon-github", "https://github.com/camptocamp/bivac"]
       ]
 
     [[params.about.item]]
