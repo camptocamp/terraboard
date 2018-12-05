@@ -1,3 +1,3 @@
 [submodule "hugo/themes/elate"]
 	path = hugo/themes/elate
-	url = git@github.com:camptocamp/hugo-elate-theme.git
+	url = https://github.com/camptocamp/hugo-elate-theme.git
