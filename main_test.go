@@ -15,7 +15,7 @@ func TestIsKnownStateVersion_Match(t *testing.T) {
 	}
 
 	if !isKnownStateVersion(statesVersions, "fakeVersionID", "myfakepath/terraform.tfstate") {
-		t.Fatalf("Expected %s, got %s", true, false)
+		t.Fatalf("Expected %t, got %t", true, false)
 	}
 }
 
@@ -26,7 +26,7 @@ func TestIsKnownStateVersion_NoMatch(t *testing.T) {
 	}
 
 	if isKnownStateVersion(statesVersions, "VersionID", "myfakepath/terraform.tfstate") {
-		t.Fatalf("Expected %s, got %s", false, true)
+		t.Fatalf("Expected %t, got %t", false, true)
 	}
 }
 
