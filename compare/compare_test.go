@@ -113,7 +113,7 @@ func TestGetResource_Match(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(result, expectedResult) {
-		t.Fatalf("Expected %s, got %s", expectedResult, result)
+		t.Fatalf("Expected %v, got %v", expectedResult, result)
 	}
 }
 
@@ -339,7 +339,7 @@ func TestCompare_Result(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(result, expectedResult) {
-		t.Fatalf("Expected %s, got %s", expectedResult, result)
+		t.Fatalf("Expected %v, got %v", expectedResult, result)
 	}
 }
 
