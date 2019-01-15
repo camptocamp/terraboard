@@ -21,6 +21,7 @@ vet: main.go
 	go vet $<
 
 imports: main.go
+	dep ensure
 	goimports -d $<
 
 test: lint vet imports
