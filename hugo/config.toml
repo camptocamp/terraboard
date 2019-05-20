@@ -95,7 +95,7 @@ docker run -p 8080:8080 \
     [[params.work.row]]
       img = "screenshots/main.png"
       alt = "Overview"
-      title = "Overview"
+      title = "Overviews"
       subtitle = "The overview presents all the state files in the S3 bucket, by most recent modification date."
 
     [[params.work.row]]
