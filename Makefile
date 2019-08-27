@@ -4,7 +4,7 @@ VERSION = $(shell git describe --always)
 all: test terraboard
 
 terraboard: main.go $(DEPS)
-	CGO_ENABLED=1 GOOS=linux go build \
+	GO111MODULE=on CGO_ENABLED=1 GOOS=linux go build \
 	  -ldflags "-linkmode external -extldflags -static -X main.version=$(VERSION)" \
 	-o $@ $<
 	strip $@
@@ -21,11 +21,13 @@ vet: main.go
 	go vet $<
 
 imports: main.go
-	dep ensure
 	goimports -d $<
 
 test: lint vet imports
-	go test -v ./...
+	GO111MODULE=on go test -v ./...
+
+vendor:
+	GO111MODULE=on go mod vendor
 
 coverage:
 	rm -rf *.out
