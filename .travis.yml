@@ -1,14 +1,13 @@
 language: go
 go:
-- "1.11"
+- "1.12"
 go_import_path: github.com/camptocamp/terraboard
 install:
-- go get -u github.com/golang/dep/cmd/dep
-- go get -u github.com/bradfitz/goimports
+- make vendor
+script:
+- make terraboard
+- make test
 - go get -u github.com/mattn/goveralls
 - go get -u golang.org/x/tools/cmd/cover
-- dep ensure
-script:
-- make
 - make coverage
 - "$HOME/gopath/bin/goveralls -service=travis-ci -coverprofile=coverage.out"
