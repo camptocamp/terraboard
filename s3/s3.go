@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"strings"
 	"time"
 
@@ -14,7 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/camptocamp/terraboard/config"
-	"github.com/hashicorp/terraform/terraform"
+	"github.com/hashicorp/terraform/states/statefile"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -124,7 +123,7 @@ func GetVersions(prefix string) (versions []*s3.ObjectVersion, err error) {
 }
 
 // GetState retrieves a single State from the S3 bucket
-func GetState(st, versionID string) (state *terraform.State, err error) {
+func GetState(st, versionID string) (sf *statefile.File, err error) {
 	log.WithFields(log.Fields{
 		"path":       st,
 		"version_id": versionID,
@@ -147,28 +146,30 @@ func GetState(st, versionID string) (state *terraform.State, err error) {
 		errObj["error"] = fmt.Sprintf("State file not found: %v", st)
 		errObj["details"] = fmt.Sprintf("%v", err)
 		j, _ := json.Marshal(errObj)
-		return state, fmt.Errorf("%s", string(j))
+		return sf, fmt.Errorf("%s", string(j))
 	}
 	defer result.Body.Close()
 
-	content, err := ioutil.ReadAll(result.Body)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"path":       st,
-			"version_id": versionID,
-			"error":      err,
-		}).Error("Error reading state from S3")
-		errObj := make(map[string]string)
-		errObj["error"] = fmt.Sprintf("Failed to read S3 response: %v", st)
-		errObj["details"] = fmt.Sprintf("%v", err)
-		j, _ := json.Marshal(errObj)
-		return state, fmt.Errorf("%s", string(j))
-	}
+	/*
+		content, err := ioutil.ReadAll(result.Body)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"path":       st,
+				"version_id": versionID,
+				"error":      err,
+			}).Error("Error reading state from S3")
+			errObj := make(map[string]string)
+			errObj["error"] = fmt.Sprintf("Failed to read S3 response: %v", st)
+			errObj["details"] = fmt.Sprintf("%v", err)
+			j, _ := json.Marshal(errObj)
+			return state, fmt.Errorf("%s", string(j))
+		}
+	*/
 
-	json.Unmarshal(content, &state)
+	sf, err = statefile.Read(result.Body)
 
-	if state == nil {
-		return state, fmt.Errorf("Failed to find state")
+	if sf == nil {
+		return sf, fmt.Errorf("Failed to find state")
 	}
 
 	return
