@@ -302,7 +302,7 @@ app.controller("tbStateCtrl",
             $scope.setSelected = function(m, r) {
                 $scope.selectedmod = m;
                 $scope.selectedres = r;
-                var hash = m.path+'.'+r.name;
+                var hash = r.type+'.'+r.name;
                 $location.hash(hash);
             };
         });

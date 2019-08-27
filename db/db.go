@@ -1,7 +1,7 @@
 package db
 
 import (
-	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"strconv"
@@ -9,7 +9,8 @@ import (
 
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/camptocamp/terraboard/types"
-	"github.com/hashicorp/terraform/terraform"
+	"github.com/hashicorp/terraform/states"
+	"github.com/hashicorp/terraform/states/statefile"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/jinzhu/gorm"
@@ -42,38 +43,30 @@ func Init(host, user, dbname, password, logLevel string) *Database {
 	return &Database{db}
 }
 
-func (db *Database) stateS3toDB(state *terraform.State, path string, versionID string) (st types.State) {
+type attributeValues map[string]interface{}
+
+func (db *Database) stateS3toDB(sf *statefile.File, path string, versionID string) (st types.State) {
 	var version types.Version
 	db.First(&version, types.Version{VersionID: versionID})
 	st = types.State{
 		Path:      path,
 		Version:   version,
-		TFVersion: state.TFVersion,
-		Serial:    state.Serial,
+		TFVersion: sf.TerraformVersion.String(),
+		Serial:    int64(sf.Serial),
 	}
 
-	for _, m := range state.Modules {
+	for _, m := range sf.State.Modules {
 		mod := types.Module{
-			Path: strings.Join(m.Path, "/"),
+			Path: m.Addr.String(),
 		}
-		for n, r := range m.Resources {
+		for _, r := range m.Resources {
 			res := types.Resource{
-				Type: r.Type,
-				Name: n,
+				Type: r.Addr.Type,
+				Name: r.Addr.Name,
 			}
 
-			for k, v := range r.Primary.Attributes {
-				if !isASCII(v) {
-					log.WithFields(log.Fields{
-						"key":          k,
-						"value_base64": base64.StdEncoding.EncodeToString([]byte(v)),
-					}).Info("Attribute has non-ASCII value, skipping")
-					continue
-				}
-				res.Attributes = append(res.Attributes, types.Attribute{
-					Key:   k,
-					Value: v,
-				})
+			for _, i := range r.Instances {
+				res.Attributes = marshalAttributeValues(i.Current)
 			}
 
 			mod.Resources = append(mod.Resources, res)
@@ -81,6 +74,29 @@ func (db *Database) stateS3toDB(state *terraform.State, path string, versionID s
 		st.Modules = append(st.Modules, mod)
 	}
 	return
+}
+
+func marshalAttributeValues(src *states.ResourceInstanceObjectSrc) (attrs []types.Attribute) {
+	vals := make(attributeValues)
+	if src.AttrsFlat != nil {
+		for k, v := range src.AttrsFlat {
+			vals[k] = v
+		}
+	} else {
+		json.Unmarshal(src.AttrsJSON, &vals)
+	}
+	log.Println(vals)
+
+	for k, v := range vals {
+		vJSON, _ := json.Marshal(v)
+		attr := types.Attribute{
+			Key:   k,
+			Value: string(vJSON),
+		}
+		log.Println(attrs)
+		attrs = append(attrs, attr)
+	}
+	return attrs
 }
 
 func isASCII(s string) bool {
@@ -93,8 +109,8 @@ func isASCII(s string) bool {
 }
 
 // InsertState inserts a Terraform State in the Database
-func (db *Database) InsertState(path string, versionID string, state *terraform.State) error {
-	st := db.stateS3toDB(state, path, versionID)
+func (db *Database) InsertState(path string, versionID string, sf *statefile.File) error {
+	st := db.stateS3toDB(sf, path, versionID)
 	db.Create(&st)
 	return nil
 }
@@ -430,6 +446,7 @@ func (db *Database) ListAttributeKeys(resourceType string) (results []string, er
 	return
 }
 
+// Copied and adapted from github.com/hashicorp/terraform/command/jsonstate/state.go
 // DefaultVersion returns the detault VersionID for a given State path
 func (db *Database) DefaultVersion(path string) (version string, err error) {
 	sqlQuery := "SELECT versions.version_id FROM" +
