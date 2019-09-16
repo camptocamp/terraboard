@@ -28,12 +28,12 @@ var fileExtension string
 func Setup(c *config.Config) {
 	sess := session.Must(session.NewSession())
 	svc = s3.New(sess, &aws.Config{})
-	bucket = c.S3.Bucket
-	keyPrefix = c.S3.KeyPrefix
-	fileExtension = c.S3.FileExtension
+	bucket = c.AWS.S3.Bucket
+	keyPrefix = c.AWS.S3.KeyPrefix
+	fileExtension = c.AWS.S3.FileExtension
 
 	dynamoSvc = dynamodb.New(sess, &aws.Config{})
-	dynamoTable = c.S3.DynamoDBTable
+	dynamoTable = c.AWS.DynamoDBTable
 }
 
 // LockInfo stores information on a State Lock

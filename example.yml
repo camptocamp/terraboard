@@ -1,0 +1,24 @@
+port: 9090
+
+log:
+  level: info
+  format: plain
+
+database:
+  host: 127.0.0.1
+  port: 5432
+  user: terraboard
+  password: terraboard
+  name: terraboard
+  no-sync: true
+
+aws:
+  dynamodb-table: terraboard
+  s3:
+    bucket: terraboard
+    key-prefix:
+    file-extension: .tfstate
+
+web:
+  base-url: /terraboard/
+  logout-url: /test

@@ -129,6 +129,8 @@ func getVersion(w http.ResponseWriter, r *http.Request) {
 func main() {
 	c := config.LoadConfig(version)
 
+	util.UpdateBase(c.Web.BaseURL)
+
 	log.Infof("Terraboard v%s is starting...", version)
 
 	err := c.SetupLogging()

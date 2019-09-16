@@ -3,17 +3,14 @@ package util
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 )
 
 var baseURL string
 
-func init() {
-	baseURL = os.Getenv("BASE_URL")
-	if baseURL == "" {
-		baseURL = "/"
-	}
+// UpdateBase replaces baseURL with a new one
+func UpdateBase(new string) {
+	baseURL = new
 }
 
 // ReplaceBase replaces a pattern in a string, injecting baseURL into it
