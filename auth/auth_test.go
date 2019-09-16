@@ -11,7 +11,7 @@ func TestSetup_simple(t *testing.T) {
 	expected := "/log/me/out"
 
 	c := config.Config{}
-	c.Authentication.LogoutURL = expected
+	c.Web.LogoutURL = expected
 
 	Setup(&c)
 

@@ -18,7 +18,7 @@ type User struct {
 
 // Setup sets up authentication
 func Setup(c *config.Config) {
-	logoutURL = c.Authentication.LogoutURL
+	logoutURL = c.Web.LogoutURL
 }
 
 // UserInfo returns a User given a name and email
