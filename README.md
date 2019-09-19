@@ -78,6 +78,38 @@ requires:
   you need to make sure the provided AWS credentials have `dynamodb:Scan` access to that
   table.
 
+## Configuration
+
+Terraboard currently supports configuration in three different ways:
+
+1. Environment variables
+2. CLI parameters
+3. Configuration file (YAML). A configuration file example can be found in the root directory of this repository.
+
+The precedence of configurations is as described below.
+
+### Available parameters
+
+|CLI|ENV|YAML|Description|Default|
+|---|---|----|-----------|-------|
+|`-V | --version`| - | - | Prints version | - |
+|`-p | --port`|`PORT`|`web.port`|Port to listen on| 8080 |
+|`-c | --config-file`|`CONFIG_FILE`|-|Config File path| - |
+|`-l | --log-level` | `TERRABOARD_LOG_LEVEL` | `log.level` | Set log level (debug, info, warn, error, fatal, panic) | info |
+|`--log-format` | `TERRABOARD_LOG_FORMAT` | `log.format` | Set log format (plain, json) | plain |
+|`--db-host` | `DB_HOST` | `db.host` | Database host | db |
+|`--db-port` | `DB_PORT` | `db.port` | Database port | 5432 |
+|`--db-user` | `DB_USER` | `db.user` | Database user | gorm |
+|`--db-password` | `DB_PASSWORD` | `db.password` | Database password | - |
+|`--db-name` | `DB_NAME` | `db.name` | Database name | gorm |
+|`--no-sync` | - | `db.no-sync` | Do not sync database | false |
+|`--sync-interval` | - | `db.sync-interval` | DB sync interval (in minutes) | 1 |
+|`--dynamodb-table` | `AWS_DYNAMODB_TABLE` | `aws.dynamodb-table` | AWS DynamoDB table for locks | - |
+|`--s3-bucket` | `AWS_BUCKET` | `aws.bucket` | AWS S3 bucket | - |
+|`--key-prefix` | `AWS_KEY_PREFIX` | `aws.key-prefix` | AWS Key Prefix | - |
+|`--file-extension` | `AWS_FILE_EXTENSION` | `aws.file-extension` | File extension of state files | .tfstate |
+|`--base-url` | `TERRABOARD_BASE_URL` | `web.base-url` | Base URL | / |
+|`--logout-url` | `TERRABOARD_LOGOUT_URL` | `web.logout-url` | Logout URL | - |
 
 ## Use with Docker
 
@@ -110,6 +142,8 @@ docker run -p 8080:8080 \
 Then point your browser to http://localhost:8080.
 
 To use the included compose file, you will need to configure an [OAuth application](https://developer.github.com/apps/building-oauth-apps/).
+
+Configuration file can be provided to the container using a [volume](https://docs.docker.com/compose/compose-file/#volumes) or a [configuration](https://docs.docker.com/compose/compose-file/#configs).
 
 ## Use with Rancher
 

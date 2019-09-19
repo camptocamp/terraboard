@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/camptocamp/terraboard/config"
 	"github.com/camptocamp/terraboard/types"
 	"github.com/hashicorp/terraform/states"
 	"github.com/hashicorp/terraform/states/statefile"
@@ -26,9 +27,9 @@ type Database struct {
 var pageSize = 20
 
 // Init setups up the Database and a pointer to it
-func Init(host, port, user, dbname, password, logLevel string) *Database {
+func Init(config config.DBConfig, debug bool) *Database {
 	var err error
-	connString := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s", host, port, user, dbname, password)
+	connString := fmt.Sprintf("host=%s port=%d user=%s dbname=%s sslmode=disable password=%s", config.Host, config.Port, config.User, config.Name, config.Password)
 	db, err := gorm.Open("postgres", connString)
 	if err != nil {
 		log.Fatal(err)
@@ -37,7 +38,7 @@ func Init(host, port, user, dbname, password, logLevel string) *Database {
 	log.Infof("Automigrate")
 	db.AutoMigrate(&types.Version{}, &types.State{}, &types.Module{}, &types.Resource{}, &types.Attribute{})
 
-	if logLevel == "debug" {
+	if debug {
 		db.LogMode(true)
 	}
 	return &Database{db}

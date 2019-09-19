@@ -1,10 +1,46 @@
 package config
 
 import (
+	"testing"
+
 	log "github.com/sirupsen/logrus"
 )
 
-import "testing"
+func TestLoadConfigFromYaml(t *testing.T) {
+	compareConfig := Config{
+		Log: LogConfig{
+			Level:  "error",
+			Format: "json",
+		},
+		ConfigFilePath: "config_test.yml",
+		DB: DBConfig{
+			Host:     "postgres",
+			Port:     15432,
+			User:     "terraboard-user",
+			Password: "terraboard-pass",
+			Name:     "terraboard-db",
+			NoSync:   true,
+		},
+		AWS: AWSConfig{
+			DynamoDBTable: "terraboard-dynamodb",
+			S3: S3BucketConfig{
+				Bucket:        "terraboard-bucket",
+				KeyPrefix:     "test/",
+				FileExtension: ".tfstate",
+			},
+		},
+		Web: WebConfig{
+			Port:      39090,
+			BaseURL:   "/test/",
+			LogoutURL: "/test-logout",
+		},
+	}
+	c := Config{ConfigFilePath: "config_test.yml"}
+	c.LoadConfigFromYaml()
+	if c != compareConfig {
+		t.Fatalf("Expected: %v\nGot: %v", compareConfig, c)
+	}
+}
 
 func TestSetLogging_debug(t *testing.T) {
 	c := Config{}
