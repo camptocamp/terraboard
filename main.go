@@ -28,7 +28,7 @@ func idx(w http.ResponseWriter, r *http.Request) {
 		// TODO: Return error page
 	}
 	idxStr := string(idx)
-	idxStr = util.ReplaceBase(idxStr, "base href=\"/\"", "base href=\"%s\"")
+	idxStr = util.ReplaceBasePath(idxStr, "base href=\"/\"", "base href=\"%s\"")
 	io.WriteString(w, idxStr)
 }
 
@@ -129,7 +129,7 @@ func getVersion(w http.ResponseWriter, r *http.Request) {
 func main() {
 	c := config.LoadConfig(version)
 
-	util.UpdateBase(c.Web.BaseURL)
+	util.SetBasePath(c.Web.BaseURL)
 
 	log.Infof("Terraboard v%s is starting...", version)
 
@@ -157,28 +157,28 @@ func main() {
 	defer database.Close()
 
 	// Index is a wildcard for all paths
-	http.HandleFunc(util.AddBase(""), idx)
+	http.HandleFunc(util.GetFullPath(""), idx)
 
 	// Serve static files (CSS, JS, images) from dir
 	staticFs := http.FileServer(http.Dir("static"))
-	http.Handle(util.AddBase("static/"), http.StripPrefix(util.AddBase("static"), staticFs))
+	http.Handle(util.GetFullPath("static/"), http.StripPrefix(util.GetFullPath("static"), staticFs))
 
 	// Handle API points
-	http.HandleFunc(util.AddBase("api/version"), getVersion)
-	http.HandleFunc(util.AddBase("api/user"), api.GetUser)
-	http.HandleFunc(util.AddBase("api/states"), handleWithDB(api.ListStates, database))
-	http.HandleFunc(util.AddBase("api/states/stats"), handleWithDB(api.ListStateStats, database))
-	http.HandleFunc(util.AddBase("api/states/tfversion/count"), handleWithDB(api.ListTerraformVersionsWithCount, database))
-	http.HandleFunc(util.AddBase("api/state/"), handleWithDB(api.GetState, database))
-	http.HandleFunc(util.AddBase("api/state/activity/"), handleWithDB(api.GetStateActivity, database))
-	http.HandleFunc(util.AddBase("api/state/compare/"), handleWithDB(api.StateCompare, database))
-	http.HandleFunc(util.AddBase("api/locks"), api.GetLocks)
-	http.HandleFunc(util.AddBase("api/search/attribute"), handleWithDB(api.SearchAttribute, database))
-	http.HandleFunc(util.AddBase("api/resource/types"), handleWithDB(api.ListResourceTypes, database))
-	http.HandleFunc(util.AddBase("api/resource/types/count"), handleWithDB(api.ListResourceTypesWithCount, database))
-	http.HandleFunc(util.AddBase("api/resource/names"), handleWithDB(api.ListResourceNames, database))
-	http.HandleFunc(util.AddBase("api/attribute/keys"), handleWithDB(api.ListAttributeKeys, database))
-	http.HandleFunc(util.AddBase("api/tf_versions"), handleWithDB(api.ListTfVersions, database))
+	http.HandleFunc(util.GetFullPath("api/version"), getVersion)
+	http.HandleFunc(util.GetFullPath("api/user"), api.GetUser)
+	http.HandleFunc(util.GetFullPath("api/states"), handleWithDB(api.ListStates, database))
+	http.HandleFunc(util.GetFullPath("api/states/stats"), handleWithDB(api.ListStateStats, database))
+	http.HandleFunc(util.GetFullPath("api/states/tfversion/count"), handleWithDB(api.ListTerraformVersionsWithCount, database))
+	http.HandleFunc(util.GetFullPath("api/state/"), handleWithDB(api.GetState, database))
+	http.HandleFunc(util.GetFullPath("api/state/activity/"), handleWithDB(api.GetStateActivity, database))
+	http.HandleFunc(util.GetFullPath("api/state/compare/"), handleWithDB(api.StateCompare, database))
+	http.HandleFunc(util.GetFullPath("api/locks"), api.GetLocks)
+	http.HandleFunc(util.GetFullPath("api/search/attribute"), handleWithDB(api.SearchAttribute, database))
+	http.HandleFunc(util.GetFullPath("api/resource/types"), handleWithDB(api.ListResourceTypes, database))
+	http.HandleFunc(util.GetFullPath("api/resource/types/count"), handleWithDB(api.ListResourceTypesWithCount, database))
+	http.HandleFunc(util.GetFullPath("api/resource/names"), handleWithDB(api.ListResourceNames, database))
+	http.HandleFunc(util.GetFullPath("api/attribute/keys"), handleWithDB(api.ListAttributeKeys, database))
+	http.HandleFunc(util.GetFullPath("api/tf_versions"), handleWithDB(api.ListTfVersions, database))
 
 	// Start server
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", c.Port), nil))
