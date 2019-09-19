@@ -146,9 +146,9 @@ func main() {
 
 	// Set up the DB and start S3->DB sync
 	database := db.Init(
-		c.DB.Host, c.DB.User,
-		c.DB.Name, c.DB.Password,
-		c.Log.Level)
+		c.DB.Host, c.DB.Port,
+		c.DB.User, c.DB.Password,
+		c.DB.Name, c.Log.Level)
 	if c.DB.NoSync {
 		log.Infof("Not syncing database, as requested.")
 	} else {
