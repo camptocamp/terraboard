@@ -26,9 +26,9 @@ type Database struct {
 var pageSize = 20
 
 // Init setups up the Database and a pointer to it
-func Init(host, user, dbname, password, logLevel string) *Database {
+func Init(host, port, user, dbname, password, logLevel string) *Database {
 	var err error
-	connString := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", host, user, dbname, password)
+	connString := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s", host, port, user, dbname, password)
 	db, err := gorm.Open("postgres", connString)
 	if err != nil {
 		log.Fatal(err)

@@ -26,6 +26,7 @@ type Config struct {
 
 	DB struct {
 		Host     string `long:"db-host" env:"DB_HOST" yaml:"host" description:"Database host." default:"db"`
+		Port     string `long:"db-port" env:"DB_PORT" yaml:"port" description:"Database port." default:"5432"`
 		User     string `long:"db-user" env:"DB_USER" yaml:"user" description:"Database user." default:"gorm"`
 		Password string `long:"db-password" env:"DB_PASSWORD" yaml:"password" description:"Database password."`
 		Name     string `long:"db-name" env:"DB_NAME" yaml:"name" description:"Database name." default:"gorm"`
