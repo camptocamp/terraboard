@@ -54,7 +54,8 @@ func isKnownStateVersion(statesVersions map[string][]string, versionID, path str
 
 // Refresh the DB from S3
 // This should be the only direct bridge between S3 and the DB
-func refreshDB(d *db.Database) {
+func refreshDB(syncInterval uint16, d *db.Database) {
+	interval := time.Duration(syncInterval) * time.Minute
 	for {
 		log.Infof("Refreshing DB from S3")
 		states, err := s3.GetStates()
@@ -62,7 +63,7 @@ func refreshDB(d *db.Database) {
 			log.WithFields(log.Fields{
 				"error": err,
 			}).Error("Failed to retrieve states from S3. Retrying in 1 minute.")
-			time.Sleep(1 * time.Minute)
+			time.Sleep(interval)
 			continue
 		}
 
@@ -105,7 +106,8 @@ func refreshDB(d *db.Database) {
 			}
 		}
 
-		time.Sleep(1 * time.Minute)
+		log.Debugf("Waiting %d minutes until next DB sync", syncInterval)
+		time.Sleep(interval)
 	}
 }
 
@@ -145,14 +147,11 @@ func main() {
 	auth.Setup(c)
 
 	// Set up the DB and start S3->DB sync
-	database := db.Init(
-		c.DB.Host, c.DB.Port,
-		c.DB.User, c.DB.Password,
-		c.DB.Name, c.Log.Level)
+	database := db.Init(c.DB, c.Log.Level == "debug")
 	if c.DB.NoSync {
 		log.Infof("Not syncing database, as requested.")
 	} else {
-		go refreshDB(database)
+		go refreshDB(c.DB.SyncInterval, database)
 	}
 	defer database.Close()
 
@@ -181,5 +180,6 @@ func main() {
 	http.HandleFunc(util.GetFullPath("api/tf_versions"), handleWithDB(api.ListTfVersions, database))
 
 	// Start server
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", c.Port), nil))
+	log.Debugf("Listening on port %d\n", c.Web.Port)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", c.Web.Port), nil))
 }

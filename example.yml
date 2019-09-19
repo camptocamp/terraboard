@@ -1,5 +1,3 @@
-port: 9090
-
 log:
   level: info
   format: plain
@@ -10,7 +8,8 @@ database:
   user: terraboard
   password: terraboard
   name: terraboard
-  no-sync: true
+  no-sync: false
+  sync-interval: 5
 
 aws:
   dynamodb-table: terraboard
@@ -20,5 +19,6 @@ aws:
     file-extension: .tfstate
 
 web:
+  port: 9090
   base-url: /terraboard/
   logout-url: /test

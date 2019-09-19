@@ -1,0 +1,23 @@
+log:
+  level: error
+  format: json
+
+database:
+  host: postgres
+  port: 15432
+  user: terraboard-user
+  password: terraboard-pass
+  name: terraboard-db
+  no-sync: true
+
+aws:
+  dynamodb-table: terraboard-dynamodb
+  s3:
+    bucket: terraboard-bucket
+    key-prefix: test/
+    file-extension: .tfstate
+
+web:
+  port: 39090
+  base-url: /test/
+  logout-url: /test-logout
