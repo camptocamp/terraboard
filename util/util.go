@@ -6,24 +6,24 @@ import (
 	"strings"
 )
 
-var baseURL string
+var basePath string
 
-// UpdateBase replaces baseURL with a new one
-func UpdateBase(new string) {
-	baseURL = new
+// SetBasePath replaces basePath with a new one
+func SetBasePath(new string) {
+	basePath = new
 }
 
-// ReplaceBase replaces a pattern in a string, injecting baseURL into it
-func ReplaceBase(str, old, new string) string {
-	return strings.Replace(str, old, fmt.Sprintf(new, baseURL), 1)
+// ReplaceBasePath replaces a pattern in a string, injecting basePath into it
+func ReplaceBasePath(str, old, new string) string {
+	return strings.Replace(str, old, fmt.Sprintf(new, basePath), 1)
 }
 
-// AddBase preprends baseURL to a string
-func AddBase(path string) string {
-	return fmt.Sprintf("%s%s", baseURL, path)
+// GetFullPath preprends basePath to a string
+func GetFullPath(path string) string {
+	return fmt.Sprintf("%s%s", basePath, path)
 }
 
-// TrimBase removes baseURL from the beginning of a string
-func TrimBase(r *http.Request, prefix string) string {
-	return strings.TrimPrefix(r.URL.Path, AddBase(prefix))
+// TrimBasePath removes basePath from the beginning of a string
+func TrimBasePath(r *http.Request, prefix string) string {
+	return strings.TrimPrefix(r.URL.Path, GetFullPath(prefix))
 }

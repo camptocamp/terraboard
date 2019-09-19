@@ -75,7 +75,7 @@ func ListStateStats(w http.ResponseWriter, r *http.Request, d *db.Database) {
 // GetState provides information on a State
 func GetState(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	st := util.TrimBase(r, "api/state/")
+	st := util.TrimBasePath(r, "api/state/")
 	versionID := r.URL.Query().Get("versionid")
 	var err error
 	if versionID == "" {
@@ -98,7 +98,7 @@ func GetState(w http.ResponseWriter, r *http.Request, d *db.Database) {
 // GetStateActivity returns the activity (version history) of a State
 func GetStateActivity(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	st := util.TrimBase(r, "api/state/activity/")
+	st := util.TrimBasePath(r, "api/state/activity/")
 	activity := d.GetStateActivity(st)
 
 	jActivity, err := json.Marshal(activity)
@@ -112,7 +112,7 @@ func GetStateActivity(w http.ResponseWriter, r *http.Request, d *db.Database) {
 // StateCompare compares two versions ('from' and 'to') of a State
 func StateCompare(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	st := util.TrimBase(r, "api/state/compare/")
+	st := util.TrimBasePath(r, "api/state/compare/")
 	query := r.URL.Query()
 	fromVersion := query.Get("from")
 	toVersion := query.Get("to")
