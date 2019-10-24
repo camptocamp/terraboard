@@ -1,3 +1,17 @@
+## 0.15.0 (October 24, 2019)
+
+- Docker-compose:
+
+  * Remove deprecated links, use compose default network [GH #46]
+
+- Build:
+
+  * Build with Go 1.12
+  * Use go modules
+
+- Port for Terraform 0.12 [GH #62]
+
+
 ## 0.14.3 (December 7, 2017)
 
 - Server:
