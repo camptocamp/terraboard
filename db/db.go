@@ -447,8 +447,8 @@ func (db *Database) ListAttributeKeys(resourceType string) (results []string, er
 	return
 }
 
-// Copied and adapted from github.com/hashicorp/terraform/command/jsonstate/state.go
 // DefaultVersion returns the detault VersionID for a given State path
+// Copied and adapted from github.com/hashicorp/terraform/command/jsonstate/state.go
 func (db *Database) DefaultVersion(path string) (version string, err error) {
 	sqlQuery := "SELECT versions.version_id FROM" +
 		" (SELECT states.path, max(states.serial) as mx FROM states GROUP BY states.path) t" +
