@@ -10,7 +10,7 @@ terraboard: main.go $(DEPS)
 	strip $@
 
 lint:
-	@ go get -v github.com/golang/lint/golint
+	@ go get -v golang.org/x/lint/golint
 	@for file in $$(git ls-files '*.go' | grep -v '_workspace/'); do \
 		export output="$$(golint $${file} | grep -v 'type name will be used as docker.DockerInfo')"; \
 		[ -n "$${output}" ] && echo "$${output}" && export status=1; \
@@ -21,7 +21,7 @@ vet: main.go
 	go vet $<
 
 imports: main.go
-	goimports -d $<
+	go get golang.org/x/tools/cmd/goimports && goimports -d $<
 
 test: lint vet imports
 	GO111MODULE=on go test -v ./...

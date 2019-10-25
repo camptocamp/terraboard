@@ -18,6 +18,9 @@ require (
 	github.com/sirupsen/logrus v1.2.0
 	github.com/zclconf/go-cty v1.1.0 // indirect
 	golang.org/x/crypto v0.0.0-20190820162420-60c769a6c586 // indirect
+	golang.org/x/lint v0.0.0-20190930215403-16217165b5de // indirect
 	golang.org/x/net v0.0.0-20190813141303-74dc4d7220e7 // indirect
 	golang.org/x/sys v0.0.0-20190826190057-c7b8b68b1456 // indirect
+	golang.org/x/tools v0.0.0-20191025174333-e96d959c4788 // indirect
+	gopkg.in/yaml.v2 v2.2.2
 )
