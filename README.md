@@ -92,10 +92,10 @@ The precedence of configurations is as described below.
 
 |CLI|ENV|YAML|Description|Default|
 |---|---|----|-----------|-------|
-|`-V | --version`| - | - | Prints version | - |
-|`-p | --port`|`PORT`|`web.port`|Port to listen on| 8080 |
-|`-c | --config-file`|`CONFIG_FILE`|-|Config File path| - |
-|`-l | --log-level` | `TERRABOARD_LOG_LEVEL` | `log.level` | Set log level (debug, info, warn, error, fatal, panic) | info |
+|`-V` or `--version`| - | - | Prints version | - |
+|`-p` or `--port`|`PORT`|`web.port`|Port to listen on| 8080 |
+|`-c` or `--config-file`|`CONFIG_FILE`|-|Config File path| - |
+|`-l` or `--log-level` | `TERRABOARD_LOG_LEVEL` | `log.level` | Set log level (debug, info, warn, error, fatal, panic) | info |
 |`--log-format` | `TERRABOARD_LOG_FORMAT` | `log.format` | Set log format (plain, json) | plain |
 |`--db-host` | `DB_HOST` | `db.host` | Database host | db |
 |`--db-port` | `DB_PORT` | `db.port` | Database port | 5432 |
