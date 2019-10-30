@@ -1,3 +1,10 @@
+## 0.16.0 (October 30, 2019)
+
+- Server:
+
+  * Add config file support [GH #64]
+
+
 ## 0.15.0 (October 24, 2019)
 
 - Docker-compose:
