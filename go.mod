@@ -8,7 +8,7 @@ require (
 	github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 // indirect
 	github.com/go-sql-driver/mysql v1.4.1 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
-	github.com/hashicorp/terraform v0.12.7
+	github.com/hashicorp/terraform v0.12.18
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/jinzhu/gorm v0.0.0-20190102133208-9f1a7f535111
 	github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a // indirect
