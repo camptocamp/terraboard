@@ -12,7 +12,7 @@ import (
 	"github.com/camptocamp/terraboard/auth"
 	"github.com/camptocamp/terraboard/config"
 	"github.com/camptocamp/terraboard/db"
-	"github.com/camptocamp/terraboard/s3"
+	"github.com/camptocamp/terraboard/state"
 	"github.com/camptocamp/terraboard/util"
 	log "github.com/sirupsen/logrus"
 )
@@ -58,7 +58,7 @@ func refreshDB(syncInterval uint16, d *db.Database) {
 	interval := time.Duration(syncInterval) * time.Minute
 	for {
 		log.Infof("Refreshing DB from S3")
-		states, err := s3.GetStates()
+		states, err := state.GetStates()
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err,
@@ -69,7 +69,7 @@ func refreshDB(syncInterval uint16, d *db.Database) {
 
 		statesVersions := d.ListStatesVersions()
 		for _, st := range states {
-			versions, _ := s3.GetVersions(st)
+			versions, _ := state.GetVersions(st)
 			for _, v := range versions {
 				if _, ok := statesVersions[*v.VersionId]; ok {
 					log.WithFields(log.Fields{
@@ -86,7 +86,7 @@ func refreshDB(syncInterval uint16, d *db.Database) {
 					}).Debug("State is already in the database, skipping")
 					continue
 				}
-				state, err := s3.GetState(st, *v.VersionId)
+				state, err := state.GetState(st, *v.VersionId)
 				if err != nil {
 					log.WithFields(log.Fields{
 						"path":       st,
@@ -141,7 +141,7 @@ func main() {
 	}
 
 	// Set up S3
-	s3.Setup(c)
+	state.Setup(c)
 
 	// Set up auth
 	auth.Setup(c)
