@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/camptocamp/terraboard/config"
 	"github.com/camptocamp/terraboard/types"
+	"github.com/camptocamp/terraboard/state"
 	"github.com/hashicorp/terraform/states"
 	"github.com/hashicorp/terraform/states/statefile"
 	log "github.com/sirupsen/logrus"
@@ -117,11 +117,11 @@ func (db *Database) InsertState(path string, versionID string, sf *statefile.Fil
 }
 
 // InsertVersion inserts an AWS S3 Version in the Database
-func (db *Database) InsertVersion(version *s3.ObjectVersion) error {
+func (db *Database) InsertVersion(version *state.Version) error {
 	var v types.Version
 	db.FirstOrCreate(&v, types.Version{
-		VersionID:    *version.VersionId,
-		LastModified: *version.LastModified,
+		VersionID:    version.ID,
+		LastModified: version.LastModified,
 	})
 	return nil
 }

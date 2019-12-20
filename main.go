@@ -71,35 +71,35 @@ func refreshDB(syncInterval uint16, d *db.Database) {
 		for _, st := range states {
 			versions, _ := state.GetVersions(st)
 			for _, v := range versions {
-				if _, ok := statesVersions[*v.VersionId]; ok {
+				if _, ok := statesVersions[v.ID]; ok {
 					log.WithFields(log.Fields{
-						"version_id": *v.VersionId,
+						"version_id": v.ID,
 					}).Debug("Version is already in the database, skipping")
 				} else {
-					d.InsertVersion(v)
+					d.InsertVersion(&v)
 				}
 
-				if isKnownStateVersion(statesVersions, *v.VersionId, st) {
+				if isKnownStateVersion(statesVersions, v.ID, st) {
 					log.WithFields(log.Fields{
 						"path":       st,
-						"version_id": *v.VersionId,
+						"version_id": v.ID,
 					}).Debug("State is already in the database, skipping")
 					continue
 				}
-				state, err := state.GetState(st, *v.VersionId)
+				state, err := state.GetState(st, v.ID)
 				if err != nil {
 					log.WithFields(log.Fields{
 						"path":       st,
-						"version_id": *v.VersionId,
+						"version_id": v.ID,
 						"error":      err,
 					}).Error("Failed to fetch state from S3")
 					continue
 				}
-				d.InsertState(st, *v.VersionId, state)
+				d.InsertState(st, v.ID, state)
 				if err != nil {
 					log.WithFields(log.Fields{
 						"path":       st,
-						"version_id": *v.VersionId,
+						"version_id": v.ID,
 						"error":      err,
 					}).Error("Failed to insert state in the database")
 				}
@@ -140,8 +140,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Set up S3
-	state.Setup(c)
+	// Set up the state provider
+	state.Configure(c)
 
 	// Set up auth
 	auth.Setup(c)
