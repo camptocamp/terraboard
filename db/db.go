@@ -86,7 +86,7 @@ func marshalAttributeValues(src *states.ResourceInstanceObjectSrc) (attrs []type
 	} else {
 		json.Unmarshal(src.AttrsJSON, &vals)
 	}
-	log.Println(vals)
+	log.Debug(vals)
 
 	for k, v := range vals {
 		vJSON, _ := json.Marshal(v)
@@ -94,7 +94,7 @@ func marshalAttributeValues(src *states.ResourceInstanceObjectSrc) (attrs []type
 			Key:   k,
 			Value: string(vJSON),
 		}
-		log.Println(attrs)
+		log.Debug(attrs)
 		attrs = append(attrs, attr)
 	}
 	return attrs
