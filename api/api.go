@@ -9,7 +9,7 @@ import (
 	"github.com/camptocamp/terraboard/auth"
 	"github.com/camptocamp/terraboard/compare"
 	"github.com/camptocamp/terraboard/db"
-	"github.com/camptocamp/terraboard/s3"
+	"github.com/camptocamp/terraboard/state"
 	"github.com/camptocamp/terraboard/util"
 )
 
@@ -136,7 +136,7 @@ func StateCompare(w http.ResponseWriter, r *http.Request, d *db.Database) {
 // GetLocks returns information on locked States
 func GetLocks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	locks, err := s3.GetLocks()
+	locks, err := state.GetLocks()
 	if err != nil {
 		JSONError(w, "Failed to get locks", err)
 		return
