@@ -41,6 +41,11 @@ type AWSConfig struct {
 	S3            S3BucketConfig `group:"S3 Options" yaml:"s3"`
 }
 
+// TFEConfig stores the Terraform Enterprise configuration
+type TFEConfig struct {
+	Token string         `long:"tfe-token" env:"TFE_TOKEN" yaml:"tfe-token" description:"Terraform Enterprise Token for state access"`
+}
+
 // WebConfig stores the UI interface parameters
 type WebConfig struct {
 	Port      uint16 `short:"p" long:"port" env:"TERRABOARD_PORT" yaml:"port" description:"Port to listen on." default:"8080"`
@@ -59,6 +64,8 @@ type Config struct {
 	DB DBConfig `group:"Database Options" yaml:"database"`
 
 	AWS AWSConfig `group:"AWS Options" yaml:"aws"`
+
+	TFE TFEConfig `group:"Terraform Enterprise Options" yaml:"tfe"`
 
 	Web WebConfig `group:"Web" yaml:"web"`
 }
