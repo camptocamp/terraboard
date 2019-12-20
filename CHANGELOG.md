@@ -1,3 +1,9 @@
+## Unreleased
+
+- Server:
+
+  * Bumped go to 1.13
+
 ## 0.16.0 (October 30, 2019)
 
 - Server:
