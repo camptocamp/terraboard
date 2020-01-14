@@ -43,7 +43,9 @@ type AWSConfig struct {
 
 // TFEConfig stores the Terraform Enterprise configuration
 type TFEConfig struct {
-	Token string         `long:"tfe-token" env:"TFE_TOKEN" yaml:"tfe-token" description:"Terraform Enterprise Token for state access"`
+	Address      string `long:"tfe-address" env:"TFE_ADDRESS" yaml:"tfe-address" description:"Terraform Enterprise address for states access"`
+	Token        string `long:"tfe-token" env:"TFE_TOKEN" yaml:"tfe-token" description:"Terraform Enterprise Token for states access"`
+	Organization string `long:"tfe-organization" env:"TFE_ORGANIZATION" yaml:"tfe-organization" description:"Terraform Enterprise organization for states access"`
 }
 
 // WebConfig stores the UI interface parameters

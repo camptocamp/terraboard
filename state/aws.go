@@ -18,25 +18,25 @@ import (
 
 // AWS is a state provider type, leveraging S3 and DynamoDB
 type AWS struct {
-	svc *s3.S3
-	dynamoSvc *dynamodb.DynamoDB
-	bucket string
-	dynamoTable string
-	keyPrefix string
+	svc           *s3.S3
+	dynamoSvc     *dynamodb.DynamoDB
+	bucket        string
+	dynamoTable   string
+	keyPrefix     string
 	fileExtension string
 }
 
 // NewAWS creates an AWS object
 func NewAWS(c *config.Config) AWS {
 	sess := session.Must(session.NewSession())
-	
+
 	return AWS{
-		svc: s3.New(sess, &aws_sdk.Config{}),
-		bucket: c.AWS.S3.Bucket,
-		keyPrefix: c.AWS.S3.KeyPrefix,
+		svc:           s3.New(sess, &aws_sdk.Config{}),
+		bucket:        c.AWS.S3.Bucket,
+		keyPrefix:     c.AWS.S3.KeyPrefix,
 		fileExtension: c.AWS.S3.FileExtension,
-		dynamoSvc: dynamodb.New(sess, &aws_sdk.Config{}),
-		dynamoTable: c.AWS.DynamoDBTable,
+		dynamoSvc:     dynamodb.New(sess, &aws_sdk.Config{}),
+		dynamoTable:   c.AWS.DynamoDBTable,
 	}
 }
 
@@ -146,7 +146,7 @@ func (a *AWS) GetVersions(state string) (versions []Version, err error) {
 
 	for _, v := range result.Versions {
 		versions = append(versions, Version{
-			ID: *v.VersionId,
+			ID:           *v.VersionId,
 			LastModified: *v.LastModified,
 		})
 	}
