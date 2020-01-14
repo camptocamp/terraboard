@@ -134,9 +134,9 @@ func StateCompare(w http.ResponseWriter, r *http.Request, d *db.Database) {
 }
 
 // GetLocks returns information on locked States
-func GetLocks(w http.ResponseWriter, r *http.Request) {
+func GetLocks(w http.ResponseWriter, r *http.Request, sp state.Provider) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	locks, err := state.GetLocks()
+	locks, err := sp.GetLocks()
 	if err != nil {
 		JSONError(w, "Failed to get locks", err)
 		return

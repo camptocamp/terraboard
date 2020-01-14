@@ -41,6 +41,12 @@ func handleWithDB(apiF func(w http.ResponseWriter, r *http.Request, d *db.Databa
 	})
 }
 
+func handleWithStateProvider(apiF func(w http.ResponseWriter, r *http.Request, sp state.Provider), sp state.Provider) func(http.ResponseWriter, *http.Request) {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		apiF(w, r, sp)
+	})
+}
+
 func isKnownStateVersion(statesVersions map[string][]string, versionID, path string) bool {
 	if v, ok := statesVersions[versionID]; ok {
 		for _, s := range v {
@@ -52,24 +58,24 @@ func isKnownStateVersion(statesVersions map[string][]string, versionID, path str
 	return false
 }
 
-// Refresh the DB from S3
-// This should be the only direct bridge between S3 and the DB
-func refreshDB(syncInterval uint16, d *db.Database) {
+// Refresh the DB
+// This should be the only direct bridge between the state provider and the DB
+func refreshDB(syncInterval uint16, d *db.Database, sp state.Provider) {
 	interval := time.Duration(syncInterval) * time.Minute
 	for {
-		log.Infof("Refreshing DB from S3")
-		states, err := state.GetStates()
+		log.Infof("Refreshing DB")
+		states, err := sp.GetStates()
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err,
-			}).Error("Failed to retrieve states from S3. Retrying in 1 minute.")
+			}).Error("Failed to retrieve states. Retrying in 1 minute.")
 			time.Sleep(interval)
 			continue
 		}
 
 		statesVersions := d.ListStatesVersions()
 		for _, st := range states {
-			versions, _ := state.GetVersions(st)
+			versions, _ := sp.GetVersions(st)
 			for _, v := range versions {
 				if _, ok := statesVersions[v.ID]; ok {
 					log.WithFields(log.Fields{
@@ -86,7 +92,7 @@ func refreshDB(syncInterval uint16, d *db.Database) {
 					}).Debug("State is already in the database, skipping")
 					continue
 				}
-				state, err := state.GetState(st, v.ID)
+				state, err := sp.GetState(st, v.ID)
 				if err != nil {
 					log.WithFields(log.Fields{
 						"path":       st,
@@ -141,7 +147,10 @@ func main() {
 	}
 
 	// Set up the state provider
-	state.Configure(c)
+	sp, err := state.Configure(c)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// Set up auth
 	auth.Setup(c)
@@ -151,7 +160,7 @@ func main() {
 	if c.DB.NoSync {
 		log.Infof("Not syncing database, as requested.")
 	} else {
-		go refreshDB(c.DB.SyncInterval, database)
+		go refreshDB(c.DB.SyncInterval, database, sp)
 	}
 	defer database.Close()
 
@@ -171,7 +180,7 @@ func main() {
 	http.HandleFunc(util.GetFullPath("api/state/"), handleWithDB(api.GetState, database))
 	http.HandleFunc(util.GetFullPath("api/state/activity/"), handleWithDB(api.GetStateActivity, database))
 	http.HandleFunc(util.GetFullPath("api/state/compare/"), handleWithDB(api.StateCompare, database))
-	http.HandleFunc(util.GetFullPath("api/locks"), api.GetLocks)
+	http.HandleFunc(util.GetFullPath("api/locks"), handleWithStateProvider(api.GetLocks, sp))
 	http.HandleFunc(util.GetFullPath("api/search/attribute"), handleWithDB(api.SearchAttribute, database))
 	http.HandleFunc(util.GetFullPath("api/resource/types"), handleWithDB(api.ListResourceTypes, database))
 	http.HandleFunc(util.GetFullPath("api/resource/types/count"), handleWithDB(api.ListResourceTypesWithCount, database))

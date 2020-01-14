@@ -5,6 +5,7 @@ go 1.13
 require (
 	github.com/aws/aws-sdk-go v1.26.6
 	github.com/denisenkom/go-mssqldb v0.0.0-20190820223206-44cdfe8d8ba9 // indirect
+	github.com/hashicorp/go-tfe v0.3.27
 	github.com/hashicorp/hcl/v2 v2.2.0 // indirect
 	github.com/hashicorp/hil v0.0.0-20190212132231-97b3a9cdfa93 // indirect
 	github.com/hashicorp/terraform v0.12.18
