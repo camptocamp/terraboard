@@ -23,6 +23,6 @@ require (
 	golang.org/x/lint v0.0.0-20191125180803-fdd1cda4f05f // indirect
 	golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553 // indirect
 	golang.org/x/sys v0.0.0-20191220142924-d4481acd189f // indirect
-	golang.org/x/tools v0.0.0-20191219230827-5e752206af05 // indirect
+	golang.org/x/tools v0.0.0-20200119215504-eb0d8dd85bcc // indirect
 	gopkg.in/yaml.v2 v2.2.7
 )
