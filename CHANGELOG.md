@@ -1,8 +1,15 @@
-## Unreleased
+## 0.17.0 (January 20, 2020)
+
+- General:
+
+  * New logo [GH #69]
+  * Bump Terraform libs [GH #65]
 
 - Server:
 
-  * Bumped go to 1.13
+  * Bump go to 1.13 [GH #66]
+  * Support for Terraform Enterprise as state provider [GH #67]
+  * Reduce noise in logs when parsing statefiles [GH #68]
 
 ## 0.16.0 (October 30, 2019)
 
