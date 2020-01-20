@@ -10,9 +10,9 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="76.879066mm"
-   height="30.016651mm"
-   viewBox="0 0 76.879066 30.016652"
+   width="144.48363mm"
+   height="56.412163mm"
+   viewBox="0 0 144.48363 56.412164"
    version="1.1"
    id="svg8"
    inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
@@ -256,14 +256,14 @@
      inkscape:pageshadow="2"
      inkscape:zoom="1.2249853"
      inkscape:cx="381.9577"
-     inkscape:cy="60.39256"
+     inkscape:cy="60.392543"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1920"
-     inkscape:window-height="1043"
-     inkscape:window-x="3840"
-     inkscape:window-y="0"
+     inkscape:window-height="1016"
+     inkscape:window-x="1920"
+     inkscape:window-y="27"
      inkscape:window-maximized="1"
      fit-margin-top="0"
      fit-margin-left="0"
@@ -286,7 +286,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-112.79606,-169.3091)">
+     transform="translate(-112.79606,-142.91359)">
     <g
        id="g2162"
        transform="translate(-520.96542,-37.150104)">
@@ -3059,7 +3059,7 @@
     </g>
     <g
        id="g1461"
-       transform="matrix(0.30430814,0,0,0.30430814,78.4713,138.6693)">
+       transform="matrix(0.57190524,0,0,0.57190524,48.287402,85.330309)">
       <g
          transform="translate(23.68511)"
          id="g2408">
