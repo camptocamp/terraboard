@@ -24,7 +24,7 @@ type DBConfig struct {
 	User         string `long:"db-user" env:"DB_USER" yaml:"user" description:"Database user." default:"gorm"`
 	Password     string `long:"db-password" env:"DB_PASSWORD" yaml:"password" description:"Database password."`
 	Name         string `long:"db-name" env:"DB_NAME" yaml:"name" description:"Database name." default:"gorm"`
-	SSLMode      string `long:"db-sslmode" yaml:"sslmode" description:"Database SSL mode." default:"disable"`
+	SSLMode      string `long:"db-sslmode" env:"DB_SSLMODE" yaml:"sslmode" description:"Database SSL mode." default:"disable"`
 	NoSync       bool   `long:"no-sync" yaml:"no-sync" description:"Do not sync database."`
 	SyncInterval uint16 `long:"sync-interval" yaml:"sync-interval" description:"DB sync interval (in minutes)" default:"1"`
 }
