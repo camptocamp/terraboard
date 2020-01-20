@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/camptocamp/terraboard/config"
-	"github.com/camptocamp/terraboard/types"
 	"github.com/camptocamp/terraboard/state"
+	"github.com/camptocamp/terraboard/types"
 	"github.com/hashicorp/terraform/states"
 	"github.com/hashicorp/terraform/states/statefile"
 	log "github.com/sirupsen/logrus"
@@ -29,7 +29,7 @@ var pageSize = 20
 // Init setups up the Database and a pointer to it
 func Init(config config.DBConfig, debug bool) *Database {
 	var err error
-	connString := fmt.Sprintf("host=%s port=%d user=%s dbname=%s sslmode=disable password=%s", config.Host, config.Port, config.User, config.Name, config.Password)
+	connString := fmt.Sprintf("host=%s port=%d user=%s dbname=%s sslmode=%s password=%s", config.Host, config.Port, config.User, config.Name, config.SSLMode, config.Password)
 	db, err := gorm.Open("postgres", connString)
 	if err != nil {
 		log.Fatal(err)
