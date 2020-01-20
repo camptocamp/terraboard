@@ -1,354 +1,218 @@
-## 0.17.0 (January 20, 2020)
+# Changelog
 
-- General:
+## [0.17.0](https://github.com/camptocamp/terraboard/tree/0.17.0) (2020-01-20)
 
-  * New logo [GH #69]
-  * Bump Terraform libs [GH #65]
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.16.0...0.17.0)
 
-- Server:
+**Merged pull requests:**
 
-  * Bump go to 1.13 [GH #66]
-  * Support for Terraform Enterprise as state provider [GH #67]
-  * Reduce noise in logs when parsing statefiles [GH #68]
+- New flat logo [\#69](https://github.com/camptocamp/terraboard/pull/69) ([raphink](https://github.com/raphink))
+- Reduce the noise in the logs when parsing statefiles [\#68](https://github.com/camptocamp/terraboard/pull/68) ([mvisonneau](https://github.com/mvisonneau))
+- Implemented support for Terraform Enterprise as state provider [\#67](https://github.com/camptocamp/terraboard/pull/67) ([mvisonneau](https://github.com/mvisonneau))
+- Bumped go version to 1.13 [\#66](https://github.com/camptocamp/terraboard/pull/66) ([mvisonneau](https://github.com/mvisonneau))
+- Add support for newer terraform versions [\#65](https://github.com/camptocamp/terraboard/pull/65) ([slitsevych](https://github.com/slitsevych))
 
-## 0.16.0 (October 30, 2019)
+## [0.16.0](https://github.com/camptocamp/terraboard/tree/0.16.0) (2019-10-30)
 
-- Server:
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.15.0...0.16.0)
 
-  * Add config file support [GH #64]
+**Closed issues:**
 
+- Compatibility Issue with Terraform v0.12.0  [\#59](https://github.com/camptocamp/terraboard/issues/59)
 
-## 0.15.0 (October 24, 2019)
+**Merged pull requests:**
 
-- Docker-compose:
+- Config file support [\#64](https://github.com/camptocamp/terraboard/pull/64) ([AndresCidoncha](https://github.com/AndresCidoncha))
 
-  * Remove deprecated links, use compose default network [GH #46]
+## [0.15.0](https://github.com/camptocamp/terraboard/tree/0.15.0) (2019-10-24)
 
-- Build:
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.14.3...0.15.0)
 
-  * Build with Go 1.12
-  * Use go modules
+**Closed issues:**
 
-- Port for Terraform 0.12 [GH #62]
+- simple install issues [\#63](https://github.com/camptocamp/terraboard/issues/63)
+- Terraboard unable to DNS look up DB on ECS [\#61](https://github.com/camptocamp/terraboard/issues/61)
+- Don't know how to install & run [\#44](https://github.com/camptocamp/terraboard/issues/44)
+- base [\#43](https://github.com/camptocamp/terraboard/issues/43)
 
+**Merged pull requests:**
 
-## 0.14.3 (December 7, 2017)
+- Support Terraform 0.12 [\#62](https://github.com/camptocamp/terraboard/pull/62) ([raphink](https://github.com/raphink))
+- Correct Travis fail [\#55](https://github.com/camptocamp/terraboard/pull/55) ([gliptak](https://github.com/gliptak))
+- Correct Travis fail [\#54](https://github.com/camptocamp/terraboard/pull/54) ([gliptak](https://github.com/gliptak))
+- Switch submodule hugo-elate-theme to https [\#53](https://github.com/camptocamp/terraboard/pull/53) ([gliptak](https://github.com/gliptak))
+- Bring Go to 1.11 [\#52](https://github.com/camptocamp/terraboard/pull/52) ([gliptak](https://github.com/gliptak))
+- Remove deprecated links, use compose default network [\#46](https://github.com/camptocamp/terraboard/pull/46) ([kwerey](https://github.com/kwerey))
 
-- Server:
+## [0.14.3](https://github.com/camptocamp/terraboard/tree/0.14.3) (2017-12-07)
 
-  * Fix json field for value [GH #41]
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.14.2...0.14.3)
 
+**Merged pull requests:**
 
-## 0.14.2 (November 30, 2017)
+- Fix json field for value [\#41](https://github.com/camptocamp/terraboard/pull/41) ([raphink](https://github.com/raphink))
 
-- Server:
+## [0.14.2](https://github.com/camptocamp/terraboard/tree/0.14.2) (2017-11-30)
 
-  * Detect if state is nil [GH #40]
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.14.1...0.14.2)
 
+**Merged pull requests:**
 
-## 0.14.1 (November 29, 2017)
+- Detect if state is nil [\#40](https://github.com/camptocamp/terraboard/pull/40) ([raphink](https://github.com/raphink))
 
-- Server:
+## [0.14.1](https://github.com/camptocamp/terraboard/tree/0.14.1) (2017-11-29)
 
-  * Remove index for attribute value, fix GH #37 [GH #39]
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.14.0...0.14.1)
 
+**Closed issues:**
 
-## 0.14.0 (November 25, 2017)
+- Index creation issue on blocking parsing of some statefiles [\#37](https://github.com/camptocamp/terraboard/issues/37)
 
-- Server:
+**Merged pull requests:**
 
-  * Report errors fetching state from S3 [GH #34]
-  * Fix Sirupsen into sirupsen to build on newer go
-  * Add option to change state file extension [GH #38]
+- Remove index for attribute value [\#39](https://github.com/camptocamp/terraboard/pull/39) ([raphink](https://github.com/raphink))
 
-- Documentation
+## [0.14.0](https://github.com/camptocamp/terraboard/tree/0.14.0) (2017-11-25)
 
-  * Add Rancher catalog to README
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.13.0...0.14.0)
 
-- Build:
+**Merged pull requests:**
 
-  * Vendor dependencies
-  * Use dep and make in Dockerfile [GH #35]
-  * Use dep in .travis.yml [GH #35]
-  * Do not use --dirty in Makefile [GH #35]
-  * Build with go 1.9 [GH #35]
+- Add option to change state file extension [\#38](https://github.com/camptocamp/terraboard/pull/38) ([gordonbondon](https://github.com/gordonbondon))
+- Build improvements [\#35](https://github.com/camptocamp/terraboard/pull/35) ([raphink](https://github.com/raphink))
+- Report errors fetching state from S3 [\#34](https://github.com/camptocamp/terraboard/pull/34) ([ant1441](https://github.com/ant1441))
 
+## [0.13.0](https://github.com/camptocamp/terraboard/tree/0.13.0) (2017-08-16)
 
-## 0.13.0 (August 16, 2017)
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.12.0...0.13.0)
 
-FEATURES:
+**Implemented enhancements:**
 
-- General:
+- Authentication info [\#29](https://github.com/camptocamp/terraboard/pull/29) ([raphink](https://github.com/raphink))
+- S3 key prefix [\#25](https://github.com/camptocamp/terraboard/pull/25) ([leonidcliqz](https://github.com/leonidcliqz))
 
-  * Integrate in Travis CI and Coveralls
-  * Use go get ./... in Dockerfile
+**Merged pull requests:**
 
-- Server:
+- Add a resource filter to the state view [\#31](https://github.com/camptocamp/terraboard/pull/31) ([raphink](https://github.com/raphink))
+- Test compare 100% coverage [\#30](https://github.com/camptocamp/terraboard/pull/30) ([cryptobioz](https://github.com/cryptobioz))
+- Lint code \[WIP\] [\#28](https://github.com/camptocamp/terraboard/pull/28) ([raphink](https://github.com/raphink))
+- Add Makefile and use it in .travis.yml [\#27](https://github.com/camptocamp/terraboard/pull/27) ([raphink](https://github.com/raphink))
+- Add tests for utils and compare [\#26](https://github.com/camptocamp/terraboard/pull/26) ([cryptobioz](https://github.com/cryptobioz))
 
-  * Add S3 key prefix [GH #25]
-  * Add tests [GH #26], [GH #30]
-  * Lint code [GH #28]
-  * Add api/user API point [GH #29]
+## [0.12.0](https://github.com/camptocamp/terraboard/tree/0.12.0) (2017-08-03)
 
-- UI:
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.11.0...0.12.0)
 
-  * Add a logo
-  * Overview: Use pointer cursor on sparklines
-  * State view: make whole module title clickable
-  * State view: add a resource filter
-  * State view: simplify/fix module/resource selection code
-  * Search view: Use pre white-space style for attributes
-  * Navbar: add user authentication info and log out link [GH #29]
+**Implemented enhancements:**
 
+- Use location in search [\#7](https://github.com/camptocamp/terraboard/issues/7)
+- Add a compare view [\#6](https://github.com/camptocamp/terraboard/issues/6)
 
-## 0.12.0 (August 3, 2017)
+**Merged pull requests:**
 
-FEATURES:
+- Merge compare view into state view [\#24](https://github.com/camptocamp/terraboard/pull/24) ([raphink](https://github.com/raphink))
+- Add a compare API and view [\#21](https://github.com/camptocamp/terraboard/pull/21) ([raphink](https://github.com/raphink))
+- Add compare API point [\#20](https://github.com/camptocamp/terraboard/pull/20) ([raphink](https://github.com/raphink))
+- Improve logging [\#19](https://github.com/camptocamp/terraboard/pull/19) ([raphink](https://github.com/raphink))
+- Fix bugs in state view [\#18](https://github.com/camptocamp/terraboard/pull/18) ([raphink](https://github.com/raphink))
+- Do not import non-ASCII data [\#17](https://github.com/camptocamp/terraboard/pull/17) ([raphink](https://github.com/raphink))
+- Improve search engine [\#16](https://github.com/camptocamp/terraboard/pull/16) ([cryptobioz](https://github.com/cryptobioz))
 
-- Server:
+## [0.11.0](https://github.com/camptocamp/terraboard/tree/0.11.0) (2017-08-01)
 
-  * Check versions and path existence in memory to limit DB queries
-  * Add log-level and log-format options
-  * Log with fields [GH #19]
-  * Add a compare API point [GH #20]
-  * Split types into a types package
-  * Add tf_versions API point
-  * Add version API point
-  * Sanitize raw SQL queries
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.10.1...0.11.0)
 
-- UI:
+**Implemented enhancements:**
 
-  * Remove sb-admin theme
-  * Make charts in overview clickable, linking to search view
-  * Fix display bugs in state view [GH #18]
-  * Select first resource of first module on state view load
-  * Add a compare function to state view [GH #21]
-  * Use $routeParams instead of parsing $location.url()
-  * Make state view work without reloading the page
-  * Order resource attributes in state view
-  * Display long resource attributes and titles with ellipsis
-  * Support permalinks and fix form in search view [GH #16]
-  * Add tf_version filtering to search view
-  * Allow to clear filters in search view
-  * Remove unused sorting in tables
+- Make sparklines clickable [\#9](https://github.com/camptocamp/terraboard/issues/9)
+- Get lock status [\#3](https://github.com/camptocamp/terraboard/issues/3)
 
-FIXES:
+**Merged pull requests:**
 
-- Server:
+- Make sparklines clickable [\#15](https://github.com/camptocamp/terraboard/pull/15) ([raphink](https://github.com/raphink))
+- Sort versions using an array of objects [\#14](https://github.com/camptocamp/terraboard/pull/14) ([raphink](https://github.com/raphink))
+- Fix lock chart async [\#13](https://github.com/camptocamp/terraboard/pull/13) ([cryptobioz](https://github.com/cryptobioz))
+- Add charts [\#12](https://github.com/camptocamp/terraboard/pull/12) ([cryptobioz](https://github.com/cryptobioz))
+- Add lock info [\#11](https://github.com/camptocamp/terraboard/pull/11) ([raphink](https://github.com/raphink))
+- state: get version list from api/state/activity [\#10](https://github.com/camptocamp/terraboard/pull/10) ([raphink](https://github.com/raphink))
+- Add sparklines to overview [\#5](https://github.com/camptocamp/terraboard/pull/5) ([raphink](https://github.com/raphink))
 
-  * Do not import non-ASCII attribute values [GH #17]
-  * Remove --no-sync from docker-compose.yml
+## [0.10.1](https://github.com/camptocamp/terraboard/tree/0.10.1) (2017-07-27)
 
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.10.0...0.10.1)
 
-## 0.11.0 (August 1, 2017)
+## [0.10.0](https://github.com/camptocamp/terraboard/tree/0.10.0) (2017-07-27)
 
-FEATURES:
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.9.0...0.10.0)
 
-- Server:
+**Fixed bugs:**
 
-  * Optimize various database queries
-  * Add state activity to API
-  * Add --no-sync flag to disable S3 syncing
-  * Get version list from activity API point [GH #10]
-  * Retire legacy history API point
-  * Add locks API point [GH #11]
-  * Add tfversion and types counts to API
+- Can't get terraboard running locally \(without docker\) [\#1](https://github.com/camptocamp/terraboard/issues/1)
 
-- UI:
+## [0.9.0](https://github.com/camptocamp/terraboard/tree/0.9.0) (2017-07-26)
 
-  * Use a non-fluid container and fix the margins
-  * Move index.html to static/ directory
-  * List each path only once in overview, with most recent version
-  * Add state activity to overview [GH #5]
-  * Sort state files in navbar select
-  * Add lock information to overview and state view [GH #11]
-  * Add charts to overview [GH #12]
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.8.0...0.9.0)
 
+**Merged pull requests:**
 
-## 0.10.1 (July 27, 2017)
+- Port to PostgreSQL [\#2](https://github.com/camptocamp/terraboard/pull/2) ([raphink](https://github.com/raphink))
 
-FIXES:
+## [0.8.0](https://github.com/camptocamp/terraboard/tree/0.8.0) (2017-07-25)
 
-- UI:
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.7.2...0.8.0)
 
-  * Rename Main link to Overview
-  * Use relative path to get back to Overview
+## [0.7.2](https://github.com/camptocamp/terraboard/tree/0.7.2) (2017-07-24)
 
-## 0.10.0 (July 27, 2017)
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.7.1...0.7.2)
 
-FEATURES:
+## [0.7.1](https://github.com/camptocamp/terraboard/tree/0.7.1) (2017-07-24)
 
-- Server:
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.7.0...0.7.1)
 
-  * Change default port to 8080
-  * Add flags and help to command line
-  * Add version
-  * List states from the DB instead of S3
+## [0.7.0](https://github.com/camptocamp/terraboard/tree/0.7.0) (2017-07-24)
 
-- UI:
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.6.0...0.7.0)
 
-  * Add list of state updates to main page
-  * Do search on clear and when search page is loaded
-  * Use sb-admin Bootstrap theme
+## [0.6.0](https://github.com/camptocamp/terraboard/tree/0.6.0) (2017-07-22)
 
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.5.0...0.6.0)
 
-FIXES:
+## [0.5.0](https://github.com/camptocamp/terraboard/tree/0.5.0) (2017-07-20)
 
-- Server:
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.4.0...0.5.0)
 
-  * Crash if HTTP Listenandserve fails [GH #1]
+## [0.4.0](https://github.com/camptocamp/terraboard/tree/0.4.0) (2017-07-20)
 
-## 0.9.0 (July 26, 2017)
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.3.3...0.4.0)
 
-**Warning**: The database was ported from SQLite3 to PostgreSQL and needs to be
-rebuilt!
+## [0.3.3](https://github.com/camptocamp/terraboard/tree/0.3.3) (2017-07-20)
 
-FEATURES:
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.3.2...0.3.3)
 
-- Server:
+## [0.3.2](https://github.com/camptocamp/terraboard/tree/0.3.2) (2017-07-20)
 
-  * Port to PostgreSQL [GH #2]
-  * Improve and fix search API
-  * Add flags and environment variables
-  * Improve DB refresh idempotence
-  * Migrate all API calls to DB
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.3.1...0.3.2)
 
-- UI
+## [0.3.1](https://github.com/camptocamp/terraboard/tree/0.3.1) (2017-07-20)
 
-  * Use container-fluid instead of container
-  * Improve and fix search interface
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.3.0...0.3.1)
 
+## [0.3.0](https://github.com/camptocamp/terraboard/tree/0.3.0) (2017-07-20)
 
-## 0.8.0 (July 26, 2017)
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.2.0...0.3.0)
 
-FEATURES:
+## [0.2.0](https://github.com/camptocamp/terraboard/tree/0.2.0) (2017-07-19)
 
-* Add a landing page
-* Add a search interface
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.1.1...0.2.0)
 
+## [0.1.1](https://github.com/camptocamp/terraboard/tree/0.1.1) (2017-07-19)
 
-## 0.7.2 (July 24, 2017)
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.1.0...0.1.1)
 
-FIXES:
+## [0.1.0](https://github.com/camptocamp/terraboard/tree/0.1.0) (2017-07-19)
 
-- Server:
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/a1e76f6fe37cc64e01b4a142d6f749cabd6f9170...0.1.0)
 
-  * Do not UpdateState(), select default version instead
-  * Do not insert states without versions, select default version instead
 
-- UI:
 
-  * Select default version from state
-
-
-## 0.7.1 (July 24, 2017)
-
-FIXES:
-
-- Server:
-
-  * Add indices on tables to improve performance
-
-- UI:
-
-  * Fix selected class on resource
-
-
-## 0.7.0 (July 24, 2017)
-
-FEATURES:
-
-- Server:
-
-  * Use a SQLite3 database to store states locally
-
-
-## 0.6.0 (July 22, 2017)
-
-FEATURES:
-
-- Server:
-
-  * Cache versioned states
-  * Add finer internal methods
-  * Add buildCache() (not activated yet)
-
-- UI:
-
-  * Adjust resource list height
-  * Mark selected resource
-
-
-## 0.5.0 (July 21, 2017)
-
-FEATURES:
-
-* Use standard notation `<module>.<resource>`.
-* Use hash in URL to track resources.
-* Remove `/state/` prefix from breadcrumbs.
-
-IMPROVEMENTS:
-
-- Server:
-
-  * Split and refactor code.
-  * Log errors.
-
-- UI:
-
-  * Split navbar from index.html.
-  * Split javascript code.
-
-
-## 0.4.0 (July 20, 2017)
-
-FEATURES:
-
-* Use locale date for versions.
-
-
-## 0.3.3 (July 20, 2017)
-
-FIXES:
-
-* Fix vertical scrolling issues in UI.
-
-
-## 0.3.2 (July 20, 2017)
-
-FIXES:
-
-* Use `BASE_URL` in style sheet.
-
-
-## 0.3.1 (July 20, 2017)
-
-FIXES:
-
-* Fix `BASE_URL` support in API.
-
-
-## 0.3.0 (July 20, 2017)
-
-FEATURES:
-
-* Add support for `BASE_URL` to change app base URL.
-
-
-## 0.2.0 (July 20, 2017)
-
-FEATURES:
-
-* Add history to API.
-* Add version selection in UI.
-* Add screenshot to README.
-
-## 0.1.1 (July 19, 2017)
-
-FIXES:
-
-* Add missing files and README instructions.
-
-## 0.1.0 (July 19, 2017)
-
-* Initial release.
+\* *This Changelog was automatically generated by [github_changelog_generator](https://github.com/github-changelog-generator/github-changelog-generator)*
