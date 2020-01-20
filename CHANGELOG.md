@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.18.0](https://github.com/camptocamp/terraboard/tree/0.18.0) (2020-01-20)
+
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.17.0...0.18.0)
+
+**Merged pull requests:**
+
+- Update go modules [\#71](https://github.com/camptocamp/terraboard/pull/71) ([raphink](https://github.com/raphink))
+- Add setting for DB sslmode [\#70](https://github.com/camptocamp/terraboard/pull/70) ([raphink](https://github.com/raphink))
+
 ## [0.17.0](https://github.com/camptocamp/terraboard/tree/0.17.0) (2020-01-20)
 
 [Full Changelog](https://github.com/camptocamp/terraboard/compare/0.16.0...0.17.0)
