@@ -33,10 +33,11 @@ type State struct {
 
 // Module is a Terraform module in a State
 type Module struct {
-	ID        uint          `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
-	StateID   sql.NullInt64 `gorm:"index" json:"-"`
-	Path      string        `json:"path"`
-	Resources []Resource    `json:"resources"`
+	ID           uint          `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
+	StateID      sql.NullInt64 `gorm:"index" json:"-"`
+	Path         string        `json:"path"`
+	Resources    []Resource    `json:"resources"`
+	OutputValues []OutputValue `json:"outputs"`
 }
 
 // Resource is a Terraform resource in a Module
@@ -46,6 +47,15 @@ type Resource struct {
 	Type       string        `gorm:"index" json:"type"`
 	Name       string        `gorm:"index" json:"name"`
 	Attributes []Attribute   `json:"attributes"`
+}
+
+// OutputValue is a Terraform output in a Module
+type OutputValue struct {
+	ID        uint          `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"-"`
+	ModuleID  sql.NullInt64 `gorm:"index" json:"-"`
+	Sensitive bool          `gorm:"index" json:"sensitive"`
+	Name      string        `gorm:"index" json:"name"`
+	Value     string        `json:"value"`
 }
 
 // Attribute is a Terraform attribute in a Resource
