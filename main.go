@@ -14,6 +14,7 @@ import (
 	"github.com/camptocamp/terraboard/db"
 	"github.com/camptocamp/terraboard/state"
 	"github.com/camptocamp/terraboard/util"
+	tfversion "github.com/hashicorp/terraform/version"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -139,7 +140,7 @@ func main() {
 
 	util.SetBasePath(c.Web.BaseURL)
 
-	log.Infof("Terraboard v%s is starting...", version)
+	log.Infof("Terraboard v%s (built for Terraform v%s) is starting...", version, tfversion.Version)
 
 	err := c.SetupLogging()
 	if err != nil {

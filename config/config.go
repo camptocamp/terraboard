@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	tfversion "github.com/hashicorp/terraform/version"
 	"github.com/jessevdk/go-flags"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
@@ -107,7 +108,7 @@ func LoadConfig(version string) *Config {
 	}
 
 	if c.Version {
-		fmt.Printf("Terraboard v%v\n", version)
+		fmt.Printf("Terraboard v%v (built for Terraform v%v)\n", version, tfversion.Version)
 		os.Exit(0)
 	}
 
