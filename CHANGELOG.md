@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.19.0](https://github.com/camptocamp/terraboard/tree/0.19.0) (2020-01-24)
+
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.18.0...0.19.0)
+
+**Fixed bugs:**
+
+- Terraform version in changelog [\#73](https://github.com/camptocamp/terraboard/issues/73)
+
+**Merged pull requests:**
+
+- Output Terraform lib version in version string [\#75](https://github.com/camptocamp/terraboard/pull/75) ([raphink](https://github.com/raphink))
+- Use Terraform 0.12.20 [\#74](https://github.com/camptocamp/terraboard/pull/74) ([raphink](https://github.com/raphink))
+
 ## [0.18.0](https://github.com/camptocamp/terraboard/tree/0.18.0) (2020-01-20)
 
 [Full Changelog](https://github.com/camptocamp/terraboard/compare/0.17.0...0.18.0)
