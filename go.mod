@@ -8,7 +8,7 @@ require (
 	github.com/hashicorp/go-tfe v0.3.27
 	github.com/hashicorp/hcl/v2 v2.2.0 // indirect
 	github.com/hashicorp/hil v0.0.0-20190212132231-97b3a9cdfa93 // indirect
-	github.com/hashicorp/terraform v0.12.18
+	github.com/hashicorp/terraform v0.12.20
 	github.com/hashicorp/terraform-svchost v0.0.0-20191119180714-d2e4933b9136 // indirect
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/jinzhu/gorm v1.9.11
