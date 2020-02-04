@@ -102,7 +102,7 @@ The precedence of configurations is as described below.
 |`--db-user` | `DB_USER` | `db.user` | Database user | gorm |
 |`--db-password` | `DB_PASSWORD` | `db.password` | Database password | - |
 |`--db-name` | `DB_NAME` | `db.name` | Database name | gorm |
-|`--db-sslmode` | `DB_SSLMODE` | `db.sslmode` | SSL mode enforced for database access (require, verify-full, verify-ca, prefer, disable) | prefer |
+|`--db-sslmode` | `DB_SSLMODE` | `db.sslmode` | SSL mode enforced for database access (require, verify-full, verify-ca, disable) | require |
 |`--no-sync` | - | `db.no-sync` | Do not sync database | false |
 |`--sync-interval` | - | `db.sync-interval` | DB sync interval (in minutes) | 1 |
 |`--dynamodb-table` | `AWS_DYNAMODB_TABLE` | `aws.dynamodb-table` | AWS DynamoDB table for locks | - |
