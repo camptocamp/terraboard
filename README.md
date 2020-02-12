@@ -93,7 +93,7 @@ The precedence of configurations is as described below.
 |CLI|ENV|YAML|Description|Default|
 |---|---|----|-----------|-------|
 |`-V` or `--version`| - | - | Prints version | - |
-|`-p` or `--port`|`PORT`|`web.port`|Port to listen on| 8080 |
+|`-p` or `--port`|`TERRABOARD_PORT`|`web.port`|Port to listen on| 8080 |
 |`-c` or `--config-file`|`CONFIG_FILE`|-|Config File path| - |
 |`-l` or `--log-level` | `TERRABOARD_LOG_LEVEL` | `log.level` | Set log level (debug, info, warn, error, fatal, panic) | info |
 |`--log-format` | `TERRABOARD_LOG_FORMAT` | `log.format` | Set log format (plain, json) | plain |
