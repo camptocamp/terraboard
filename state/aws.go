@@ -31,12 +31,16 @@ type AWS struct {
 func NewAWS(c *config.Config) AWS {
 	sess := session.Must(session.NewSession())
 
-	awsConfig := &aws_sdk.Config{}
+	awsConfig := aws_sdk.NewConfig()
 
 	if len(c.AWS.APPRoleArn) > 0 {
 		log.Debugf("Using %s role", c.AWS.APPRoleArn)
 		creds := stscreds.NewCredentials(sess, c.AWS.APPRoleArn)
-		awsConfig = &aws_sdk.Config{Credentials: creds}
+		awsConfig.WithCredentials(creds)
+	}
+
+	if e := c.AWS.Endpoint; e != "" {
+		awsConfig.WithEndpoint(e)
 	}
 
 	return AWS{
