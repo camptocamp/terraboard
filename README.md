@@ -26,8 +26,8 @@ Terraboard is a web dashboard to visualize and query
 - a search interface to query resources by type, name or attributes
 - a diff interface to compare state between versions
 
-It currently only supports S3 as a remote state backend, and dynamoDB for
-retrieving lock informations.
+It currently supports S3 as a remote state backend, and dynamoDB for
+retrieving lock informations. Also supports Terraform Cloud (in past Terraform Enterprise [more](https://www.terraform.io/docs/cloud/index.html#note-about-product-names))
 
 
 ### Overview
@@ -62,21 +62,26 @@ version.
 
 ### Requirements
 
-Terraboard currently supports getting the Terraform states from AWS S3. It
+Terraboard currently supports getting the Terraform states from AWS S3 and Terraform Cloud (in past Terraform Enterprise [more](https://www.terraform.io/docs/cloud/index.html#note-about-product-names)). It
 requires:
-
-* A **versioned** S3 bucket name with one or more Terraform states,
-  named with a `.tfstate` suffix
-* AWS credentials with the following rights on the bucket:
-   - `s3:GetObject`
-   - `s3:ListBucket`
-   - `s3:ListBucketVersions`
-   - `s3:GetObjectVersion`
-* A running PostgreSQL database
-* If you want to retrieve lock states
+- Terraform states from AWS S3:
+  * A **versioned** S3 bucket name with one or more Terraform states,
+    named with a `.tfstate` suffix
+  * AWS credentials with the following rights on the bucket:
+    - `s3:GetObject`
+    - `s3:ListBucket`
+    - `s3:ListBucketVersions`
+    - `s3:GetObjectVersion`
+  * If you want to retrieve lock states
   [from a dynamoDB table](https://www.terraform.io/docs/backends/types/s3.html#dynamodb_table),
   you need to make sure the provided AWS credentials have `dynamodb:Scan` access to that
   table.
+- Terraform states from Terraform Cloud:
+  * Account on [Terraform Cloud](https://app.terraform.io/)
+  * Existing organization
+  * Token assigned to an organization
+- A running PostgreSQL database
+
 
 ## Configuration
 
@@ -111,6 +116,9 @@ The precedence of configurations is as described below.
 |`--file-extension` | `AWS_FILE_EXTENSION` | `aws.file-extension` | File extension of state files | .tfstate |
 |`--base-url` | `TERRABOARD_BASE_URL` | `web.base-url` | Base URL | / |
 |`--logout-url` | `TERRABOARD_LOGOUT_URL` | `web.logout-url` | Logout URL | - |
+|`--tfe-address` | `TFE_ADDRESS` | `tfe.tfe-address` | Terraform Enterprise address for states access | - |
+|`--tfe-token` | `TFE_TOKEN` | `tfe.tfe-token` | Terraform Enterprise token for states access | - |
+|`--tfe-organization` | `TFE_ORGANIZATION` | `tfe.tfe-organization` | Terraform Enterprise organization for states access | - |
 
 ## Use with Docker
 
