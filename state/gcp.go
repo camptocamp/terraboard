@@ -17,7 +17,7 @@ import (
 	"google.golang.org/api/option"
 )
 
-// GCP is a state provider type, leveraging S3 and DynamoDB
+// GCP is a state provider type, leveraging GCS
 type GCP struct {
 	svc    *storage.Client
 	bucket string
@@ -123,7 +123,7 @@ func (a *GCP) GetStates() (states []string, err error) {
 	return stateFiles, nil
 }
 
-// GetState retrieves a single State from the S3 bucket
+// GetState retrieves a single State from the GCS bucket
 func (a *GCP) GetState(st, versionID string) (sf *statefile.File, err error) {
 	log.WithFields(log.Fields{
 		"path":       st,
