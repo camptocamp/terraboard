@@ -50,6 +50,12 @@ type TFEConfig struct {
 	Organization string `long:"tfe-organization" env:"TFE_ORGANIZATION" yaml:"tfe-organization" description:"Terraform Enterprise organization for states access"`
 }
 
+// GCPConfig stores the Google Cloud configutation
+type GCPConfig struct {
+	GCSBucket string `long:"gcs-bucket" env:"GCS_BUCKET" yaml:"gcs-bucket" description:"Google Cloud bucket to search"`
+	GCPSAKey  string `long:"gcp-sa-key-path" env:"GCP_SA_KEY_PATH" yaml:"gcp-sa-key-path" description:"The path to the service account to use to connect to Google Cloud Platform"`
+}
+
 // WebConfig stores the UI interface parameters
 type WebConfig struct {
 	Port      uint16 `short:"p" long:"port" env:"TERRABOARD_PORT" yaml:"port" description:"Port to listen on." default:"8080"`
@@ -70,6 +76,8 @@ type Config struct {
 	AWS AWSConfig `group:"AWS Options" yaml:"aws"`
 
 	TFE TFEConfig `group:"Terraform Enterprise Options" yaml:"tfe"`
+
+	GCP GCPConfig `group:"Google Cloud Platform Options" yaml:"gcp"`
 
 	Web WebConfig `group:"Web" yaml:"web"`
 }
