@@ -19,8 +19,8 @@ import (
 
 // GCP is a state provider type, leveraging GCS
 type GCP struct {
-	svc    *storage.Client
-	bucket string
+	svc     *storage.Client
+	buckets []string
 }
 
 // NewGCP creates an GCP object
@@ -43,9 +43,13 @@ func NewGCP(c *config.Config) (GCP, error) {
 		return GCP{}, err
 	}
 
+	log.WithFields(log.Fields{
+		"buckets": c.GCP.GCSBuckets,
+	}).Info("Client succesfully created")
+
 	return GCP{
-		svc:    client,
-		bucket: c.GCP.GCSBucket,
+		svc:     client,
+		buckets: c.GCP.GCSBuckets,
 	}, nil
 }
 
@@ -56,43 +60,46 @@ func (a *GCP) GetLocks() (locks map[string]LockInfo, err error) {
 	defer cancel()
 
 	var lockFiles []string
-	it := a.svc.Bucket(a.bucket).Objects(ctx, nil)
-	for {
-		attrs, err := it.Next()
-		if err == iterator.Done {
-			break
-		}
-		if err != nil {
-			return nil, err
+	for _, bucketName := range a.buckets {
+		it := a.svc.Bucket(bucketName).Objects(ctx, nil)
+		for {
+			attrs, err := it.Next()
+			if err == iterator.Done {
+				break
+			}
+			if err != nil {
+				return nil, err
+			}
+
+			if strings.HasSuffix(attrs.Name, ".tflock") {
+				lockFiles = append(lockFiles, attrs.Name)
+			}
 		}
 
-		if strings.HasSuffix(attrs.Name, ".tflock") {
-			lockFiles = append(lockFiles, attrs.Name)
-		}
-	}
+		locks = make(map[string]LockInfo)
+		for _, lockFile := range lockFiles {
+			ctx, cancel := context.WithTimeout(ctx, time.Second*50)
+			defer cancel()
+			rc, err := a.svc.Bucket(bucketName).Object(lockFile).NewReader(ctx)
+			if err != nil {
+				return nil, err
+			}
+			defer rc.Close()
 
-	locks = make(map[string]LockInfo)
-	for _, lockFile := range lockFiles {
-		ctx, cancel := context.WithTimeout(ctx, time.Second*50)
-		defer cancel()
-		rc, err := a.svc.Bucket(a.bucket).Object(lockFile).NewReader(ctx)
-		if err != nil {
-			return nil, err
-		}
-		defer rc.Close()
+			data, err := ioutil.ReadAll(rc)
+			if err != nil {
+				return nil, err
+			}
 
-		data, err := ioutil.ReadAll(rc)
-		if err != nil {
-			return nil, err
-		}
+			var info LockInfo
+			err = json.Unmarshal([]byte(data), &info)
+			if err != nil {
+				return nil, err
+			}
 
-		var info LockInfo
-		err = json.Unmarshal([]byte(data), &info)
-		if err != nil {
-			return nil, err
+			locks[strings.Join([]string{bucketName, lockFile}, "/")] = info
 		}
 
-		locks[lockFile] = info
 	}
 
 	return locks, nil
@@ -105,18 +112,20 @@ func (a *GCP) GetStates() (states []string, err error) {
 	defer cancel()
 
 	var stateFiles []string
-	it := a.svc.Bucket(a.bucket).Objects(ctx, nil)
-	for {
-		attrs, err := it.Next()
-		if err == iterator.Done {
-			break
-		}
-		if err != nil {
-			return nil, err
-		}
+	for _, bucketName := range a.buckets {
+		it := a.svc.Bucket(bucketName).Objects(ctx, nil)
+		for {
+			attrs, err := it.Next()
+			if err == iterator.Done {
+				break
+			}
+			if err != nil {
+				return nil, err
+			}
 
-		if strings.HasSuffix(attrs.Name, ".tfstate") {
-			stateFiles = append(stateFiles, attrs.Name)
+			if strings.HasSuffix(attrs.Name, ".tfstate") {
+				stateFiles = append(stateFiles, strings.Join([]string{bucketName, attrs.Name}, "/"))
+			}
 		}
 	}
 
@@ -125,15 +134,15 @@ func (a *GCP) GetStates() (states []string, err error) {
 
 // GetState retrieves a single State from the GCS bucket
 func (a *GCP) GetState(st, versionID string) (sf *statefile.File, err error) {
-	log.WithFields(log.Fields{
-		"path":       st,
-		"version_id": versionID,
-	}).Info("Retrieving state from GCS")
 	ctx := context.Background()
 	ctx, cancel := context.WithTimeout(ctx, time.Second*60)
 	defer cancel()
 
-	obj := a.svc.Bucket(a.bucket).Object(st)
+	bucketSplit := strings.Index(st, "/")
+	bucketName := st[0:bucketSplit]
+	fileName := st[bucketSplit+1:]
+
+	obj := a.svc.Bucket(bucketName).Object(fileName)
 	if versionID != "" {
 		version, err := strconv.ParseInt(versionID, 10, 64)
 		if err != nil {
@@ -162,6 +171,11 @@ func (a *GCP) GetState(st, versionID string) (sf *statefile.File, err error) {
 		return sf, fmt.Errorf("Failed to find state")
 	}
 
+	log.WithFields(log.Fields{
+		"path":       st,
+		"version_id": versionID,
+	}).Info("State read from GCS")
+
 	return
 }
 
@@ -172,12 +186,16 @@ func (a *GCP) GetVersions(state string) (versions []Version, err error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Second*60)
 	defer cancel()
 
+	bucketSplit := strings.Index(state, "/")
+	bucketName := state[0:bucketSplit]
+	fileName := state[bucketSplit+1:]
+
 	q := storage.Query{
 		Versions: true,
-		Prefix:   state,
+		Prefix:   fileName,
 	}
 
-	it := a.svc.Bucket(a.bucket).Objects(ctx, &q)
+	it := a.svc.Bucket(bucketName).Objects(ctx, &q)
 	for {
 		attrs, err := it.Next()
 		if err == iterator.Done {
@@ -187,7 +205,7 @@ func (a *GCP) GetVersions(state string) (versions []Version, err error) {
 			return nil, err
 		}
 
-		if attrs.Name == state {
+		if attrs.Name == fileName {
 			tm := attrs.Updated
 			versions = append(versions, Version{
 				ID:           strconv.FormatInt(attrs.Generation, 10),

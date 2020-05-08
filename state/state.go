@@ -50,7 +50,7 @@ func Configure(c *config.Config) (Provider, error) {
 		return &provider, nil
 	}
 
-	if len(c.GCP.GCSBucket) > 0 {
+	if c.GCP.GCSBuckets != nil {
 		log.Info("Using Google Cloud as the state/locks provider")
 		provider, err := NewGCP(c)
 		if err != nil {

@@ -119,7 +119,7 @@ The precedence of configurations is as described below.
 |`--tfe-address` | `TFE_ADDRESS` | `tfe.tfe-address` | Terraform Enterprise address for states access | - |
 |`--tfe-token` | `TFE_TOKEN` | `tfe.tfe-token` | Terraform Enterprise token for states access | - |
 |`--tfe-organization` | `TFE_ORGANIZATION` | `tfe.tfe-organization` | Terraform Enterprise organization for states access | - |
-|`--gcs-bucket` | `GCS_BUCKET` | `gcp.gcs-bucket` | Google Cloud Storage bucket to access | - |
+|`--gcs-bucket` | `N/A` | `gcp.gcs-buckets` | Google Cloud Storage buckets to access | - |
 |`--gcp-sa-key-path` | `GCP_SA_KEY_PATH` | `gcp.gcp-sa-key-path` | Path to the service account key to use for Google Cloud Storage | - |
 
 ## Use with Docker

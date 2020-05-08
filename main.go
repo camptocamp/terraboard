@@ -99,7 +99,7 @@ func refreshDB(syncInterval uint16, d *db.Database, sp state.Provider) {
 						"path":       st,
 						"version_id": v.ID,
 						"error":      err,
-					}).Error("Failed to fetch state from S3")
+					}).Error("Failed to fetch state")
 					continue
 				}
 				d.InsertState(st, v.ID, state)

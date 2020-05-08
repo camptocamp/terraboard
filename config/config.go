@@ -52,8 +52,8 @@ type TFEConfig struct {
 
 // GCPConfig stores the Google Cloud configutation
 type GCPConfig struct {
-	GCSBucket string `long:"gcs-bucket" env:"GCS_BUCKET" yaml:"gcs-bucket" description:"Google Cloud bucket to search"`
-	GCPSAKey  string `long:"gcp-sa-key-path" env:"GCP_SA_KEY_PATH" yaml:"gcp-sa-key-path" description:"The path to the service account to use to connect to Google Cloud Platform"`
+	GCSBuckets []string `long:"gcs-bucket" yaml:"gcs-bucket" description:"Google Cloud bucket to search"`
+	GCPSAKey   string   `long:"gcp-sa-key-path" env:"GCP_SA_KEY_PATH" yaml:"gcp-sa-key-path" description:"The path to the service account to use to connect to Google Cloud Platform"`
 }
 
 // WebConfig stores the UI interface parameters

@@ -17,6 +17,12 @@ aws:
     key-prefix: test/
     file-extension: .tfstate
 
+gcp:
+  gcs-bucket:
+    - my-bucket-1
+    - my-bucket-2
+  gcp-sa-key-path: /path/to/key
+
 web:
   port: 39090
   base-url: /test/
