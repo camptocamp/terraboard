@@ -41,6 +41,7 @@ type S3BucketConfig struct {
 type AWSConfig struct {
 	DynamoDBTable string         `long:"dynamodb-table" env:"AWS_DYNAMODB_TABLE" yaml:"dynamodb-table" description:"AWS DynamoDB table for locks."`
 	S3            S3BucketConfig `group:"S3 Options" yaml:"s3"`
+	APPRoleArn    string         `long:"aws-role-arn" env:"APP_ROLE_ARN" yaml:"app-role-arn" description:"Role ARN to Assume."`
 }
 
 // TFEConfig stores the Terraform Enterprise configuration
