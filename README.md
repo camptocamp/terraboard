@@ -112,6 +112,7 @@ The precedence of configurations is as described below.
 |`--sync-interval` | - | `db.sync-interval` | DB sync interval (in minutes) | 1 |
 |`--dynamodb-table` | `AWS_DYNAMODB_TABLE` | `aws.dynamodb-table` | AWS DynamoDB table for locks | - |
 |`--s3-bucket` | `AWS_BUCKET` | `aws.bucket` | AWS S3 bucket | - |
+|`--app-role-arn` | `APPRoleArn` | `aws.app-role-arn` | Role ARN to Assume | - |
 |`--key-prefix` | `AWS_KEY_PREFIX` | `aws.key-prefix` | AWS Key Prefix | - |
 |`--file-extension` | `AWS_FILE_EXTENSION` | `aws.file-extension` | File extension of state files | .tfstate |
 |`--base-url` | `TERRABOARD_BASE_URL` | `web.base-url` | Base URL | / |
@@ -144,6 +145,7 @@ docker run -p 8080:8080 \
  -e AWS_BUCKET="<bucket>" \
  -e AWS_DYNAMODB_TABLE="<table>" \
  -e DB_PASSWORD="<mypassword>" \
+ -e APP_ROLE_ARN="<myrolearn>" \
  --net terranet \
  camptocamp/terraboard:latest
 ```
