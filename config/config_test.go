@@ -1,6 +1,7 @@
 package config
 
 import (
+	"reflect"
 	"testing"
 
 	log "github.com/sirupsen/logrus"
@@ -29,6 +30,10 @@ func TestLoadConfigFromYaml(t *testing.T) {
 				FileExtension: ".tfstate",
 			},
 		},
+		GCP: GCPConfig{
+			GCSBuckets: []string{"my-bucket-1", "my-bucket-2"},
+			GCPSAKey:   "/path/to/key",
+		},
 		Web: WebConfig{
 			Port:      39090,
 			BaseURL:   "/test/",
@@ -37,7 +42,7 @@ func TestLoadConfigFromYaml(t *testing.T) {
 	}
 	c := Config{ConfigFilePath: "config_test.yml"}
 	c.LoadConfigFromYaml()
-	if c != compareConfig {
+	if !reflect.DeepEqual(c, compareConfig) {
 		t.Fatalf("Expected: %v\nGot: %v", compareConfig, c)
 	}
 }

@@ -50,6 +50,15 @@ func Configure(c *config.Config) (Provider, error) {
 		return &provider, nil
 	}
 
+	if c.GCP.GCSBuckets != nil {
+		log.Info("Using Google Cloud as the state/locks provider")
+		provider, err := NewGCP(c)
+		if err != nil {
+			return nil, err
+		}
+		return &provider, nil
+	}
+
 	log.Info("Using AWS (S3+DynamoDB) as the state/locks provider")
 	provider := NewAWS(c)
 	return &provider, nil
