@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.20.0](https://github.com/camptocamp/terraboard/tree/0.20.0) (2020-06-09)
+
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.19.0...0.20.0)
+
+**Closed issues:**
+
+- Terraform v0.12.26 [\#93](https://github.com/camptocamp/terraboard/issues/93)
+- pq sslmode [\#76](https://github.com/camptocamp/terraboard/issues/76)
+
+**Merged pull requests:**
+
+- Update for terraform 0.12.26 [\#94](https://github.com/camptocamp/terraboard/pull/94) ([raphink](https://github.com/raphink))
+- update to use terraform 0.12.24 [\#88](https://github.com/camptocamp/terraboard/pull/88) ([BlackWebWolf](https://github.com/BlackWebWolf))
+- Update documentation Terraform Cloud \(TFE\) support [\#82](https://github.com/camptocamp/terraboard/pull/82) ([binlab](https://github.com/binlab))
+- update to use terraform 0.12.21 [\#80](https://github.com/camptocamp/terraboard/pull/80) ([rickhlx](https://github.com/rickhlx))
+- change PORT to TERRABOARD\_PORT in README.md [\#79](https://github.com/camptocamp/terraboard/pull/79) ([jimsheldon](https://github.com/jimsheldon))
+- Make database sslmode default to require [\#78](https://github.com/camptocamp/terraboard/pull/78) ([raphink](https://github.com/raphink))
+- docs: add --db-sslmode flag [\#77](https://github.com/camptocamp/terraboard/pull/77) ([tedder](https://github.com/tedder))
+
 ## [0.19.0](https://github.com/camptocamp/terraboard/tree/0.19.0) (2020-01-24)
 
 [Full Changelog](https://github.com/camptocamp/terraboard/compare/0.18.0...0.19.0)
@@ -30,7 +49,7 @@
 
 - New flat logo [\#69](https://github.com/camptocamp/terraboard/pull/69) ([raphink](https://github.com/raphink))
 - Reduce the noise in the logs when parsing statefiles [\#68](https://github.com/camptocamp/terraboard/pull/68) ([mvisonneau](https://github.com/mvisonneau))
-- Implemented support for Terraform Enterprise as state provider [\#67](https://github.com/camptocamp/terraboard/pull/67) ([mvisonneau](https://github.com/mvisonneau))
+- Implemented support for Terraform Cloud as state provider [\#67](https://github.com/camptocamp/terraboard/pull/67) ([mvisonneau](https://github.com/mvisonneau))
 - Bumped go version to 1.13 [\#66](https://github.com/camptocamp/terraboard/pull/66) ([mvisonneau](https://github.com/mvisonneau))
 - Add support for newer terraform versions [\#65](https://github.com/camptocamp/terraboard/pull/65) ([slitsevych](https://github.com/slitsevych))
 

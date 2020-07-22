@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	aws_sdk "github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
@@ -30,12 +31,24 @@ type AWS struct {
 func NewAWS(c *config.Config) AWS {
 	sess := session.Must(session.NewSession())
 
+	awsConfig := aws_sdk.NewConfig()
+
+	if len(c.AWS.APPRoleArn) > 0 {
+		log.Debugf("Using %s role", c.AWS.APPRoleArn)
+		creds := stscreds.NewCredentials(sess, c.AWS.APPRoleArn)
+		awsConfig.WithCredentials(creds)
+	}
+
+	if e := c.AWS.Endpoint; e != "" {
+		awsConfig.WithEndpoint(e)
+	}
+
 	return AWS{
-		svc:           s3.New(sess, &aws_sdk.Config{}),
+		svc:           s3.New(sess, awsConfig),
 		bucket:        c.AWS.S3.Bucket,
 		keyPrefix:     c.AWS.S3.KeyPrefix,
 		fileExtension: c.AWS.S3.FileExtension,
-		dynamoSvc:     dynamodb.New(sess, &aws_sdk.Config{}),
+		dynamoSvc:     dynamodb.New(sess, awsConfig),
 		dynamoTable:   c.AWS.DynamoDBTable,
 	}
 }
