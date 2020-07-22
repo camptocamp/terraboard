@@ -3,6 +3,7 @@ module github.com/camptocamp/terraboard
 go 1.13
 
 require (
+	cloud.google.com/go v0.45.1
 	github.com/aws/aws-sdk-go v1.30.12
 	github.com/denisenkom/go-mssqldb v0.0.0-20190820223206-44cdfe8d8ba9 // indirect
 	github.com/hashicorp/go-tfe v0.8.1
