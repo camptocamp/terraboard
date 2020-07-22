@@ -22,8 +22,7 @@ require (
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/zclconf/go-cty v1.2.1
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
-	golang.org/x/sys v0.0.0-20191220142924-d4481acd189f // indirect
-	golang.org/x/tools v0.0.0-20200414032229-332987a829c3 // indirect
+	golang.org/x/tools v0.0.0-20200721223218-6123e77877b2 // indirect
 	google.golang.org/api v0.9.0
 	gopkg.in/yaml.v2 v2.2.7
 )
