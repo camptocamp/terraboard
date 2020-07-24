@@ -9,7 +9,7 @@ require (
 	github.com/hashicorp/go-tfe v0.8.1
 	github.com/hashicorp/go-version v1.2.0
 	github.com/hashicorp/hil v0.0.0-20190212132231-97b3a9cdfa93 // indirect
-	github.com/hashicorp/terraform v0.12.28
+	github.com/hashicorp/terraform v0.12.29
 	github.com/hashicorp/terraform-svchost v0.0.0-20191119180714-d2e4933b9136 // indirect
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/jinzhu/gorm v1.9.11
@@ -22,7 +22,7 @@ require (
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/zclconf/go-cty v1.2.1
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
-	golang.org/x/tools v0.0.0-20200721223218-6123e77877b2 // indirect
+	golang.org/x/tools v0.0.0-20200724022722-7017fd6b1305 // indirect
 	google.golang.org/api v0.9.0
 	gopkg.in/yaml.v2 v2.2.7
 )
