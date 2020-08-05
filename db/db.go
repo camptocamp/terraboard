@@ -54,6 +54,7 @@ func (db *Database) stateS3toDB(sf *statefile.File, path string, versionID strin
 		Version:   version,
 		TFVersion: sf.TerraformVersion.String(),
 		Serial:    int64(sf.Serial),
+		Lineage:   sf.Lineage,
 	}
 
 	for _, m := range sf.State.Modules {
