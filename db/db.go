@@ -63,8 +63,8 @@ func (db *Database) stateS3toDB(sf *statefile.File, path string, versionID strin
 		}
 		for _, r := range m.Resources {
 			res := types.Resource{
-				Type: r.Addr.Type,
-				Name: r.Addr.Name,
+				Type: r.Addr.Resource.Type,
+				Name: r.Addr.Resource.Name,
 			}
 
 			for _, i := range r.Instances {
