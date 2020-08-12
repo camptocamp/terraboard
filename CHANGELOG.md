@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.22.0](https://github.com/camptocamp/terraboard/tree/0.22.0) (2020-08-12)
+
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.21.0...0.22.0)
+
+**Implemented enhancements:**
+
+- Support Terraform v0.13.0 [\#104](https://github.com/camptocamp/terraboard/pull/104) ([raphink](https://github.com/raphink))
+- Add lineage to states in DB [\#103](https://github.com/camptocamp/terraboard/pull/103) ([raphink](https://github.com/raphink))
+- Support Terraform 0.12.29 [\#102](https://github.com/camptocamp/terraboard/pull/102) ([raphink](https://github.com/raphink))
+
 ## [0.21.0](https://github.com/camptocamp/terraboard/tree/0.21.0) (2020-07-22)
 
 [Full Changelog](https://github.com/camptocamp/terraboard/compare/0.20.0...0.21.0)
