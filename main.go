@@ -125,7 +125,7 @@ func getVersion(w http.ResponseWriter, r *http.Request) {
 
 	j, err := json.Marshal(map[string]string{
 		"version":   version,
-		"copyright": "Copyright © 2017 Camptocamp",
+		"copyright": "Copyright © 2017-2020 Camptocamp",
 	})
 	if err != nil {
 		api.JSONError(w, "Failed to marshal version", err)
