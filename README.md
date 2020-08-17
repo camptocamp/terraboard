@@ -195,6 +195,7 @@ $ go get github.com/camptocamp/terraboard
 | 0.19.0   |  0.12.20            |
 | 0.20.0   |  0.12.26            |
 | 0.21.0   |  0.12.28            |
+| 0.22.0   |  0.13.0             |
 
 ## Development
 
