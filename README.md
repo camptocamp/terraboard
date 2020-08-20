@@ -138,18 +138,18 @@ docker run --name db \
   -e POSTGRES_USER=gorm \
   -e POSTGRES_DB=gorm \
   -e POSTGRES_PASSWORD="<mypassword>" \
-   --net terranet \
+  --net terranet \
   --restart=always postgres -d
 docker run -p 8080:8080 \
- -e AWS_REGION="<region>" \
- -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" \
- -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" \
- -e AWS_BUCKET="<bucket>" \
- -e AWS_DYNAMODB_TABLE="<table>" \
- -e DB_PASSWORD="<mypassword>" \
- -e APP_ROLE_ARN="<myrolearn>" \
- --net terranet \
- camptocamp/terraboard:latest
+  -e AWS_REGION="<region>" \
+  -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" \
+  -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" \
+  -e AWS_BUCKET="<bucket>" \
+  -e AWS_DYNAMODB_TABLE="<table>" \
+  -e DB_PASSWORD="<mypassword>" \
+  -e APP_ROLE_ARN="<myrolearn>" \
+  --net terranet \
+  camptocamp/terraboard:latest
 ```
 
 Then point your browser to http://localhost:8080.
