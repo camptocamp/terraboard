@@ -134,12 +134,14 @@ export AWS_ACCESS_KEY_ID=<access_key>
 export AWS_SECRET_ACCESS_KEY=<access_secret>
 # Spin up the two containers and a network for them to communciate on:
 docker network create terranet
-docker run --name db \
+# download the postgres.conf file to your local machine using the below command
+# docker run -i --rm postgres cat /usr/share/postgresql/postgresql.conf.sample > my-postgres.conf
+docker run -d --name db -v "$PWD/my-postgres.conf":/etc/postgresql/postgresql.conf \
   -e POSTGRES_USER=gorm \
   -e POSTGRES_DB=gorm \
-  -e POSTGRES_PASSWORD="<mypassword>" \
+  -e POSTGRES_PASSWORD=<your_secret_password> \
   --net terranet \
-  --restart=always postgres -d
+  --restart=always postgres -c 'config_file=/etc/postgresql/postgresql.conf'
 docker run -p 8080:8080 \
   -e AWS_REGION="<region>" \
   -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" \
