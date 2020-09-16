@@ -26,7 +26,7 @@ func JSONError(w http.ResponseWriter, message string, err error) {
 }
 
 // ListStates lists States
-func ListStates(w http.ResponseWriter, r *http.Request, d *db.Database) {
+func ListStates(w http.ResponseWriter, _ *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	states := d.ListStates()
 
@@ -134,7 +134,7 @@ func StateCompare(w http.ResponseWriter, r *http.Request, d *db.Database) {
 }
 
 // GetLocks returns information on locked States
-func GetLocks(w http.ResponseWriter, r *http.Request, sp state.Provider) {
+func GetLocks(w http.ResponseWriter, _ *http.Request, sp state.Provider) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	locks, err := sp.GetLocks()
 	if err != nil {
@@ -172,7 +172,7 @@ func SearchAttribute(w http.ResponseWriter, r *http.Request, d *db.Database) {
 }
 
 // ListResourceTypes lists all Resource types
-func ListResourceTypes(w http.ResponseWriter, r *http.Request, d *db.Database) {
+func ListResourceTypes(w http.ResponseWriter, _ *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	result, _ := d.ListResourceTypes()
 	j, err := json.Marshal(result)
@@ -184,7 +184,7 @@ func ListResourceTypes(w http.ResponseWriter, r *http.Request, d *db.Database) {
 }
 
 // ListResourceTypesWithCount lists all Resource types with their associated count
-func ListResourceTypesWithCount(w http.ResponseWriter, r *http.Request, d *db.Database) {
+func ListResourceTypesWithCount(w http.ResponseWriter, _ *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	result, _ := d.ListResourceTypesWithCount()
 	j, err := json.Marshal(result)
@@ -196,7 +196,7 @@ func ListResourceTypesWithCount(w http.ResponseWriter, r *http.Request, d *db.Da
 }
 
 // ListResourceNames lists all Resource names
-func ListResourceNames(w http.ResponseWriter, r *http.Request, d *db.Database) {
+func ListResourceNames(w http.ResponseWriter, _ *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	result, _ := d.ListResourceNames()
 	j, err := json.Marshal(result)
@@ -222,7 +222,7 @@ func ListAttributeKeys(w http.ResponseWriter, r *http.Request, d *db.Database) {
 }
 
 // ListTfVersions lists all Terraform versions
-func ListTfVersions(w http.ResponseWriter, r *http.Request, d *db.Database) {
+func ListTfVersions(w http.ResponseWriter, _ *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	result, _ := d.ListTfVersions()
 	j, err := json.Marshal(result)
