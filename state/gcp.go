@@ -45,7 +45,7 @@ func NewGCP(c *config.Config) (GCP, error) {
 
 	log.WithFields(log.Fields{
 		"buckets": c.GCP.GCSBuckets,
-	}).Info("Client succesfully created")
+	}).Info("Client successfully created")
 
 	return GCP{
 		svc:     client,
