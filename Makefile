@@ -50,8 +50,8 @@ test: ## Run the tests against the codebase
 build: main.go $(FILES) ## Build the binary
 	CGO_ENABLED=1 GOOS=linux go build \
 	  -ldflags "-linkmode external -extldflags -static -X main.version=$(VERSION)" \
-	-o $@ $<
-	strip $@
+	-o $(NAME) $<
+	strip $(NAME)
 
 .PHONY: vendor
 vendor: # Vendor go modules

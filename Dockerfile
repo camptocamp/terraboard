@@ -1,4 +1,4 @@
-FROM golang:1.12 as builder
+FROM golang:1.15 as builder
 WORKDIR /go/src/github.com/camptocamp/terraboard
 COPY . .
 ENV GO111MODULE=on
