@@ -30,7 +30,9 @@ func idx(w http.ResponseWriter, r *http.Request) {
 	}
 	idxStr := string(idx)
 	idxStr = util.ReplaceBasePath(idxStr, "base href=\"/\"", "base href=\"%s\"")
-	io.WriteString(w, idxStr)
+	if _, err := io.WriteString(w, idxStr); err != nil {
+		log.Error(err.Error())
+	}
 }
 
 // Pass the DB to API handlers
@@ -77,13 +79,15 @@ func refreshDB(syncInterval uint16, d *db.Database, sp state.Provider) {
 		statesVersions := d.ListStatesVersions()
 		for _, st := range states {
 			versions, _ := sp.GetVersions(st)
-			for _, v := range versions {
+			for k, v := range versions {
 				if _, ok := statesVersions[v.ID]; ok {
 					log.WithFields(log.Fields{
 						"version_id": v.ID,
 					}).Debug("Version is already in the database, skipping")
 				} else {
-					d.InsertVersion(&v)
+					if err := d.InsertVersion(&versions[k]); err != nil {
+						log.Error(err.Error())
+					}
 				}
 
 				if isKnownStateVersion(statesVersions, v.ID, st) {
@@ -102,8 +106,7 @@ func refreshDB(syncInterval uint16, d *db.Database, sp state.Provider) {
 					}).Error("Failed to fetch state from bucket")
 					continue
 				}
-				d.InsertState(st, v.ID, state)
-				if err != nil {
+				if err = d.InsertState(st, v.ID, state); err != nil {
 					log.WithFields(log.Fields{
 						"path":       st,
 						"version_id": v.ID,
@@ -131,7 +134,9 @@ func getVersion(w http.ResponseWriter, r *http.Request) {
 		api.JSONError(w, "Failed to marshal version", err)
 		return
 	}
-	io.WriteString(w, string(j))
+	if _, err := io.WriteString(w, string(j)); err != nil {
+		log.Error(err.Error())
+	}
 }
 
 // Main

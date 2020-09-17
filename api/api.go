@@ -11,6 +11,7 @@ import (
 	"github.com/camptocamp/terraboard/db"
 	"github.com/camptocamp/terraboard/state"
 	"github.com/camptocamp/terraboard/util"
+	log "github.com/sirupsen/logrus"
 )
 
 var states []string
@@ -22,7 +23,9 @@ func JSONError(w http.ResponseWriter, message string, err error) {
 	errObj["error"] = message
 	errObj["details"] = fmt.Sprintf("%v", err)
 	j, _ := json.Marshal(errObj)
-	io.WriteString(w, string(j))
+	if _, err := io.WriteString(w, string(j)); err != nil {
+		log.Error(err.Error())
+	}
 }
 
 // ListStates lists States
@@ -35,7 +38,9 @@ func ListStates(w http.ResponseWriter, _ *http.Request, d *db.Database) {
 		JSONError(w, "Failed to marshal states", err)
 		return
 	}
-	io.WriteString(w, string(j))
+	if _, err := io.WriteString(w, string(j)); err != nil {
+		log.Error(err.Error())
+	}
 }
 
 // ListTerraformVersionsWithCount lists Terraform versions with their associated
@@ -50,7 +55,9 @@ func ListTerraformVersionsWithCount(w http.ResponseWriter, r *http.Request, d *d
 		JSONError(w, "Failed to marshal states", err)
 		return
 	}
-	io.WriteString(w, string(j))
+	if _, err := io.WriteString(w, string(j)); err != nil {
+		log.Error(err.Error())
+	}
 }
 
 // ListStateStats returns State information for a given path as parameter
@@ -69,7 +76,9 @@ func ListStateStats(w http.ResponseWriter, r *http.Request, d *db.Database) {
 		JSONError(w, "Failed to marshal states", err)
 		return
 	}
-	io.WriteString(w, string(j))
+	if _, err := io.WriteString(w, string(j)); err != nil {
+		log.Error(err.Error())
+	}
 }
 
 // GetState provides information on a State
@@ -87,12 +96,14 @@ func GetState(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	}
 	state := d.GetState(st, versionID)
 
-	jState, err := json.Marshal(state)
+	j, err := json.Marshal(state)
 	if err != nil {
 		JSONError(w, "Failed to marshal state", err)
 		return
 	}
-	io.WriteString(w, string(jState))
+	if _, err := io.WriteString(w, string(j)); err != nil {
+		log.Error(err.Error())
+	}
 }
 
 // GetStateActivity returns the activity (version history) of a State
@@ -101,12 +112,14 @@ func GetStateActivity(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	st := util.TrimBasePath(r, "api/state/activity/")
 	activity := d.GetStateActivity(st)
 
-	jActivity, err := json.Marshal(activity)
+	j, err := json.Marshal(activity)
 	if err != nil {
 		JSONError(w, "Failed to marshal state activity", err)
 		return
 	}
-	io.WriteString(w, string(jActivity))
+	if _, err := io.WriteString(w, string(j)); err != nil {
+		log.Error(err.Error())
+	}
 }
 
 // StateCompare compares two versions ('from' and 'to') of a State
@@ -125,12 +138,14 @@ func StateCompare(w http.ResponseWriter, r *http.Request, d *db.Database) {
 		return
 	}
 
-	jCompare, err := json.Marshal(compare)
+	j, err := json.Marshal(compare)
 	if err != nil {
 		JSONError(w, "Failed to marshal state compare", err)
 		return
 	}
-	io.WriteString(w, string(jCompare))
+	if _, err := io.WriteString(w, string(j)); err != nil {
+		log.Error(err.Error())
+	}
 }
 
 // GetLocks returns information on locked States
@@ -147,7 +162,9 @@ func GetLocks(w http.ResponseWriter, _ *http.Request, sp state.Provider) {
 		JSONError(w, "Failed to marshal locks", err)
 		return
 	}
-	io.WriteString(w, string(j))
+	if _, err := io.WriteString(w, string(j)); err != nil {
+		log.Error(err.Error())
+	}
 }
 
 // SearchAttribute performs a search on Resource Attributes
@@ -168,7 +185,9 @@ func SearchAttribute(w http.ResponseWriter, r *http.Request, d *db.Database) {
 		JSONError(w, "Failed to marshal json", err)
 		return
 	}
-	io.WriteString(w, string(j))
+	if _, err := io.WriteString(w, string(j)); err != nil {
+		log.Error(err.Error())
+	}
 }
 
 // ListResourceTypes lists all Resource types
@@ -180,7 +199,9 @@ func ListResourceTypes(w http.ResponseWriter, _ *http.Request, d *db.Database) {
 		JSONError(w, "Failed to marshal json", err)
 		return
 	}
-	io.WriteString(w, string(j))
+	if _, err := io.WriteString(w, string(j)); err != nil {
+		log.Error(err.Error())
+	}
 }
 
 // ListResourceTypesWithCount lists all Resource types with their associated count
@@ -192,7 +213,9 @@ func ListResourceTypesWithCount(w http.ResponseWriter, _ *http.Request, d *db.Da
 		JSONError(w, "Failed to marshal json", err)
 		return
 	}
-	io.WriteString(w, string(j))
+	if _, err := io.WriteString(w, string(j)); err != nil {
+		log.Error(err.Error())
+	}
 }
 
 // ListResourceNames lists all Resource names
@@ -204,7 +227,9 @@ func ListResourceNames(w http.ResponseWriter, _ *http.Request, d *db.Database) {
 		JSONError(w, "Failed to marshal json", err)
 		return
 	}
-	io.WriteString(w, string(j))
+	if _, err := io.WriteString(w, string(j)); err != nil {
+		log.Error(err.Error())
+	}
 }
 
 // ListAttributeKeys lists all Resource Attribute Keys,
@@ -218,7 +243,9 @@ func ListAttributeKeys(w http.ResponseWriter, r *http.Request, d *db.Database) {
 		JSONError(w, "Failed to marshal json", err)
 		return
 	}
-	io.WriteString(w, string(j))
+	if _, err := io.WriteString(w, string(j)); err != nil {
+		log.Error(err.Error())
+	}
 }
 
 // ListTfVersions lists all Terraform versions
@@ -230,7 +257,9 @@ func ListTfVersions(w http.ResponseWriter, _ *http.Request, d *db.Database) {
 		JSONError(w, "Failed to marshal json", err)
 		return
 	}
-	io.WriteString(w, string(j))
+	if _, err := io.WriteString(w, string(j)); err != nil {
+		log.Error(err.Error())
+	}
 }
 
 // GetUser returns information about the logged user
@@ -247,5 +276,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		JSONError(w, "Failed to marshal user information", err)
 		return
 	}
-	io.WriteString(w, string(j))
+	if _, err := io.WriteString(w, string(j)); err != nil {
+		log.Error(err.Error())
+	}
 }
