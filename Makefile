@@ -48,10 +48,16 @@ test: ## Run the tests against the codebase
 
 .PHONY: build
 build: main.go $(FILES) ## Build the binary
-	CGO_ENABLED=1 GOOS=linux go build \
-	  -ldflags "-linkmode external -extldflags -static -X main.version=$(VERSION)" \
-	-o $(NAME) $<
+	CGO_ENABLED=1 GOOS=linux \
+		go build \
+		-trimpath \
+		-ldflags "-linkmode external -extldflags -static -X main.version=$(VERSION)" \
+		-o $(NAME) $<
 	strip $(NAME)
+
+.PHONY: install
+install: ## Install the binary using local environment
+	go install .
 
 .PHONY: vendor
 vendor: # Vendor go modules
