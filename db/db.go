@@ -85,7 +85,9 @@ func marshalAttributeValues(src *states.ResourceInstanceObjectSrc) (attrs []type
 			vals[k] = v
 		}
 	} else {
-		json.Unmarshal(src.AttrsJSON, &vals)
+		if err := json.Unmarshal(src.AttrsJSON, &vals); err != nil {
+			log.Error(err.Error())
+		}
 	}
 	log.Debug(vals)
 
@@ -156,7 +158,9 @@ func (db *Database) KnownVersions() (versions []string) {
 	defer rows.Close()
 	for rows.Next() {
 		var version string
-		rows.Scan(&version) // TODO: err
+		if err := rows.Scan(&version); err != nil {
+			log.Error(err.Error())
+		}
 		versions = append(versions, version)
 	}
 	return
@@ -222,7 +226,9 @@ func (db *Database) SearchAttribute(query url.Values) (results []types.SearchRes
 
 	// Count everything
 	row := db.Raw("SELECT count(*)"+sqlQuery, params...).Row()
-	row.Scan(&total)
+	if err := row.Scan(&total); err != nil {
+		log.Error(err.Error())
+	}
 
 	// Now get results
 	// gorm doesn't support subqueries...
@@ -258,7 +264,9 @@ func (db *Database) ListStatesVersions() (statesVersions map[string][]string) {
 	for rows.Next() {
 		var path string
 		var versionID string
-		rows.Scan(&path, &versionID)
+		if err := rows.Scan(&path, &versionID); err != nil {
+			log.Error(err.Error())
+		}
 		statesVersions[versionID] = append(statesVersions[versionID], path)
 	}
 	return
@@ -270,7 +278,9 @@ func (db *Database) ListStates() (states []string) {
 	defer rows.Close()
 	for rows.Next() {
 		var state string
-		rows.Scan(&state)
+		if err := rows.Scan(&state); err != nil {
+			log.Error(err.Error())
+		}
 		states = append(states, state)
 	}
 	return
@@ -303,7 +313,9 @@ func (db *Database) ListTerraformVersionsWithCount(query url.Values) (results []
 		var name string
 		var count string
 		r := make(map[string]string)
-		rows.Scan(&name, &count)
+		if err = rows.Scan(&name, &count); err != nil {
+			return
+		}
 		r["name"] = name
 		r["count"] = count
 		results = append(results, r)
@@ -314,7 +326,9 @@ func (db *Database) ListTerraformVersionsWithCount(query url.Values) (results []
 // ListStateStats returns a slice of StateStat, along with paging information
 func (db *Database) ListStateStats(query url.Values) (states []types.StateStat, page int, total int) {
 	row := db.Table("states").Select("count(DISTINCT path)").Row()
-	row.Scan(&total)
+	if err := row.Scan(&total); err != nil {
+		log.Error(err.Error())
+	}
 
 	offset := 0
 	page = 1
@@ -346,7 +360,9 @@ func (db *Database) listField(table, field string) (results []string, err error)
 
 	for rows.Next() {
 		var t string
-		rows.Scan(&t)
+		if err = rows.Scan(&t); err != nil {
+			return
+		}
 		results = append(results, t)
 	}
 
@@ -367,7 +383,9 @@ func (db *Database) listFieldWithCount(table, field string) (results []map[strin
 		var name string
 		var count string
 		r := make(map[string]string)
-		rows.Scan(&name, &count)
+		if err = rows.Scan(&name, &count); err != nil {
+			return
+		}
 		r["name"] = name
 		r["count"] = count
 		results = append(results, r)
@@ -404,7 +422,9 @@ func (db *Database) ListResourceTypesWithCount() (results []map[string]string, e
 		var name string
 		var count string
 		r := make(map[string]string)
-		rows.Scan(&name, &count)
+		if err = rows.Scan(&name, &count); err != nil {
+			return
+		}
 		r["name"] = name
 		r["count"] = count
 		results = append(results, r)
@@ -441,7 +461,9 @@ func (db *Database) ListAttributeKeys(resourceType string) (results []string, er
 
 	for rows.Next() {
 		var t string
-		rows.Scan(&t)
+		if err = rows.Scan(&t); err != nil {
+			return
+		}
 		results = append(results, t)
 	}
 
@@ -458,6 +480,6 @@ func (db *Database) DefaultVersion(path string) (version string, err error) {
 		" WHERE states.path = ?"
 
 	row := db.Raw(sqlQuery, path).Row()
-	row.Scan(&version)
+	err = row.Scan(&version)
 	return
 }
