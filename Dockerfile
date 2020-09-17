@@ -1,13 +1,12 @@
 FROM golang:1.15 as builder
-WORKDIR /go/src/github.com/camptocamp/terraboard
+WORKDIR /opt/build
 COPY . .
-ENV GO111MODULE=on
-RUN make terraboard
+RUN make build
 
 FROM scratch
 WORKDIR /
 COPY static /static
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /go/src/github.com/camptocamp/terraboard/terraboard /
+COPY --from=builder /opt/build/terraboard /
 ENTRYPOINT ["/terraboard"]
 CMD [""]

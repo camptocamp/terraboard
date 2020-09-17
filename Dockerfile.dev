@@ -1,7 +1,6 @@
 FROM golang:1.15
-WORKDIR /go/src/github.com/camptocamp/terraboard
+WORKDIR /opt/build
 COPY . .
-ENV GO111MODULE=on
-RUN go install .
+RUN make install
 ENTRYPOINT ["terraboard"]
 CMD [""]
