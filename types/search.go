@@ -17,6 +17,7 @@ type SearchResult struct {
 	ModulePath     string `gorm:"column:module_path" json:"module_path"`
 	ResourceType   string `gorm:"column:type" json:"resource_type"`
 	ResourceName   string `gorm:"column:name" json:"resource_name"`
+	ResourceIndex  string `gorm:"column:index" json:"resource_index"`
 	AttributeKey   string `gorm:"column:key" json:"attribute_key"`
 	AttributeValue string `gorm:"column:value" json:"attribute_value"`
 }

@@ -48,7 +48,7 @@
                             <li ng-repeat="r in mod.resources | filter:{name:resFilter} as filteredRes"
                                 ng-class="{selected: r == selectedres}"
                                 ng-click="setSelected(mod, r)" class="list-group-item resource">
-                                {{r.type}}.{{r.name}}
+                                {{r.type}}.{{r.name}}{{r.index}}
                             </li>
                         </ul>
                     </li>
@@ -62,7 +62,7 @@
         </div>
         <!-- Resource details view -->
         <div class="row" ng-if="display.details && selectedres">
-            <h2 class="node-title">{{selectedres.type}}.{{selectedres.name}}</h2>
+            <h2 class="node-title">{{selectedres.type}}.{{selectedres.name}}{{selectedres.index}}</h2>
             <div class="panel-group">
                 <div class="panel panel-info">
                     <div class="panel-heading">
