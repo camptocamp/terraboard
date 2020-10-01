@@ -91,6 +91,10 @@ func (a *AWS) GetLocks() (locks map[string]LockInfo, err error) {
 
 // GetStates returns a slice of State files in the S3 bucket
 func (a *AWS) GetStates() (states []string, err error) {
+	log.WithFields(log.Fields{
+		"bucket": a.bucket,
+		"prefix": a.keyPrefix,
+	}).Debug("Listing states from S3")
 	result, err := a.svc.ListObjects(&s3.ListObjectsInput{
 		Bucket: aws_sdk.String(a.bucket),
 		Prefix: &a.keyPrefix,
@@ -106,6 +110,11 @@ func (a *AWS) GetStates() (states []string, err error) {
 		}
 	}
 	states = keys
+	log.WithFields(log.Fields{
+		"bucket": a.bucket,
+		"prefix": a.keyPrefix,
+		"states": len(states),
+	}).Debug("Found states from S3")
 	return states, nil
 }
 

@@ -46,6 +46,7 @@ type Resource struct {
 	ModuleID   sql.NullInt64 `gorm:"index" json:"-"`
 	Type       string        `gorm:"index" json:"type"`
 	Name       string        `gorm:"index" json:"name"`
+	Index      string        `gorm:"index" json:"index"`
 	Attributes []Attribute   `json:"attributes"`
 }
 

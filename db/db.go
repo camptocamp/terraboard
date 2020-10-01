@@ -10,6 +10,7 @@ import (
 	"github.com/camptocamp/terraboard/config"
 	"github.com/camptocamp/terraboard/state"
 	"github.com/camptocamp/terraboard/types"
+	"github.com/hashicorp/terraform/addrs"
 	"github.com/hashicorp/terraform/states"
 	"github.com/hashicorp/terraform/states/statefile"
 	log "github.com/sirupsen/logrus"
@@ -62,20 +63,29 @@ func (db *Database) stateS3toDB(sf *statefile.File, path string, versionID strin
 			Path: m.Addr.String(),
 		}
 		for _, r := range m.Resources {
-			res := types.Resource{
-				Type: r.Addr.Resource.Type,
-				Name: r.Addr.Resource.Name,
+			for index, i := range r.Instances {
+				res := types.Resource{
+					Type:       r.Addr.Resource.Type,
+					Name:       r.Addr.Resource.Name,
+					Index:      getResourceIndex(index),
+					Attributes: marshalAttributeValues(i.Current),
+				}
+				mod.Resources = append(mod.Resources, res)
 			}
 
-			for _, i := range r.Instances {
-				res.Attributes = marshalAttributeValues(i.Current)
-			}
-
-			mod.Resources = append(mod.Resources, res)
 		}
 		st.Modules = append(st.Modules, mod)
 	}
 	return
+}
+
+// getResourceIndex transforms an addrs.InstanceKey instance into a string representation
+func getResourceIndex(index addrs.InstanceKey) string {
+	switch index.(type) {
+	case addrs.IntKey, addrs.StringKey:
+		return index.String()
+	}
+	return ""
 }
 
 func marshalAttributeValues(src *states.ResourceInstanceObjectSrc) (attrs []types.Attribute) {
@@ -232,9 +242,9 @@ func (db *Database) SearchAttribute(query url.Values) (results []types.SearchRes
 
 	// Now get results
 	// gorm doesn't support subqueries...
-	sql := "SELECT states.path, states.version_id, states.tf_version, states.serial, modules.path as module_path, resources.type, resources.name, attributes.key, attributes.value" +
+	sql := "SELECT states.path, states.version_id, states.tf_version, states.serial, modules.path as module_path, resources.type, resources.name, resources.index, attributes.key, attributes.value" +
 		sqlQuery +
-		" ORDER BY states.path, states.serial, modules.path, resources.type, resources.name, attributes.key" +
+		" ORDER BY states.path, states.serial, modules.path, resources.type, resources.name, resources.index, attributes.key" +
 		" LIMIT ?"
 
 	params = append(params, pageSize)
