@@ -13,7 +13,7 @@ require (
 	github.com/hashicorp/go-tfe v0.10.1
 	github.com/hashicorp/go-version v1.2.1 // indirect
 	github.com/hashicorp/hil v0.0.0-20200423225030-a18a1cd20038 // indirect
-	github.com/hashicorp/terraform v0.13.3
+	github.com/hashicorp/terraform v0.13.4
 	github.com/hashicorp/terraform-svchost v0.0.0-20200729002733-f050f53b9734 // indirect
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/jinzhu/gorm v1.9.16
