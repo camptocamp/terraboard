@@ -132,23 +132,32 @@ the app itself and a PostgreSQL database for it to store information in.
 # Set AWS credentials as environment variables:
 export AWS_ACCESS_KEY_ID=<access_key>
 export AWS_SECRET_ACCESS_KEY=<access_secret>
+
+# Set AWS configuration as environment variables:
+export AWS_DEFAULT_REGION=<AWS default region>
+export AWS_BUCKET=<S3 Bucket name>
+export AWS_DYNAMODB_TABLE=<AWS_DYNAMODB_TABLE>
+
 # Spin up the two containers and a network for them to communciate on:
-docker network create terranet
+docker network create terraboard
 docker run --name db \
   -e POSTGRES_USER=gorm \
   -e POSTGRES_DB=gorm \
   -e POSTGRES_PASSWORD="<mypassword>" \
-  --net terranet \
-  --restart=always postgres -d
+  --net terraboard \
+  --detach \
+  --restart=always \
+  postgres:9.5
+
 docker run -p 8080:8080 \
-  -e AWS_REGION="<region>" \
   -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" \
   -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" \
-  -e AWS_BUCKET="<bucket>" \
-  -e AWS_DYNAMODB_TABLE="<table>" \
+  -e AWS_REGION="${AWS_DEFAULT_REGION}" \
+  -e AWS_BUCKET="${AWS_BUCKET}" \
+  -e WS_DYNAMODB_TABLE="${AWS_DYNAMODB_TABLE}" \
   -e DB_PASSWORD="<mypassword>" \
-  -e APP_ROLE_ARN="<myrolearn>" \
-  --net terranet \
+  -e DB_SSLMODE="disable" \
+  --net terraboard \
   camptocamp/terraboard:latest
 ```
 
