@@ -176,7 +176,7 @@ contains a Terraboard template to automate its installation in Cattle.
 ## Authentication and base URL
 
 Terraboard does not implement authentication. Instead, it is recommended to use
-an authentication proxy such as [oauth2_proxy](https://github.com/bitly/oauth2_proxy).
+an authentication proxy such as [oauth2_proxy](https://github.com/camptocamp/oauth2_proxy).
 
 If you need to set a route path for Terraboard, you can set a base URL by
 passing it as the `BASE_URL` environment variable.
