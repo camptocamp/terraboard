@@ -125,8 +125,37 @@ The precedence of configurations is as described below.
 
 ## Use with Docker
 
-Either use the included docker-compose file, or run two containers from the commandline:
-the app itself and a PostgreSQL database for it to store information in.
+### Docker-compose
+
+To use the included compose file, you will need to configure an OAuth application from Github, more information in next section [Authentication and base URL](#Authentication-and-base-URL)
+
+Configuration file can be provided to the container using a [volume](https://docs.docker.com/compose/compose-file/#volumes) or a [configuration](https://docs.docker.com/compose/compose-file/#configs).
+
+```shell
+# Set oauth information:
+export OAUTH_CLIENT_ID=<>
+export OAUTH_CLIENT_SECRET=<>
+export OAUTH_COOKIE_SECRET=<>
+
+# Set AWS credentials as environment variables:
+export AWS_ACCESS_KEY_ID=<access_key>
+export AWS_SECRET_ACCESS_KEY=<access_secret>
+
+# Set AWS configuration as environment variables:
+export AWS_DEFAULT_REGION=<AWS default region>
+export AWS_BUCKET=<S3 Bucket name>
+export AWS_DYNAMODB_TABLE=<Aws DynamoDB Table>
+export AWS_KEY_PREFIX=<AWS Key Prefix>
+
+# Set basic Terraboard configuration
+export TERRABOARD_LOG_LEVEL=<Set log level (debug, info, warn, error, fatal, panic)>
+
+docker-compose up
+```
+
+Then point your browser to http://localhost.
+
+### Docker command line
 
 ```shell
 # Set AWS credentials as environment variables:
@@ -162,10 +191,6 @@ docker run -p 8080:8080 \
 ```
 
 Then point your browser to http://localhost:8080.
-
-To use the included compose file, you will need to configure an [OAuth application](https://developer.github.com/apps/building-oauth-apps/).
-
-Configuration file can be provided to the container using a [volume](https://docs.docker.com/compose/compose-file/#volumes) or a [configuration](https://docs.docker.com/compose/compose-file/#configs).
 
 ## Use with Rancher
 
