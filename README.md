@@ -127,16 +127,9 @@ The precedence of configurations is as described below.
 
 ### Docker-compose
 
-To use the included compose file, you will need to configure an OAuth application from Github, more information in next section [Authentication and base URL](#Authentication-and-base-URL)
-
 Configuration file can be provided to the container using a [volume](https://docs.docker.com/compose/compose-file/#volumes) or a [configuration](https://docs.docker.com/compose/compose-file/#configs).
 
 ```shell
-# Set oauth information:
-export OAUTH_CLIENT_ID=<>
-export OAUTH_CLIENT_SECRET=<>
-export OAUTH_COOKIE_SECRET=<>
-
 # Set AWS credentials as environment variables:
 export AWS_ACCESS_KEY_ID=<access_key>
 export AWS_SECRET_ACCESS_KEY=<access_secret>
@@ -145,15 +138,11 @@ export AWS_SECRET_ACCESS_KEY=<access_secret>
 export AWS_DEFAULT_REGION=<AWS default region>
 export AWS_BUCKET=<S3 Bucket name>
 export AWS_DYNAMODB_TABLE=<Aws DynamoDB Table>
-export AWS_KEY_PREFIX=<AWS Key Prefix>
-
-# Set basic Terraboard configuration
-export TERRABOARD_LOG_LEVEL=<Set log level (debug, info, warn, error, fatal, panic)>
 
 docker-compose up
 ```
 
-Then point your browser to http://localhost.
+Then point your browser to http://localhost:8080.
 
 ### Docker command line
 
@@ -201,7 +190,7 @@ contains a Terraboard template to automate its installation in Cattle.
 ## Authentication and base URL
 
 Terraboard does not implement authentication. Instead, it is recommended to use
-an authentication proxy such as [oauth2_proxy](https://github.com/camptocamp/oauth2_proxy).
+an authentication proxy such as [oauth2_proxy](https://github.com/bitly/oauth2_proxy).
 
 If you need to set a route path for Terraboard, you can set a base URL by
 passing it as the `BASE_URL` environment variable.

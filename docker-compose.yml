@@ -11,34 +11,15 @@ services:
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_REGION: ${AWS_DEFAULT_REGION}
       AWS_BUCKET: ${AWS_BUCKET}
-      AWS_FILE_EXTENSION: ${AWS_FILE_EXTENSION}
-      BASE_URL: /terraboard/
+      AWS_DYNAMODB_TABLE: ${AWS_DYNAMODB_TABLE}
       DB_PASSWORD: mypassword
       DB_SSLMODE: disable
-      AWS_DYNAMODB_TABLE: ${AWS_DYNAMODB_TABLE}
-      AWS_KEY_PREFIX: ${AWS_KEY_PREFIX}
-      TERRABOARD_LOG_LEVEL: ${TERRABOARD_LOG_LEVEL}
-      TERRABOARD_LOGOUT_URL: /oauth2/sign_in
     depends_on:
       - "db"
     volumes:
       - ./static:/static:ro
-
-  proxy:
-    image: camptocamp/oauth2_proxy
-    command:
-      - -http-address=0.0.0.0:80
-      - -upstream=http://terraboard:8080/terraboard/
-      - -provider=github
-      - -email-domain=*
-      - -cookie-secure=false
-      - -redirect-url=http://localhost/oauth2/callback
-    environment:
-      OAUTH2_PROXY_CLIENT_ID: ${OAUTH_CLIENT_ID}
-      OAUTH2_PROXY_CLIENT_SECRET: ${OAUTH_CLIENT_SECRET}
-      OAUTH2_PROXY_COOKIE_SECRET: ${OAUTH_COOKIE_SECRET}
     ports:
-      - 80:80
+      - "8080:8080"
 
   db:
     image: postgres:9.5
