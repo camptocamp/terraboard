@@ -37,7 +37,7 @@ goimports: setup ## Test code syntax with goimports
 
 .PHONY: ineffassign
 ineffassign: setup ## Test code syntax for ineffassign
-	ineffassign $(FILES)
+	ineffassign ./...
 
 .PHONY: misspell
 misspell: setup ## Test code with misspell
