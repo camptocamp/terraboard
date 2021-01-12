@@ -17,11 +17,20 @@ aws:
     key-prefix: test/
     file-extension: .tfstate
 
+tfe:
+  address: https://tfe.example.com
+  token: foo
+  organisation: bar
+
 gcp:
   gcs-bucket:
     - my-bucket-1
     - my-bucket-2
   gcp-sa-key-path: /path/to/key
+
+gitlab:
+  address: https://gitlab.example.com
+  token: foo
 
 web:
   port: 39090

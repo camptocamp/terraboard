@@ -72,7 +72,6 @@ func (db *Database) stateS3toDB(sf *statefile.File, path string, versionID strin
 				}
 				mod.Resources = append(mod.Resources, res)
 			}
-
 		}
 		st.Modules = append(st.Modules, mod)
 	}
@@ -409,8 +408,8 @@ func (db *Database) ListResourceTypes() ([]string, error) {
 	return db.listField("resources", "type")
 }
 
-//ListResourceTypesWithCount returns a list of Resource types with associated counts
-//from the Database
+// ListResourceTypesWithCount returns a list of Resource types with associated counts
+// from the Database
 func (db *Database) ListResourceTypesWithCount() (results []map[string]string, err error) {
 	sql := "SELECT resources.type, COUNT(*)" +
 		" FROM (SELECT DISTINCT ON(states.path) states.id, states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified" +

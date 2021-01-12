@@ -26,9 +26,12 @@ Terraboard is a web dashboard to visualize and query
 - a search interface to query resources by type, name or attributes
 - a diff interface to compare state between versions
 
-It currently supports S3 as a remote state backend, and dynamoDB for
-retrieving lock informations. Also supports Terraform Cloud (in past Terraform Enterprise [more](https://www.terraform.io/docs/cloud/index.html#note-about-product-names))
+It currently supports several remote state backend providers:
 
+- [AWS S3 (state) + DynamoDB (lock)](https://www.terraform.io/docs/backends/types/s3.html)
+- [Google Cloud Storage](https://www.terraform.io/docs/backends/types/gcs.html)
+- [Terraform Cloud (remote)](https://www.terraform.io/docs/backends/types/remote.html)
+- [GitLab](https://docs.gitlab.com/ee/user/infrastructure/terraform_state.html)
 
 ### Overview
 
@@ -62,26 +65,22 @@ version.
 
 ### Requirements
 
-Terraboard currently supports getting the Terraform states from AWS S3 and Terraform Cloud (in past Terraform Enterprise [more](https://www.terraform.io/docs/cloud/index.html#note-about-product-names)). It
-requires:
-- Terraform states from AWS S3:
-  * A **versioned** S3 bucket name with one or more Terraform states,
-    named with a `.tfstate` suffix
-  * AWS credentials with the following rights on the bucket:
-    - `s3:GetObject`
-    - `s3:ListBucket`
-    - `s3:ListBucketVersions`
-    - `s3:GetObjectVersion`
-  * If you want to retrieve lock states
-  [from a dynamoDB table](https://www.terraform.io/docs/backends/types/s3.html#dynamodb_table),
-  you need to make sure the provided AWS credentials have `dynamodb:Scan` access to that
-  table.
-- Terraform states from Terraform Cloud:
-  * Account on [Terraform Cloud](https://app.terraform.io/)
-  * Existing organization
-  * Token assigned to an organization
-- A running PostgreSQL database
+Independently of the location of your statefiles, Terraboard needs to store a internal version of its dataset. For this purpose it requires a PostgreSQL database.
+Data resiliency is not paramount though as this dataset can be rebuilt upon your statefiles at anytime.
+#### AWS S3 (state) + DynamoDB (lock)
 
+- A **versioned** S3 bucket name with one or more Terraform states, named with a `.tfstate` suffix
+- AWS credentials with the following IAM permissions over the bucket:
+  - `s3:GetObject`
+  - `s3:ListBucket`
+  - `s3:ListBucketVersions`
+  - `s3:GetObjectVersion`
+- If you want to retrieve lock states [from a dynamoDB table](https://www.terraform.io/docs/backends/types/s3.html#dynamodb_table), you need to make sure the provided AWS credentials have `dynamodb:Scan` access to that table.
+#### Terraform Cloud
+
+- Account on [Terraform Cloud](https://app.terraform.io/)
+- Existing organization
+- Token assigned to an organization
 
 ## Configuration
 
@@ -230,10 +229,10 @@ Terraboard is made of two components:
 
 The server is written in go and runs a web server which serves:
 
-  - the API on known access points, taking the data from the PostgreSQL
-    database
-  - the index page (from [static/index.html](static/index.html)) on all other
-    URLs
+- the API on known access points, taking the data from the PostgreSQL
+  database
+- the index page (from [static/index.html](static/index.html)) on all other
+  URLs
 
 The server also has a routine which regularly (every 1 minute) feeds
 the PostgreSQL database from the S3 bucket.
@@ -244,7 +243,6 @@ The UI is an AngularJS application served from `index.html`. All the UI code
 can be found in the [static/](static/) directory.
 
 
-
 ### Testing
 
 ```shell
@@ -253,6 +251,5 @@ $ docker-compose build && docker-compose up -d
 ```
 
 ### Contributing
-
 
 See [CONTRIBUTING.md](CONTRIBUTING.md)
