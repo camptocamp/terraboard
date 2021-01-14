@@ -65,7 +65,7 @@ version.
 
 ### Requirements
 
-Independently of the location of your statefiles, Terraboard needs to store a internal version of its dataset. For this purpose it requires a PostgreSQL database.
+Independently of the location of your statefiles, Terraboard needs to store an internal version of its dataset. For this purpose it requires a PostgreSQL database.
 Data resiliency is not paramount though as this dataset can be rebuilt upon your statefiles at anytime.
 #### AWS S3 (state) + DynamoDB (lock)
 
