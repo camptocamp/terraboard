@@ -30,9 +30,18 @@ func TestLoadConfigFromYaml(t *testing.T) {
 				FileExtension: ".tfstate",
 			},
 		},
+		TFE: TFEConfig{
+			Address:      "https://tfe.example.com",
+			Token:        "foo",
+			Organization: "bar",
+		},
 		GCP: GCPConfig{
 			GCSBuckets: []string{"my-bucket-1", "my-bucket-2"},
 			GCPSAKey:   "/path/to/key",
+		},
+		Gitlab: GitlabConfig{
+			Address: "https://gitlab.example.com",
+			Token:   "foo",
 		},
 		Web: WebConfig{
 			Port:      39090,
@@ -52,7 +61,6 @@ func TestSetLogging_debug(t *testing.T) {
 	c.Log.Level = "debug"
 	c.Log.Format = "plain"
 	err := c.SetupLogging()
-
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -67,7 +75,6 @@ func TestSetLogging_info(t *testing.T) {
 	c.Log.Level = "info"
 	c.Log.Format = "plain"
 	err := c.SetupLogging()
-
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -82,7 +89,6 @@ func TestSetLogging_warn(t *testing.T) {
 	c.Log.Level = "warn"
 	c.Log.Format = "plain"
 	err := c.SetupLogging()
-
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -97,7 +103,6 @@ func TestSetLogging_error(t *testing.T) {
 	c.Log.Level = "error"
 	c.Log.Format = "plain"
 	err := c.SetupLogging()
-
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -112,7 +117,6 @@ func TestSetLogging_fatal(t *testing.T) {
 	c.Log.Level = "fatal"
 	c.Log.Format = "plain"
 	err := c.SetupLogging()
-
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -127,7 +131,6 @@ func TestSetLogging_panic(t *testing.T) {
 	c.Log.Level = "panic"
 	c.Log.Format = "plain"
 	err := c.SetupLogging()
-
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -159,7 +162,6 @@ func TestSetLogging_json(t *testing.T) {
 	c.Log.Level = "debug"
 	c.Log.Format = "json"
 	err := c.SetupLogging()
-
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}

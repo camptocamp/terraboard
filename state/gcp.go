@@ -24,7 +24,7 @@ type GCP struct {
 }
 
 // NewGCP creates an GCP object
-func NewGCP(c *config.Config) (GCP, error) {
+func NewGCP(c *config.Config) (*GCP, error) {
 	ctx := context.Background()
 	var client *storage.Client
 	var err error
@@ -40,14 +40,14 @@ func NewGCP(c *config.Config) (GCP, error) {
 
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
-		return GCP{}, err
+		return nil, err
 	}
 
 	log.WithFields(log.Fields{
 		"buckets": c.GCP.GCSBuckets,
 	}).Info("Client successfully created")
 
-	return GCP{
+	return &GCP{
 		svc:     client,
 		buckets: c.GCP.GCSBuckets,
 	}, nil

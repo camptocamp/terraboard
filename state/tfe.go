@@ -19,7 +19,7 @@ type TFE struct {
 }
 
 // NewTFE creates a new TFE object
-func NewTFE(c *config.Config) (TFE, error) {
+func NewTFE(c *config.Config) (*TFE, error) {
 	config := &tfe.Config{
 		Address: c.TFE.Address,
 		Token:   c.TFE.Token,
@@ -27,12 +27,12 @@ func NewTFE(c *config.Config) (TFE, error) {
 
 	client, err := tfe.NewClient(config)
 	if err != nil {
-		return TFE{}, err
+		return nil, err
 	}
 
 	ctx := context.Background()
 
-	return TFE{
+	return &TFE{
 		Client: client,
 		org:    c.TFE.Organization,
 		ctx:    &ctx,

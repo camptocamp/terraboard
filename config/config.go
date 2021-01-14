@@ -52,10 +52,16 @@ type TFEConfig struct {
 	Organization string `long:"tfe-organization" env:"TFE_ORGANIZATION" yaml:"tfe-organization" description:"Terraform Enterprise organization for states access"`
 }
 
-// GCPConfig stores the Google Cloud configutation
+// GCPConfig stores the Google Cloud configuration
 type GCPConfig struct {
 	GCSBuckets []string `long:"gcs-bucket" yaml:"gcs-bucket" description:"Google Cloud bucket to search"`
 	GCPSAKey   string   `long:"gcp-sa-key-path" env:"GCP_SA_KEY_PATH" yaml:"gcp-sa-key-path" description:"The path to the service account to use to connect to Google Cloud Platform"`
+}
+
+// GitlabConfig stores the GitLab configuration
+type GitlabConfig struct {
+	Address string `long:"gitlab-address" env:"GITLAB_ADDRESS" yaml:"gitlab-address" description:"GitLab address (root)" default:"https://gitlab.com"`
+	Token   string `long:"gitlab-token" env:"GITLAB_TOKEN" yaml:"gitlab-token" description:"Token to authenticate upon GitLab"`
 }
 
 // WebConfig stores the UI interface parameters
@@ -80,6 +86,8 @@ type Config struct {
 	TFE TFEConfig `group:"Terraform Enterprise Options" yaml:"tfe"`
 
 	GCP GCPConfig `group:"Google Cloud Platform Options" yaml:"gcp"`
+
+	Gitlab GitlabConfig `group:"GitLab Options" yaml:"gitlab"`
 
 	Web WebConfig `group:"Web" yaml:"web"`
 }

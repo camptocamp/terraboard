@@ -18,6 +18,7 @@ require (
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/jinzhu/gorm v1.9.16
 	github.com/lib/pq v1.8.0 // indirect
+	github.com/machinebox/graphql v0.2.2
 	github.com/mitchellh/mapstructure v1.3.3 // indirect
 	github.com/pmezard/go-difflib v1.0.0
 	github.com/sirupsen/logrus v1.6.0

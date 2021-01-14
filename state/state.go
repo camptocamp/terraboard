@@ -43,20 +43,17 @@ type Provider interface {
 func Configure(c *config.Config) (Provider, error) {
 	if len(c.TFE.Token) > 0 {
 		log.Info("Using Terraform Enterprise as the state/locks provider")
-		provider, err := NewTFE(c)
-		if err != nil {
-			return nil, err
-		}
-		return &provider, nil
+		return NewTFE(c)
 	}
 
 	if c.GCP.GCSBuckets != nil {
 		log.Info("Using Google Cloud as the state/locks provider")
-		provider, err := NewGCP(c)
-		if err != nil {
-			return nil, err
-		}
-		return &provider, nil
+		return NewGCP(c)
+	}
+
+	if len(c.Gitlab.Token) > 0 {
+		log.Info("Using Gitab as the state/locks provider")
+		return NewGitlab(c), nil
 	}
 
 	log.Info("Using AWS (S3+DynamoDB) as the state/locks provider")
