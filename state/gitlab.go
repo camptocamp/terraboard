@@ -27,7 +27,7 @@ func NewGitlab(c *config.Config) *Gitlab {
 // GetLocks returns a map of locks by State path
 func (g *Gitlab) GetLocks() (locks map[string]LockInfo, err error) {
 	locks = make(map[string]LockInfo)
-	projects := gitlab.Projects{}
+	var projects gitlab.Projects
 	projects, err = g.Client.GetProjectsWithTerraformStates()
 	if err != nil {
 		return
@@ -54,7 +54,7 @@ func (g *Gitlab) GetLocks() (locks map[string]LockInfo, err error) {
 
 // GetStates returns a slice of all found workspaces
 func (g *Gitlab) GetStates() (states []string, err error) {
-	projects := gitlab.Projects{}
+	var projects gitlab.Projects
 	projects, err = g.Client.GetProjectsWithTerraformStates()
 	if err != nil {
 		return
@@ -71,20 +71,26 @@ func (g *Gitlab) GetStates() (states []string, err error) {
 
 // GetVersions returns a slice of Version objects
 func (g *Gitlab) GetVersions(state string) (versions []Version, err error) {
-	projects := gitlab.Projects{}
+	var projects gitlab.Projects
 	projects, err = g.Client.GetProjectsWithTerraformStates()
 	if err != nil {
 		return
 	}
 
+	// TODO: Highly unoptimized: whether implement a GraphQL query to fetch the correct project only
+	// TODO: or cache the values locally
 	for _, project := range projects {
-		for _, state := range project.TerraformStates {
-			for i := state.LatestVersion.Serial; i >= 0; i-- {
+		for _, s := range project.TerraformStates {
+			if state != s.GlobalPath() {
+				continue
+			}
+
+			for i := s.LatestVersion.Serial; i >= 0; i-- {
 				versions = append(versions, Version{
 					ID: strconv.Itoa(i),
 					// TODO: Fix/implement once https://gitlab.com/gitlab-org/gitlab/-/merge_requests/45851 will be released
 					// somehow it seems to be working correctly though, not sure from which place it manages to find the correct date
-					LastModified: state.LatestVersion.CreatedAt,
+					LastModified: s.LatestVersion.CreatedAt,
 				})
 			}
 		}

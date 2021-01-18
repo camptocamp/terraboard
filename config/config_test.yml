@@ -20,7 +20,7 @@ aws:
 tfe:
   address: https://tfe.example.com
   token: foo
-  organisation: bar
+  organization: bar
 
 gcp:
   gcs-bucket:
