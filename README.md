@@ -121,6 +121,7 @@ The precedence of configurations is as described below.
 |`--tfe-organization` | `TFE_ORGANIZATION` | `tfe.tfe-organization` | Terraform Enterprise organization for states access | - |
 |`--gcs-bucket` | `N/A` | `gcp.gcs-buckets` | Google Cloud Storage buckets to access | - |
 |`--gcp-sa-key-path` | `GCP_SA_KEY_PATH` | `gcp.gcp-sa-key-path` | Path to the service account key to use for Google Cloud Storage | - |
+| | `GODEBUG` | `netdns=go` | DNS resolver to use (see https://github.com/camptocamp/terraboard/issues/118) | netdns=cgo |
 
 ## Use with Docker
 
@@ -161,6 +162,7 @@ docker run --name db \
   -e POSTGRES_USER=gorm \
   -e POSTGRES_DB=gorm \
   -e POSTGRES_PASSWORD="<mypassword>" \
+  -e GODEBUG="netdns=go" \
   --net terraboard \
   --detach \
   --restart=always \

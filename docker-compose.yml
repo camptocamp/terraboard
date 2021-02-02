@@ -14,6 +14,7 @@ services:
       AWS_DYNAMODB_TABLE: ${AWS_DYNAMODB_TABLE}
       DB_PASSWORD: mypassword
       DB_SSLMODE: disable
+      GODEBUG: netdns=go
     depends_on:
       - "db"
     volumes:

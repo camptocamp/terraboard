@@ -70,6 +70,7 @@ docker run -p 8080:8080 \
  -e AWS_BUCKET="<bucket>" \
  -e AWS_DYNAMODB_TABLE="<table>" \
  -e DB_PASSWORD="<mypassword>" \
+ -e GODEBUG="netdns=go" \
  --net terranet \
  camptocamp/terraboard:latest
 ```
