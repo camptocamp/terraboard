@@ -47,9 +47,9 @@ type AWSConfig struct {
 
 // TFEConfig stores the Terraform Enterprise configuration
 type TFEConfig struct {
-	Address      string `long:"tfe-address" env:"TFE_ADDRESS" yaml:"tfe-address" description:"Terraform Enterprise address for states access"`
-	Token        string `long:"tfe-token" env:"TFE_TOKEN" yaml:"tfe-token" description:"Terraform Enterprise Token for states access"`
-	Organization string `long:"tfe-organization" env:"TFE_ORGANIZATION" yaml:"tfe-organization" description:"Terraform Enterprise organization for states access"`
+	Address      string `long:"tfe-address" env:"TFE_ADDRESS" yaml:"address" description:"Terraform Enterprise address for states access"`
+	Token        string `long:"tfe-token" env:"TFE_TOKEN" yaml:"token" description:"Terraform Enterprise Token for states access"`
+	Organization string `long:"tfe-organization" env:"TFE_ORGANIZATION" yaml:"organization" description:"Terraform Enterprise organization for states access"`
 }
 
 // GCPConfig stores the Google Cloud configuration
@@ -60,8 +60,8 @@ type GCPConfig struct {
 
 // GitlabConfig stores the GitLab configuration
 type GitlabConfig struct {
-	Address string `long:"gitlab-address" env:"GITLAB_ADDRESS" yaml:"gitlab-address" description:"GitLab address (root)" default:"https://gitlab.com"`
-	Token   string `long:"gitlab-token" env:"GITLAB_TOKEN" yaml:"gitlab-token" description:"Token to authenticate upon GitLab"`
+	Address string `long:"gitlab-address" env:"GITLAB_ADDRESS" yaml:"address" description:"GitLab address (root)" default:"https://gitlab.com"`
+	Token   string `long:"gitlab-token" env:"GITLAB_TOKEN" yaml:"token" description:"Token to authenticate upon GitLab"`
 }
 
 // WebConfig stores the UI interface parameters
