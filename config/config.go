@@ -32,9 +32,10 @@ type DBConfig struct {
 
 // S3BucketConfig stores the S3 bucket configuration
 type S3BucketConfig struct {
-	Bucket        string `long:"s3-bucket" env:"AWS_BUCKET" yaml:"bucket" description:"AWS S3 bucket."`
-	KeyPrefix     string `long:"key-prefix" env:"AWS_KEY_PREFIX" yaml:"key-prefix" description:"AWS Key Prefix."`
-	FileExtension string `long:"file-extension" env:"AWS_FILE_EXTENSION" yaml:"file-extension" description:"File extension of state files." default:".tfstate"`
+	Bucket         string `long:"s3-bucket" env:"AWS_BUCKET" yaml:"bucket" description:"AWS S3 bucket."`
+	KeyPrefix      string `long:"key-prefix" env:"AWS_KEY_PREFIX" yaml:"key-prefix" description:"AWS Key Prefix."`
+	FileExtension  string `long:"file-extension" env:"AWS_FILE_EXTENSION" yaml:"file-extension" description:"File extension of state files." default:".tfstate"`
+	ForcePathStyle bool   `long:"force-path-style" env:"AWS_FORCE_PATH_STYLE" yaml:"force-path-style" description:"Force path style S3 bucket calls."`
 }
 
 // AWSConfig stores the DynamoDB table and S3 Bucket configuration
@@ -42,6 +43,7 @@ type AWSConfig struct {
 	DynamoDBTable string         `long:"dynamodb-table" env:"AWS_DYNAMODB_TABLE" yaml:"dynamodb-table" description:"AWS DynamoDB table for locks."`
 	S3            S3BucketConfig `group:"S3 Options" yaml:"s3"`
 	Endpoint      string         `long:"aws-endpoint" env:"AWS_ENDPOINT" yaml:"endpoint" description:"AWS endpoint."`
+	Region        string         `long:"aws-region" env:"AWS_REGION" yaml:"region" description:"AWS region."`
 	APPRoleArn    string         `long:"aws-role-arn" env:"APP_ROLE_ARN" yaml:"app-role-arn" description:"Role ARN to Assume."`
 }
 
@@ -113,6 +115,7 @@ func LoadConfig(version string) *Config {
 	var c Config
 	parser := flags.NewParser(&c, flags.Default)
 	if _, err := parser.Parse(); err != nil {
+		fmt.Printf("Failed to parsed flags due to err: %s", err)
 		os.Exit(1)
 	}
 

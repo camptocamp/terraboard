@@ -42,6 +42,10 @@ func NewAWS(c *config.Config) AWS {
 	if e := c.AWS.Endpoint; e != "" {
 		awsConfig.WithEndpoint(e)
 	}
+	if e := c.AWS.Region; e != "" {
+		awsConfig.WithRegion(e)
+	}
+	awsConfig.S3ForcePathStyle = &c.AWS.S3.ForcePathStyle
 
 	return AWS{
 		svc:           s3.New(sess, awsConfig),
