@@ -34,7 +34,7 @@ type DBConfig struct {
 type S3BucketConfig struct {
 	Bucket        string `long:"s3-bucket" env:"AWS_BUCKET" yaml:"bucket" description:"AWS S3 bucket."`
 	KeyPrefix     string `long:"key-prefix" env:"AWS_KEY_PREFIX" yaml:"key-prefix" description:"AWS Key Prefix."`
-	FileExtension string `long:"file-extension" env:"AWS_FILE_EXTENSION" yaml:"file-extension" description:"File extension of state files." default:".tfstate"`
+	FileExtension string `long:"file-extension" env:"AWS_FILE_EXTENSION" yaml:"file-extension" description:"Comma separated list of file extensions of state files." default:".tfstate"`
 }
 
 // AWSConfig stores the DynamoDB table and S3 Bucket configuration

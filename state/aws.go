@@ -105,8 +105,10 @@ func (a *AWS) GetStates() (states []string, err error) {
 
 	var keys []string
 	for _, obj := range result.Contents {
-		if strings.HasSuffix(*obj.Key, a.fileExtension) {
-			keys = append(keys, *obj.Key)
+		for _, ext := range strings.Split(a.fileExtension, ",") {
+			if strings.HasSuffix(*obj.Key, ext) {
+				keys = append(keys, *obj.Key)
+			}
 		}
 	}
 	states = keys
