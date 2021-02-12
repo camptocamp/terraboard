@@ -113,7 +113,7 @@ The precedence of configurations is as described below.
 |`--s3-bucket` | `AWS_BUCKET` | `aws.bucket` | AWS S3 bucket | - |
 |`--app-role-arn` | `APPRoleArn` | `aws.app-role-arn` | Role ARN to Assume | - |
 |`--key-prefix` | `AWS_KEY_PREFIX` | `aws.key-prefix` | AWS Key Prefix | - |
-|`--file-extension` | `AWS_FILE_EXTENSION` | `aws.file-extension` | Comma separated list of file extensions of state files | .tfstate |
+|`--file-extension` | `AWS_FILE_EXTENSION` | `aws.file-extension` | File extension(s) of state files. Use multiple CLI flags or a comma separated list ENV variable | .tfstate |
 |`--base-url` | `TERRABOARD_BASE_URL` | `web.base-url` | Base URL | / |
 |`--logout-url` | `TERRABOARD_LOGOUT_URL` | `web.logout-url` | Logout URL | - |
 |`--tfe-address` | `TFE_ADDRESS` | `tfe.tfe-address` | Terraform Enterprise address for states access | - |
