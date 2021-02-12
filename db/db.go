@@ -89,9 +89,6 @@ func getResourceIndex(index addrs.InstanceKey) string {
 
 func marshalAttributeValues(src *states.ResourceInstanceObjectSrc) (attrs []types.Attribute) {
 	vals := make(attributeValues)
-	if src == nil {
-		return 
-	}
 	if src.AttrsFlat != nil {
 		for k, v := range src.AttrsFlat {
 			vals[k] = v
