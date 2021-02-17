@@ -1,4 +1,4 @@
-baseURL = "http://camptocamp.github.io/terraboard/"
+baseURL = "http://terraboard.io/"
 title = "Terraboard"
 languageCode = "en-us"
 theme = "elate"
@@ -186,8 +186,8 @@ docker run -p 8080:8080 \
       img = "bivac.png"
       alt = "Bivac"
       social = [
-        ["icon-globe", "https://camptocamp.github.io/bivac"],
-        ["icon-github", "https://github.com/camptocamp/bivac"]
+        ["icon-globe", "https://bivac.io"],
+        ["icon-github", "https://bivac.io"]
       ]
 
     [[params.about.item]]

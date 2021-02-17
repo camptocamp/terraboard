@@ -1,6 +1,6 @@
 # Terraboard
 
-Website: [https://camptocamp.github.io/terraboard](https://camptocamp.github.io/terraboard)
+Website: [https://terraboard.io](https://terraboard.io)
 
 ![Terraboard Logo](logo/terraboard_logo.png)
 
