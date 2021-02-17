@@ -28,6 +28,7 @@ func TestLoadConfigFromYaml(t *testing.T) {
 				Bucket:        "terraboard-bucket",
 				KeyPrefix:     "test/",
 				FileExtension: []string{".tfstate"},
+				ForcePathStyle: true,
 			},
 		},
 		TFE: TFEConfig{

@@ -16,6 +16,7 @@ aws:
     bucket: terraboard-bucket
     key-prefix: test/
     file-extension: .tfstate
+    force-path-style: true
 
 tfe:
   address: https://tfe.example.com
