@@ -25,9 +25,9 @@ func TestLoadConfigFromYaml(t *testing.T) {
 		AWS: AWSConfig{
 			DynamoDBTable: "terraboard-dynamodb",
 			S3: S3BucketConfig{
-				Bucket:        "terraboard-bucket",
-				KeyPrefix:     "test/",
-				FileExtension: []string{".tfstate"},
+				Bucket:         "terraboard-bucket",
+				KeyPrefix:      "test/",
+				FileExtension:  []string{".tfstate"},
 				ForcePathStyle: true,
 			},
 		},
