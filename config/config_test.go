@@ -27,7 +27,7 @@ func TestLoadConfigFromYaml(t *testing.T) {
 			S3: S3BucketConfig{
 				Bucket:        "terraboard-bucket",
 				KeyPrefix:     "test/",
-				FileExtension: ".tfstate",
+				FileExtension: []string{".tfstate"},
 			},
 		},
 		TFE: TFEConfig{

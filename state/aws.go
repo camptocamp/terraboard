@@ -24,7 +24,7 @@ type AWS struct {
 	bucket        string
 	dynamoTable   string
 	keyPrefix     string
-	fileExtension string
+	fileExtension []string
 }
 
 // NewAWS creates an AWS object
@@ -105,8 +105,10 @@ func (a *AWS) GetStates() (states []string, err error) {
 
 	var keys []string
 	for _, obj := range result.Contents {
-		if strings.HasSuffix(*obj.Key, a.fileExtension) {
-			keys = append(keys, *obj.Key)
+		for _, ext := range a.fileExtension {
+			if strings.HasSuffix(*obj.Key, ext) {
+				keys = append(keys, *obj.Key)
+			}
 		}
 	}
 	states = keys
