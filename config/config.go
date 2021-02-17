@@ -115,7 +115,7 @@ func LoadConfig(version string) *Config {
 	var c Config
 	parser := flags.NewParser(&c, flags.Default)
 	if _, err := parser.Parse(); err != nil {
-		fmt.Printf("Failed to parsed flags due to err: %s", err)
+		fmt.Printf("Failed to parse flags: %s", err)
 		os.Exit(1)
 	}
 
