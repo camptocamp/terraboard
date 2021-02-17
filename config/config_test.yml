@@ -15,7 +15,7 @@ aws:
   s3:
     bucket: terraboard-bucket
     key-prefix: test/
-    file-extension: .tfstate
+    file-extension: [.tfstate]
     force-path-style: true
 
 tfe:
