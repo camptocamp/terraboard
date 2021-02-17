@@ -1,5 +1,47 @@
 # Changelog
 
+## [1.0.0](https://github.com/camptocamp/terraboard/tree/1.0.0) (2021-02-17)
+
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/0.22.0...1.0.0)
+
+**Breaking changes:**
+
+- Fixed failing CI following recent changes introducing GitLab backend support [\#133](https://github.com/camptocamp/terraboard/pull/133) ([mvisonneau](https://github.com/mvisonneau))
+- Support multiple file extensions in S3 [\#122](https://github.com/camptocamp/terraboard/pull/122) ([Moglum](https://github.com/Moglum))
+
+**Implemented enhancements:**
+
+- Allow setting region and force path style for s3 [\#136](https://github.com/camptocamp/terraboard/pull/136) ([hoshsadiq](https://github.com/hoshsadiq))
+- option to switch go dns resolver [\#135](https://github.com/camptocamp/terraboard/pull/135) ([mihaiplesa](https://github.com/mihaiplesa))
+- bump terraform to 0.13.6 [\#134](https://github.com/camptocamp/terraboard/pull/134) ([mihaiplesa](https://github.com/mihaiplesa))
+- Bumped all dependencies / TF 0.14.5 / TFE 0.12.0 [\#131](https://github.com/camptocamp/terraboard/pull/131) ([mvisonneau](https://github.com/mvisonneau))
+- Added support for GitLab as terraform state backend provider [\#130](https://github.com/camptocamp/terraboard/pull/130) ([mvisonneau](https://github.com/mvisonneau))
+- made the goreleaser config a bit more readable [\#129](https://github.com/camptocamp/terraboard/pull/129) ([mvisonneau](https://github.com/mvisonneau))
+- Fix/docker instructions [\#124](https://github.com/camptocamp/terraboard/pull/124) ([uritau](https://github.com/uritau))
+- bump terraform to 0.13.5 [\#120](https://github.com/camptocamp/terraboard/pull/120) ([filiptepper](https://github.com/filiptepper))
+- Bump to terraform 0.13.4 [\#119](https://github.com/camptocamp/terraboard/pull/119) ([ouranos](https://github.com/ouranos))
+- Bump to terraform 0.13.3 [\#117](https://github.com/camptocamp/terraboard/pull/117) ([chelnak](https://github.com/chelnak))
+- Add support for multiple instances of the same resource [\#115](https://github.com/camptocamp/terraboard/pull/115) ([Wiston999](https://github.com/Wiston999))
+- Implemented gosec as part of the testing workflow [\#114](https://github.com/camptocamp/terraboard/pull/114) ([mvisonneau](https://github.com/mvisonneau))
+- Fixed Dockerfiles following recent changes [\#113](https://github.com/camptocamp/terraboard/pull/113) ([mvisonneau](https://github.com/mvisonneau))
+- Enhanced Makefile and testing implementation [\#112](https://github.com/camptocamp/terraboard/pull/112) ([mvisonneau](https://github.com/mvisonneau))
+- Bumped to golang 1.15 and upgraded all modules to their latest version [\#111](https://github.com/camptocamp/terraboard/pull/111) ([mvisonneau](https://github.com/mvisonneau))
+- Upgraded terraform to 0.13.2 [\#110](https://github.com/camptocamp/terraboard/pull/110) ([mvisonneau](https://github.com/mvisonneau))
+- ADDED release URL and updated links to open in new tab [\#108](https://github.com/camptocamp/terraboard/pull/108) ([azhar22k](https://github.com/azhar22k))
+
+**Fixed bugs:**
+
+- Resources created using `for\_each` are missing [\#97](https://github.com/camptocamp/terraboard/issues/97)
+- Fix nill pointer [\#138](https://github.com/camptocamp/terraboard/pull/138) ([Moglum](https://github.com/Moglum))
+- Fixed ineffassign definition following a recent update [\#132](https://github.com/camptocamp/terraboard/pull/132) ([mvisonneau](https://github.com/mvisonneau))
+
+**Closed issues:**
+
+- Unable to start terraboard in Docker following Readme instructions  [\#123](https://github.com/camptocamp/terraboard/issues/123)
+- v0.21.0 can't connect to RDS db when running on AWS ECS [\#118](https://github.com/camptocamp/terraboard/issues/118)
+- Add support for terraform 0.13.3 [\#116](https://github.com/camptocamp/terraboard/issues/116)
+- Use docker networks instead of deprecated --link. [\#45](https://github.com/camptocamp/terraboard/issues/45)
+
 ## [0.22.0](https://github.com/camptocamp/terraboard/tree/0.22.0) (2020-08-12)
 
 [Full Changelog](https://github.com/camptocamp/terraboard/compare/0.21.0...0.22.0)
