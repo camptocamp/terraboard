@@ -32,10 +32,10 @@ type DBConfig struct {
 
 // S3BucketConfig stores the S3 bucket configuration
 type S3BucketConfig struct {
-	Bucket         string `long:"s3-bucket" env:"AWS_BUCKET" yaml:"bucket" description:"AWS S3 bucket."`
-	KeyPrefix      string `long:"key-prefix" env:"AWS_KEY_PREFIX" yaml:"key-prefix" description:"AWS Key Prefix."`
-	FileExtension []string `long:"file-extension" env:"AWS_FILE_EXTENSION" env-delim:"," yaml:"file-extension" description:"File extension(s) of state files." default:".tfstate"`
-	ForcePathStyle bool   `long:"force-path-style" env:"AWS_FORCE_PATH_STYLE" yaml:"force-path-style" description:"Force path style S3 bucket calls."`
+	Bucket         string   `long:"s3-bucket" env:"AWS_BUCKET" yaml:"bucket" description:"AWS S3 bucket."`
+	KeyPrefix      string   `long:"key-prefix" env:"AWS_KEY_PREFIX" yaml:"key-prefix" description:"AWS Key Prefix."`
+	FileExtension  []string `long:"file-extension" env:"AWS_FILE_EXTENSION" env-delim:"," yaml:"file-extension" description:"File extension(s) of state files." default:".tfstate"`
+	ForcePathStyle bool     `long:"force-path-style" env:"AWS_FORCE_PATH_STYLE" yaml:"force-path-style" description:"Force path style S3 bucket calls."`
 }
 
 // AWSConfig stores the DynamoDB table and S3 Bucket configuration
