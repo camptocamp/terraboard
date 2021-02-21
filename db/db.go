@@ -15,9 +15,9 @@ import (
 	"github.com/hashicorp/terraform/states/statefile"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/jinzhu/gorm"
 	ctyJson "github.com/zclconf/go-cty/cty/json"
 
-	"github.com/jinzhu/gorm"
 	// Use postgres as a DB backend
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -77,8 +77,10 @@ func (db *Database) stateS3toDB(sf *statefile.File, path string, versionID strin
 		}
 
 		for n, r := range m.OutputValues {
-			jsonVal, _ := ctyJson.Marshal(r.Value, r.Value.Type())
-
+			jsonVal, err := ctyJson.Marshal(r.Value, r.Value.Type())
+			if err != nil {
+				log.WithError(err).Errorf("failed to load output for %s", r.Addr.String())
+			}
 			out := types.OutputValue{
 				Sensitive: r.Sensitive,
 				Name:      n,
@@ -111,10 +113,8 @@ func marshalAttributeValues(src *states.ResourceInstanceObjectSrc) (attrs []type
 		for k, v := range src.AttrsFlat {
 			vals[k] = v
 		}
-	} else {
-		if err := json.Unmarshal(src.AttrsJSON, &vals); err != nil {
-			log.Error(err.Error())
-		}
+	} else if err := json.Unmarshal(src.AttrsJSON, &vals); err != nil {
+		log.Error(err.Error())
 	}
 	log.Debug(vals)
 

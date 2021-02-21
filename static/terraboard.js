@@ -302,7 +302,7 @@ app.controller("tbStateCtrl",
             $scope.setSelected = function(m, r) {
                 $scope.selectedmod = m;
                 $scope.selectedres = r;
-                $scope.outputs = false
+                $scope.outputs = false;
                 var hash = r.type+'.'+r.name;
                 $location.hash(hash);
             };
@@ -311,10 +311,9 @@ app.controller("tbStateCtrl",
 
     $scope.setOutputs = function(m) {
         $scope.selectedmod = m;
-      ￼ $scope.selectedres = null;
-      ￼ $scope.outputs = true;
-      ￼ var hash = m.path+'.'+'outputs';
-      ￼ $location.hash(hash);
+        $scope.selectedres = null;
+        $scope.outputs = true;
+        $location.hash(m.path+'.'+'outputs');
     };
 
     /*
