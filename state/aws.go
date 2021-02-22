@@ -35,7 +35,9 @@ func NewAWS(c *config.Config) AWS {
 
 	if len(c.AWS.APPRoleArn) > 0 {
 		log.Debugf("Using %s role", c.AWS.APPRoleArn)
-		creds := stscreds.NewCredentials(sess, c.AWS.APPRoleArn)
+		creds := stscreds.NewCredentials(sess, c.AWS.APPRoleArn, func(p *stscreds.AssumeRoleProvider) {
+			p.ExternalID = aws_sdk.String(c.AWS.ExternalID)
+		})
 		awsConfig.WithCredentials(creds)
 	}
 
