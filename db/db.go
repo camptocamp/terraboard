@@ -16,6 +16,8 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/jinzhu/gorm"
+	ctyJson "github.com/zclconf/go-cty/cty/json"
+
 	// Use postgres as a DB backend
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -37,7 +39,7 @@ func Init(config config.DBConfig, debug bool) *Database {
 	}
 
 	log.Infof("Automigrate")
-	db.AutoMigrate(&types.Version{}, &types.State{}, &types.Module{}, &types.Resource{}, &types.Attribute{})
+	db.AutoMigrate(&types.Version{}, &types.State{}, &types.Module{}, &types.Resource{}, &types.Attribute{}, &types.OutputValue{})
 
 	if debug {
 		db.LogMode(true)
@@ -73,6 +75,21 @@ func (db *Database) stateS3toDB(sf *statefile.File, path string, versionID strin
 				mod.Resources = append(mod.Resources, res)
 			}
 		}
+
+		for n, r := range m.OutputValues {
+			jsonVal, err := ctyJson.Marshal(r.Value, r.Value.Type())
+			if err != nil {
+				log.WithError(err).Errorf("failed to load output for %s", r.Addr.String())
+			}
+			out := types.OutputValue{
+				Sensitive: r.Sensitive,
+				Name:      n,
+				Value:     string(jsonVal),
+			}
+
+			mod.OutputValues = append(mod.OutputValues, out)
+		}
+
 		st.Modules = append(st.Modules, mod)
 	}
 	return
@@ -96,10 +113,8 @@ func marshalAttributeValues(src *states.ResourceInstanceObjectSrc) (attrs []type
 		for k, v := range src.AttrsFlat {
 			vals[k] = v
 		}
-	} else {
-		if err := json.Unmarshal(src.AttrsJSON, &vals); err != nil {
-			log.Error(err.Error())
-		}
+	} else if err := json.Unmarshal(src.AttrsJSON, &vals); err != nil {
+		log.Error(err.Error())
 	}
 	log.Debug(vals)
 
@@ -145,6 +160,7 @@ func (db *Database) InsertVersion(version *state.Version) error {
 func (db *Database) GetState(path, versionID string) (state types.State) {
 	db.Joins("JOIN versions on states.version_id=versions.id").
 		Preload("Version").Preload("Modules").Preload("Modules.Resources").Preload("Modules.Resources.Attributes").
+		Preload("Modules.OutputValues").
 		Find(&state, "states.path = ? AND versions.version_id = ?", path, versionID)
 	return
 }
