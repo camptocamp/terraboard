@@ -111,7 +111,7 @@ The precedence of configurations is as described below.
 |`--sync-interval` | - | `db.sync-interval` | DB sync interval (in minutes) | 1 |
 |`--dynamodb-table` | `AWS_DYNAMODB_TABLE` | `aws.dynamodb-table` | AWS DynamoDB table for locks | - |
 |`--s3-bucket` | `AWS_BUCKET` | `aws.bucket` | AWS S3 bucket | - |
-|`--app-role-arn` | `APPRoleArn` | `aws.app-role-arn` | Role ARN to Assume | - |
+|`--app-role-arn` | `APP_ROLE_ARN` | `aws.app-role-arn` | Role ARN to Assume | - |
 |`--aws-external-id` | `AWS_EXTERNAL_ID` | `aws.external-id` | External ID to use when assuming role | - |
 |`--key-prefix` | `AWS_KEY_PREFIX` | `aws.key-prefix` | AWS Key Prefix | - |
 |`--file-extension` | `AWS_FILE_EXTENSION` | `aws.file-extension` | File extension(s) of state files. Use multiple CLI flags or a comma separated list ENV variable | .tfstate |
@@ -221,6 +221,7 @@ $ go get github.com/camptocamp/terraboard
 | 0.20.0   |  0.12.26            |
 | 0.21.0   |  0.12.28            |
 | 0.22.0   |  0.13.0             |
+| 1.0.0    |  0.14.5             |
 
 ## Development
 
