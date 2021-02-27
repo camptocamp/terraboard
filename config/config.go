@@ -45,6 +45,7 @@ type AWSConfig struct {
 	Endpoint      string         `long:"aws-endpoint" env:"AWS_ENDPOINT" yaml:"endpoint" description:"AWS endpoint."`
 	Region        string         `long:"aws-region" env:"AWS_REGION" yaml:"region" description:"AWS region."`
 	APPRoleArn    string         `long:"aws-role-arn" env:"APP_ROLE_ARN" yaml:"app-role-arn" description:"Role ARN to Assume."`
+	ExternalID    string         `long:"aws-external-id" env:"AWS_EXTERNAL_ID" yaml:"external-id" description:"External ID to use when assuming role."`
 }
 
 // TFEConfig stores the Terraform Enterprise configuration

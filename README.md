@@ -112,6 +112,7 @@ The precedence of configurations is as described below.
 |`--dynamodb-table` | `AWS_DYNAMODB_TABLE` | `aws.dynamodb-table` | AWS DynamoDB table for locks | - |
 |`--s3-bucket` | `AWS_BUCKET` | `aws.bucket` | AWS S3 bucket | - |
 |`--app-role-arn` | `APP_ROLE_ARN` | `aws.app-role-arn` | Role ARN to Assume | - |
+|`--aws-external-id` | `AWS_EXTERNAL_ID` | `aws.external-id` | External ID to use when assuming role | - |
 |`--key-prefix` | `AWS_KEY_PREFIX` | `aws.key-prefix` | AWS Key Prefix | - |
 |`--file-extension` | `AWS_FILE_EXTENSION` | `aws.file-extension` | File extension(s) of state files. Use multiple CLI flags or a comma separated list ENV variable | .tfstate |
 |`--base-url` | `TERRABOARD_BASE_URL` | `web.base-url` | Base URL | / |
