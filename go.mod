@@ -6,7 +6,6 @@ require (
 	cloud.google.com/go v0.76.0 // indirect
 	cloud.google.com/go/storage v1.12.0
 	github.com/agext/levenshtein v1.2.3 // indirect
-	github.com/apparentlymart/go-textseg/v12 v12.0.0 // indirect
 	github.com/aws/aws-sdk-go v1.37.2
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.0 // indirect
