@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.1.0](https://github.com/camptocamp/terraboard/tree/1.1.0) (2021-04-14)
+
+[Full Changelog](https://github.com/camptocamp/terraboard/compare/1.0.0...1.1.0)
+
+**Implemented enhancements:**
+
+- View for outputs [\#50](https://github.com/camptocamp/terraboard/issues/50)
+- Update Terraform to 0.14.10 [\#149](https://github.com/camptocamp/terraboard/pull/149) ([raphink](https://github.com/raphink))
+- Implement AWS EXTERNAL ID feature [\#142](https://github.com/camptocamp/terraboard/pull/142) ([alemuro](https://github.com/alemuro))
+- Implement Outputs [\#140](https://github.com/camptocamp/terraboard/pull/140) ([hoshsadiq](https://github.com/hoshsadiq))
+
+**Fixed bugs:**
+
+- Fix environment variable for APPRoleArn on README [\#141](https://github.com/camptocamp/terraboard/pull/141) ([alemuro](https://github.com/alemuro))
+
+**Closed issues:**
+
+- support of terraform 0.14.3 [\#137](https://github.com/camptocamp/terraboard/issues/137)
+
 ## [1.0.0](https://github.com/camptocamp/terraboard/tree/1.0.0) (2021-02-17)
 
 [Full Changelog](https://github.com/camptocamp/terraboard/compare/0.22.0...1.0.0)
