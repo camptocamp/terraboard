@@ -40,7 +40,6 @@
     <table class="table table-border table-striped">
         <thead>
             <th></th> <!-- lock -->
-            <th></th> <!-- link -->
             <th>
                 Path
             </th>
@@ -63,8 +62,7 @@
         <tbody>
             <tr ng-repeat="r in results.states">
                 <td><span ng-if="isLocked(r.path)" ng-init="lock=locks[r.path]" class="glyphicon glyphicon-lock" title="Locked by {{lock.Who}} on {{lock.Created | date:'medium'}} ({{lock.Operation}})"></span></td>
-                <td><a href="state/{{r.path}}?versionid={{r.version_id}}"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></td>
-                <td>{{r.path}}</td>
+                <td><span class="glyphicon glyphicon-link" aria-hidden="true"></span> <a href="state/{{r.path}}?versionid={{r.version_id}}">{{r.path}}</a></td>
                 <td>{{r.terraform_version}}</td>
                 <td>{{r.serial}}</td>
                 <td>{{r.last_modified | date:'medium'}}</td>
