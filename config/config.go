@@ -67,6 +67,15 @@ type GitlabConfig struct {
 	Token   string `long:"gitlab-token" env:"GITLAB_TOKEN" yaml:"token" description:"Token to authenticate upon GitLab"`
 }
 
+// MinioConfig stores the Minio configuration
+type MinioConfig struct {
+	EndpointURL string `long:"minio-endpoint-url" env:"MINIO_ENDPOINT_URL" yaml:"endpoint_url" description:"Minio URL" default:"https://minio.mydomain.com"`
+	AccessKey   string `long:"minio-access-key" env:"MINIO_ACCESS_KEY" yaml:"access_key" description:"Minio Access Key"`
+	SecretKey   string `long:"minio-secret-key" env:"MINIO_SECRET_KEY" yaml:"secret_key" description:"Minio Secret Key"`
+	DisableSSL  bool   `long:"minio-disable-ssl" env:"MINIO_DISABLE_SSL" yaml:"use_ssl" description:"Minio SSL disabled"`
+	BucketName  string `long:"minio-bucket-name" env:"MINIO_BUCKET_NAME" yaml:"bucket_name" description:"Minio Bucket Name"`
+}
+
 // WebConfig stores the UI interface parameters
 type WebConfig struct {
 	Port      uint16 `short:"p" long:"port" env:"TERRABOARD_PORT" yaml:"port" description:"Port to listen on." default:"8080"`
@@ -91,6 +100,8 @@ type Config struct {
 	GCP GCPConfig `group:"Google Cloud Platform Options" yaml:"gcp"`
 
 	Gitlab GitlabConfig `group:"GitLab Options" yaml:"gitlab"`
+
+	Minio MinioConfig `group:"Minio Options" yaml:"minio"`
 
 	Web WebConfig `group:"Web" yaml:"web"`
 }

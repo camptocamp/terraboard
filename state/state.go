@@ -41,6 +41,11 @@ type Provider interface {
 
 // Configure the state provider
 func Configure(c *config.Config) (Provider, error) {
+	if len(c.Minio.AccessKey) > 0 {
+		log.Info("Using Minio as the state/locks provider")
+		return NewMinio(c)
+	}
+
 	if len(c.TFE.Token) > 0 {
 		log.Info("Using Terraform Enterprise as the state/locks provider")
 		return NewTFE(c)
