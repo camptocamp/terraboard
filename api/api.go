@@ -14,8 +14,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var states []string
-
 // JSONError is a wrapper function for errors
 // which prints them to the http.ResponseWriter as a JSON response
 func JSONError(w http.ResponseWriter, message string, err error) {

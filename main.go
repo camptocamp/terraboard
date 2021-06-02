@@ -22,7 +22,7 @@ import (
 // so as to let AngularJS manage the app routing.
 // The <base> HTML tag is edited on the fly
 // to reflect the proper base URL
-func idx(w http.ResponseWriter, r *http.Request) {
+func idx(w http.ResponseWriter, _ *http.Request) {
 	idx, err := ioutil.ReadFile("static/index.html")
 	if err != nil {
 		log.Errorf("Failed to open index.html: %v", err)
@@ -38,13 +38,15 @@ func idx(w http.ResponseWriter, r *http.Request) {
 // Pass the DB to API handlers
 // This takes a callback and returns a HandlerFunc
 // which calls the callback with the DB
-func handleWithDB(apiF func(w http.ResponseWriter, r *http.Request, d *db.Database), d *db.Database) func(http.ResponseWriter, *http.Request) {
+func handleWithDB(apiF func(w http.ResponseWriter, r *http.Request,
+	d *db.Database), d *db.Database) func(http.ResponseWriter, *http.Request) {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		apiF(w, r, d)
 	})
 }
 
-func handleWithStateProvider(apiF func(w http.ResponseWriter, r *http.Request, sp state.Provider), sp state.Provider) func(http.ResponseWriter, *http.Request) {
+func handleWithStateProvider(apiF func(w http.ResponseWriter, r *http.Request,
+	sp state.Provider), sp state.Provider) func(http.ResponseWriter, *http.Request) {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		apiF(w, r, sp)
 	})
@@ -123,7 +125,7 @@ func refreshDB(syncInterval uint16, d *db.Database, sp state.Provider) {
 
 var version = "undefined"
 
-func getVersion(w http.ResponseWriter, r *http.Request) {
+func getVersion(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	j, err := json.Marshal(map[string]string{
@@ -182,7 +184,8 @@ func main() {
 	http.HandleFunc(util.GetFullPath("api/user"), api.GetUser)
 	http.HandleFunc(util.GetFullPath("api/states"), handleWithDB(api.ListStates, database))
 	http.HandleFunc(util.GetFullPath("api/states/stats"), handleWithDB(api.ListStateStats, database))
-	http.HandleFunc(util.GetFullPath("api/states/tfversion/count"), handleWithDB(api.ListTerraformVersionsWithCount, database))
+	http.HandleFunc(util.GetFullPath("api/states/tfversion/count"),
+		handleWithDB(api.ListTerraformVersionsWithCount, database))
 	http.HandleFunc(util.GetFullPath("api/state/"), handleWithDB(api.GetState, database))
 	http.HandleFunc(util.GetFullPath("api/state/activity/"), handleWithDB(api.GetStateActivity, database))
 	http.HandleFunc(util.GetFullPath("api/state/compare/"), handleWithDB(api.StateCompare, database))
