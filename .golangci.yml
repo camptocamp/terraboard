@@ -1,0 +1,107 @@
+# Golangci-lint documentation: https://golangci-lint.run/
+
+# Analysis running options
+run:
+  # Disable tests to avoid redundancy with test workflow
+  tests: false
+
+issues:
+  # Maximum issues count per one linter
+  max-issues-per-linter: 0
+  # Maximum count of issues with the same text
+  max-same-issues: 0
+
+# Configuration of specific linters
+linters-settings:
+  gosec:
+    # Rules to explicitly exclude
+    # Available rules: https://github.com/securego/gosec#available-rules
+    excludes:
+      - G401
+      - G501
+
+  revive:
+    # see https://github.com/mgechev/revive#available-rules for details
+    ignore-generated-header: false
+    severity: warning
+    confidence: 0.8
+    errorCode: 1
+    warningCode: 1
+    rules:
+      - name: blank-imports
+        severity: warning
+      - name: context-as-argument
+        severity: warning
+      - name: context-keys-type
+        severity: warning
+      - name: cyclomatic
+        severity: warning
+        arguments:
+          - 15 # Maximum cyclomatic complexity
+      - name: error-return
+        severity: warning
+      - name: error-strings
+        severity: warning
+      - name: error-naming
+        severity: warning
+      - name: exported
+        severity: warning
+      - name: if-return
+        severity: warning
+      - name: increment-decrement
+        severity: warning
+      - name: var-naming
+        severity: warning
+      - name: var-declaration
+        severity: warning
+      - name: package-comments
+        severity: warning
+      - name: range
+        severity: warning
+      - name: receiver-naming
+        severity: warning
+      - name: time-naming
+        severity: warning
+      - name: unexported-return
+        severity: warning
+      - name: indent-error-flow
+        severity: warning
+      - name: errorf
+        severity: warning
+      - name: empty-block
+        severity: warning
+      - name: superfluous-else
+        severity: warning
+      - name: unused-parameter
+        severity: warning
+      - name: unreachable-code
+        severity: warning
+      - name: redefines-builtin-id
+        severity: warning
+      
+  misspell:
+    locale: US
+
+  lll:
+    line-length: 120
+  
+# Activated linters by default:
+# - deadcode
+# - errcheck
+# - gosimple
+# - govet
+# - ineffassign
+# - staticcheck
+# - structcheck
+# - typecheck
+# - unused
+# - varcheck
+
+linters:
+  # Additional linters activated
+  enable:
+    - goimports
+    - gosec
+    - lll
+    - misspell
+    - revive
