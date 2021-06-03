@@ -32,14 +32,29 @@ var pageSize = 20
 // Init setups up the Database and a pointer to it
 func Init(config config.DBConfig, debug bool) *Database {
 	var err error
-	connString := fmt.Sprintf("host=%s port=%d user=%s dbname=%s sslmode=%s password=%s", config.Host, config.Port, config.User, config.Name, config.SSLMode, config.Password)
+	connString := fmt.Sprintf(
+		"host=%s port=%d user=%s dbname=%s sslmode=%s password=%s",
+		config.Host,
+		config.Port,
+		config.User,
+		config.Name,
+		config.SSLMode,
+		config.Password,
+	)
 	db, err := gorm.Open("postgres", connString)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	log.Infof("Automigrate")
-	db.AutoMigrate(&types.Version{}, &types.State{}, &types.Module{}, &types.Resource{}, &types.Attribute{}, &types.OutputValue{})
+	db.AutoMigrate(
+		&types.Version{},
+		&types.State{},
+		&types.Module{},
+		&types.Resource{},
+		&types.Attribute{},
+		&types.OutputValue{},
+	)
 
 	if debug {
 		db.LogMode(true)
@@ -128,15 +143,6 @@ func marshalAttributeValues(src *states.ResourceInstanceObjectSrc) (attrs []type
 		attrs = append(attrs, attr)
 	}
 	return attrs
-}
-
-func isASCII(s string) bool {
-	for _, c := range s {
-		if c > 127 {
-			return false
-		}
-	}
-	return true
 }
 
 // InsertState inserts a Terraform State in the Database
@@ -332,10 +338,10 @@ func (db *Database) ListTerraformVersionsWithCount(query url.Values) (results []
 	}
 
 	rows, err := db.Raw(sql).Rows()
-	defer rows.Close()
 	if err != nil {
 		return results, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		var name string
@@ -381,10 +387,10 @@ func (db *Database) ListStateStats(query url.Values) (states []types.StateStat, 
 // listField is a wrapper utility method to list distinct values in Database tables.
 func (db *Database) listField(table, field string) (results []string, err error) {
 	rows, err := db.Table(table).Select(fmt.Sprintf("DISTINCT %s", field)).Rows()
-	defer rows.Close()
 	if err != nil {
 		return results, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		var t string
@@ -392,31 +398,6 @@ func (db *Database) listField(table, field string) (results []string, err error)
 			return
 		}
 		results = append(results, t)
-	}
-
-	return
-}
-
-// listFieldWithCount is a wrapper utility method to list counts of values
-// ordered by descending count from the Database
-func (db *Database) listFieldWithCount(table, field string) (results []map[string]string, err error) {
-	rows, err := db.Table(table).Select("?, COUNT(*)", field).
-		Group(field).Order("count DESC").Rows()
-	defer rows.Close()
-	if err != nil {
-		return results, err
-	}
-
-	for rows.Next() {
-		var name string
-		var count string
-		r := make(map[string]string)
-		if err = rows.Scan(&name, &count); err != nil {
-			return
-		}
-		r["name"] = name
-		r["count"] = count
-		results = append(results, r)
 	}
 
 	return
@@ -441,10 +422,10 @@ func (db *Database) ListResourceTypesWithCount() (results []map[string]string, e
 		" ORDER BY count DESC"
 
 	rows, err := db.Raw(sql).Rows()
-	defer rows.Close()
 	if err != nil {
 		return results, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		var name string
@@ -482,10 +463,10 @@ func (db *Database) ListAttributeKeys(resourceType string) (results []string, er
 	}
 
 	rows, err := query.Rows()
-	defer rows.Close()
 	if err != nil {
 		return results, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		var t string

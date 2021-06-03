@@ -242,7 +242,8 @@ func (s *TerraformState) GlobalPath() string {
 func (c *Client) GetState(projectID, stateName, version string) (state []byte, err error) {
 	var req *http.Request
 	var resp *http.Response
-	req, err = http.NewRequest("GET", fmt.Sprintf("%s/api/v4/projects/%s/terraform/state/%s/versions/%s", c.Endpoint, projectID, stateName, version), nil)
+	req, err = http.NewRequest("GET", fmt.Sprintf("%s/api/v4/projects/%s/terraform/state/%s/versions/%s",
+		c.Endpoint, projectID, stateName, version), nil)
 	if err != nil {
 		return
 	}

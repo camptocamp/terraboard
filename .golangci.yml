@@ -81,9 +81,6 @@ linters-settings:
       
   misspell:
     locale: US
-
-  lll:
-    line-length: 120
   
 # Activated linters by default:
 # - deadcode
@@ -102,6 +99,5 @@ linters:
   enable:
     - goimports
     - gosec
-    - lll
     - misspell
     - revive
