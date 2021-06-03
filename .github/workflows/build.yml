@@ -10,9 +10,6 @@ jobs:
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     env:
-      APP_NAME: terraboard
-      FILES: $(wildcard */*.go)
-      VERSION: $(git describe --always)
       GO111MODULE: on
     steps:
       - name: Install Go
@@ -27,10 +24,4 @@ jobs:
         run: go mod download
 
       - name: Build binary
-        env:
-          CGO_ENABLED: 1
-        run: >
-          go build
-          -trimpath
-          -ldflags "-linkmode external -extldflags -static -X main.version=${{ env.VERSION }}"
-          -o ${{ env.APP_NAME }} main.go
+        run: make build
