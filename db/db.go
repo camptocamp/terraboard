@@ -32,16 +32,29 @@ var pageSize = 20
 // Init setups up the Database and a pointer to it
 func Init(config config.DBConfig, debug bool) *Database {
 	var err error
-	connString := fmt.Sprintf("host=%s port=%d user=%s dbname=%s sslmode=%s password=%s",
-		config.Host, config.Port, config.User, config.Name, config.SSLMode, config.Password)
+	connString := fmt.Sprintf(
+		"host=%s port=%d user=%s dbname=%s sslmode=%s password=%s",
+		config.Host,
+		config.Port,
+		config.User,
+		config.Name,
+		config.SSLMode,
+		config.Password,
+	)
 	db, err := gorm.Open("postgres", connString)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	log.Infof("Automigrate")
-	db.AutoMigrate(&types.Version{}, &types.State{}, &types.Module{},
-		&types.Resource{}, &types.Attribute{}, &types.OutputValue{})
+	db.AutoMigrate(
+		&types.Version{},
+		&types.State{},
+		&types.Module{},
+		&types.Resource{},
+		&types.Attribute{},
+		&types.OutputValue{},
+	)
 
 	if debug {
 		db.LogMode(true)
