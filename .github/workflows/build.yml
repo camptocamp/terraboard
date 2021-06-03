@@ -1,0 +1,36 @@
+name: Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        go-version: [1.15.x]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      APP_NAME: terraboard
+      FILES: $(wildcard */*.go)
+      VERSION: $(git describe --always)
+      GO111MODULE: on
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Build binary
+        env:
+          CGO_ENABLED: 1
+        run: >
+          go build
+          -trimpath
+          -ldflags "-linkmode external -extldflags -static -X main.version=${{ env.VERSION }}"
+          -o ${{ env.APP_NAME }} main.go
