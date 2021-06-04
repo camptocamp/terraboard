@@ -1,9 +1,0 @@
-language: go
-go:
-  - '1.15'
-go_import_path: github.com/camptocamp/terraboard
-install:
-  - make vendor
-script:
-  - make all
-  - make publish-coveralls
