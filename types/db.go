@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm"
+	"gorm.io/datatypes"
 )
 
 /*********************************************
@@ -66,4 +67,18 @@ type Attribute struct {
 	ResourceID sql.NullInt64 `gorm:"index" json:"-"`
 	Key        string        `gorm:"index" json:"key"`
 	Value      string        `json:"value"`
+}
+
+type Plan struct {
+	ID               uint           `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"id"`
+	TerraformVersion string         `gorm:"varchar(10)" json:"terraform_version"`
+	GitRemote        string         `json:"git_remote"`
+	GitCommit        string         `gorm:"varchar(50)" json:"git_commit"`
+	CiUrl            string         `json:"ci-url"`
+	Source           string         `json:"source"`
+	RessourceUpdated int32          `json:"ressource_updated"`
+	RessourceNooped  int32          `json:"ressource_nooped"`
+	PlanJson         datatypes.JSON `json:"plan_json"`
+	CreatedAt        time.Time      `json:"created_at"`
+	UpdatedAt        time.Time      `json:"updated_at"`
 }
