@@ -10,7 +10,7 @@ setup: ## Install required libraries/tools for build tasks
 	@command -v cover 2>&1 >/dev/null       || GO111MODULE=off go get -u -v golang.org/x/tools/cmd/cover
 	@command -v goveralls 2>&1 >/dev/null   || GO111MODULE=off go get -u -v github.com/mattn/goveralls
 	@command -v goimports 2>&1 >/dev/null   || GO111MODULE=off go get -u -v golang.org/x/tools/cmd/goimports
-	@command -v ~/go/bin/golangci-lint 2>&1 >/dev/null || GO111MODULE=off go get -v github.com/golangci/golangci-lint/cmd/golangci-lint
+	@command -v golangci-lint 2>&1 >/dev/null || GO111MODULE=off go get -v github.com/golangci/golangci-lint/cmd/golangci-lint
 
 .PHONY: fmt
 fmt: setup ## Format source code
@@ -18,7 +18,7 @@ fmt: setup ## Format source code
 
 .PHONY: lint
 lint: setup ## Run all lint related tests against the codebase (will use the .golangci.yml config)
-	~/go/bin/golangci-lint run
+	golangci-lint run
 
 .PHONY: test
 test: ## Run the tests against the codebase
