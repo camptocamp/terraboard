@@ -74,6 +74,7 @@ type Plan struct {
 	ID               uint           `sql:"AUTO_INCREMENT" gorm:"primary_key" json:"id"`
 	Version          Version        `json:"version"`
 	VersionID        sql.NullInt64  `gorm:"index" json:"-"`
+	Lineage          string         `json:"lineage"`
 	TerraformVersion string         `gorm:"varchar(10)" json:"terraform_version"`
 	GitRemote        string         `json:"git_remote"`
 	GitCommit        string         `gorm:"varchar(50)" json:"git_commit"`
