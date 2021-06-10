@@ -15,11 +15,9 @@ import (
 	"github.com/hashicorp/terraform/states/statefile"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/jinzhu/gorm"
 	ctyJson "github.com/zclconf/go-cty/cty/json"
-
-	// Use postgres as a DB backend
-	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 // Database is a wrapping structure to *gorm.DB
@@ -41,7 +39,7 @@ func Init(config config.DBConfig, debug bool) *Database {
 		config.SSLMode,
 		config.Password,
 	)
-	db, err := gorm.Open("postgres", connString)
+	db, err := gorm.Open(postgres.Open(connString), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -70,7 +68,8 @@ func Init(config config.DBConfig, debug bool) *Database {
 	)
 
 	if debug {
-		db.LogMode(true)
+		//TODO: Upgrade db log system to gorm.v2
+		//db.LogMode(true)
 	}
 	return &Database{db}
 }
@@ -504,4 +503,14 @@ func (db *Database) DefaultVersion(path string) (version string, err error) {
 	row := db.Raw(sqlQuery, path).Row()
 	err = row.Scan(&version)
 	return
+}
+
+// Close get generic database interface *sql.DB from the current *gorm.DB
+// and close it
+func (db *Database) Close() {
+	sqlDb, err := db.DB.DB()
+	if err != nil {
+		log.Fatalf("Unable to terminate db instance: %v\n", err)
+	}
+	sqlDb.Close()
 }

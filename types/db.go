@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/jinzhu/gorm"
 	"gorm.io/datatypes"
+	"gorm.io/gorm"
 )
 
 /*********************************************
