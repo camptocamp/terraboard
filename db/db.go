@@ -18,6 +18,7 @@ import (
 	ctyJson "github.com/zclconf/go-cty/cty/json"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 // Database is a wrapping structure to *gorm.DB
@@ -39,13 +40,15 @@ func Init(config config.DBConfig, debug bool) *Database {
 		config.SSLMode,
 		config.Password,
 	)
-	db, err := gorm.Open(postgres.Open(connString), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(connString), &gorm.Config{
+		Logger: &LogrusGormLogger,
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	log.Infof("Automigrate")
-	db.AutoMigrate(
+	err = db.AutoMigrate(
 		&types.Version{},
 		&types.State{},
 		&types.Module{},
@@ -66,10 +69,12 @@ func Init(config config.DBConfig, debug bool) *Database {
 		&types.PlanStateValue{},
 		&types.Change{},
 	)
+	if err != nil {
+		log.Fatalf("Migration failed: %v\n", err)
+	}
 
 	if debug {
-		//TODO: Upgrade db log system to gorm.v2
-		//db.LogMode(true)
+		db.Config.Logger.LogMode(logger.Info)
 	}
 	return &Database{db}
 }
