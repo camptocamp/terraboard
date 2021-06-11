@@ -177,6 +177,8 @@ type PlanStateModule struct {
 // state representation.
 type PlanStateResource struct {
 	gorm.Model
+	PlanStateModuleID sql.NullInt64 `gorm:"index" json:"-"`
+
 	// The absolute resource address.
 	Address string `json:"address,omitempty"`
 
