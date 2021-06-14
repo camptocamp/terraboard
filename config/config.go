@@ -46,7 +46,7 @@ type AWSConfig struct {
 	Region                    string         `long:"aws-region" env:"AWS_REGION" yaml:"region" description:"AWS region."`
 	APPRoleArn                string         `long:"aws-role-arn" env:"APP_ROLE_ARN" yaml:"app-role-arn" description:"Role ARN to Assume."`
 	ExternalID                string         `long:"aws-external-id" env:"AWS_EXTERNAL_ID" yaml:"external-id" description:"External ID to use when assuming role."`
-	OtherS3CompatibleProvider bool           `long:"aws-other-compatible-provider" env:"AWS_OTHER_COMPATIBLE_PROVIDER" yaml:"other-compatible-provider" description:"Enable compatibility mode to support other providers s3 compatible (MinIO for exemple)"`
+	OtherS3CompatibleProvider bool           `long:"aws-other-compatible-provider" env:"AWS_OTHER_COMPATIBLE_PROVIDER" yaml:"other-compatible-provider" description:"Enable compatibility mode to support other providers s3 compatible (MinIO for example), disable locks support & versionning"`
 }
 
 // TFEConfig stores the Terraform Enterprise configuration

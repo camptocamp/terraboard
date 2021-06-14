@@ -115,6 +115,10 @@ The precedence of configurations is as described below.
 |`--aws-external-id` | `AWS_EXTERNAL_ID` | `aws.external-id` | External ID to use when assuming role | - |
 |`--key-prefix` | `AWS_KEY_PREFIX` | `aws.key-prefix` | AWS Key Prefix | - |
 |`--file-extension` | `AWS_FILE_EXTENSION` | `aws.file-extension` | File extension(s) of state files. Use multiple CLI flags or a comma separated list ENV variable | .tfstate |
+|`--aws-region` | `AWS_REGION` | `aws.region` | AWS region | - |
+|`--aws-endpoint` | `AWS_ENDPOINT` | `aws.endpoint` | Custom AWS endpoint | - |
+|`--aws-other-compatible-provider` | `AWS_OTHER_COMPATIBLE_PROVIDER` | `aws.other-compatible-provider` | Enable compatibility mode to support other providers s3 compatible (MinIO for example), disable locks support & versionning | false |
+|`--force-path-style` | `AWS_FORCE_PATH_STYLE` | `aws.s3.force-path-style` | Force path style S3 bucket calls. | false |
 |`--base-url` | `TERRABOARD_BASE_URL` | `web.base-url` | Base URL | / |
 |`--logout-url` | `TERRABOARD_LOGOUT_URL` | `web.logout-url` | Logout URL | - |
 |`--tfe-address` | `TFE_ADDRESS` | `tfe.tfe-address` | Terraform Enterprise address for states access | - |
