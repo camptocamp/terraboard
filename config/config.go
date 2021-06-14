@@ -40,12 +40,13 @@ type S3BucketConfig struct {
 
 // AWSConfig stores the DynamoDB table and S3 Bucket configuration
 type AWSConfig struct {
-	DynamoDBTable string         `long:"dynamodb-table" env:"AWS_DYNAMODB_TABLE" yaml:"dynamodb-table" description:"AWS DynamoDB table for locks."`
-	S3            S3BucketConfig `group:"S3 Options" yaml:"s3"`
-	Endpoint      string         `long:"aws-endpoint" env:"AWS_ENDPOINT" yaml:"endpoint" description:"AWS endpoint."`
-	Region        string         `long:"aws-region" env:"AWS_REGION" yaml:"region" description:"AWS region."`
-	APPRoleArn    string         `long:"aws-role-arn" env:"APP_ROLE_ARN" yaml:"app-role-arn" description:"Role ARN to Assume."`
-	ExternalID    string         `long:"aws-external-id" env:"AWS_EXTERNAL_ID" yaml:"external-id" description:"External ID to use when assuming role."`
+	DynamoDBTable             string         `long:"dynamodb-table" env:"AWS_DYNAMODB_TABLE" yaml:"dynamodb-table" description:"AWS DynamoDB table for locks."`
+	S3                        S3BucketConfig `group:"S3 Options" yaml:"s3"`
+	Endpoint                  string         `long:"aws-endpoint" env:"AWS_ENDPOINT" yaml:"endpoint" description:"AWS endpoint."`
+	Region                    string         `long:"aws-region" env:"AWS_REGION" yaml:"region" description:"AWS region."`
+	APPRoleArn                string         `long:"aws-role-arn" env:"APP_ROLE_ARN" yaml:"app-role-arn" description:"Role ARN to Assume."`
+	ExternalID                string         `long:"aws-external-id" env:"AWS_EXTERNAL_ID" yaml:"external-id" description:"External ID to use when assuming role."`
+	OtherS3CompatibleProvider bool           `long:"aws-other-compatible-provider" env:"AWS_OTHER_COMPATIBLE_PROVIDER" yaml:"other-compatible-provider" description:"Enable compatibility mode to support other providers s3 compatible (MinIO for exemple)"`
 }
 
 // TFEConfig stores the Terraform Enterprise configuration

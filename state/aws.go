@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	aws_sdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
@@ -19,12 +20,13 @@ import (
 
 // AWS is a state provider type, leveraging S3 and DynamoDB
 type AWS struct {
-	svc           *s3.S3
-	dynamoSvc     *dynamodb.DynamoDB
-	bucket        string
-	dynamoTable   string
-	keyPrefix     string
-	fileExtension []string
+	svc                       *s3.S3
+	dynamoSvc                 *dynamodb.DynamoDB
+	bucket                    string
+	dynamoTable               string
+	keyPrefix                 string
+	fileExtension             []string
+	otherS3CompatibleProvider bool
 }
 
 // NewAWS creates an AWS object
@@ -52,17 +54,23 @@ func NewAWS(c *config.Config) AWS {
 	awsConfig.S3ForcePathStyle = &c.AWS.S3.ForcePathStyle
 
 	return AWS{
-		svc:           s3.New(sess, awsConfig),
-		bucket:        c.AWS.S3.Bucket,
-		keyPrefix:     c.AWS.S3.KeyPrefix,
-		fileExtension: c.AWS.S3.FileExtension,
-		dynamoSvc:     dynamodb.New(sess, awsConfig),
-		dynamoTable:   c.AWS.DynamoDBTable,
+		svc:                       s3.New(sess, awsConfig),
+		bucket:                    c.AWS.S3.Bucket,
+		keyPrefix:                 c.AWS.S3.KeyPrefix,
+		fileExtension:             c.AWS.S3.FileExtension,
+		dynamoSvc:                 dynamodb.New(sess, awsConfig),
+		dynamoTable:               c.AWS.DynamoDBTable,
+		otherS3CompatibleProvider: c.AWS.OtherS3CompatibleProvider,
 	}
 }
 
 // GetLocks returns a map of locks by State path
 func (a *AWS) GetLocks() (locks map[string]LockInfo, err error) {
+	if a.otherS3CompatibleProvider {
+		locks = make(map[string]LockInfo)
+		return
+	}
+
 	if a.dynamoTable == "" {
 		err = fmt.Errorf("no dynamoDB table provided, not getting locks")
 		return
@@ -94,6 +102,7 @@ func (a *AWS) GetLocks() (locks map[string]LockInfo, err error) {
 			locks[strings.TrimPrefix(info.Path, infoPrefix)] = info
 		}
 	}
+
 	return
 }
 
@@ -138,7 +147,7 @@ func (a *AWS) GetState(st, versionID string) (sf *statefile.File, err error) {
 		Bucket: aws_sdk.String(a.bucket),
 		Key:    aws_sdk.String(st),
 	}
-	if versionID != "" {
+	if versionID != "" && !a.otherS3CompatibleProvider {
 		input.VersionId = &versionID
 	}
 	result, err := a.svc.GetObjectWithContext(context.Background(), input)
@@ -168,6 +177,14 @@ func (a *AWS) GetState(st, versionID string) (sf *statefile.File, err error) {
 // GetVersions returns a slice of Version objects
 func (a *AWS) GetVersions(state string) (versions []Version, err error) {
 	versions = []Version{}
+	if a.otherS3CompatibleProvider {
+		versions = append(versions, Version{
+			ID:           "1",
+			LastModified: time.Now(),
+		})
+		return
+	}
+
 	result, err := a.svc.ListObjectVersions(&s3.ListObjectVersionsInput{
 		Bucket: aws_sdk.String(a.bucket),
 		Prefix: aws_sdk.String(state),
