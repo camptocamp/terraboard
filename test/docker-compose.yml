@@ -1,0 +1,61 @@
+---
+version: "3"
+services:
+  terraboard-dev:
+    build:
+      context: ../
+      dockerfile: ./Dockerfile
+    environment:
+      AWS_ACCESS_KEY_ID: root
+      AWS_SECRET_ACCESS_KEY: mypassword
+      AWS_BUCKET: test-bucket
+      AWS_REGION: eu-west-1
+      AWS_ENDPOINT: http://minio:9000/
+      AWS_OTHER_COMPATIBLE_PROVIDER: "true"
+      AWS_FORCE_PATH_STYLE: "true"
+      TERRABOARD_LOG_LEVEL: debug
+      DB_PASSWORD: mypassword
+      DB_SSLMODE: disable
+      GODEBUG: netdns=go
+    depends_on:
+      - "db"
+      - "minio"
+    volumes:
+      - ../static:/static:ro
+    ports:
+      - "8080:8080"
+
+  minio:
+    image: minio/minio:latest
+    environment:
+      MINIO_ROOT_USER: root
+      MINIO_ROOT_PASSWORD: mypassword
+    expose: 
+      - "9000"
+    ports:
+      - "9200:9000"
+    volumes:
+      - ./data:/data
+    command: server /data
+
+  db:
+    image: postgres:9.5
+    environment:
+      POSTGRES_USER: gorm
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: gorm
+    volumes:
+      - tb-data:/var/lib/postgresql/data
+  
+  pgadmin:
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"
+
+volumes:
+  tb-data: {}
