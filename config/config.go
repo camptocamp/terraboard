@@ -40,13 +40,12 @@ type S3BucketConfig struct {
 
 // AWSConfig stores the DynamoDB table and S3 Bucket configuration
 type AWSConfig struct {
-	DynamoDBTable             string         `long:"dynamodb-table" env:"AWS_DYNAMODB_TABLE" yaml:"dynamodb-table" description:"AWS DynamoDB table for locks."`
-	S3                        S3BucketConfig `group:"S3 Options" yaml:"s3"`
-	Endpoint                  string         `long:"aws-endpoint" env:"AWS_ENDPOINT" yaml:"endpoint" description:"AWS endpoint."`
-	Region                    string         `long:"aws-region" env:"AWS_REGION" yaml:"region" description:"AWS region."`
-	APPRoleArn                string         `long:"aws-role-arn" env:"APP_ROLE_ARN" yaml:"app-role-arn" description:"Role ARN to Assume."`
-	ExternalID                string         `long:"aws-external-id" env:"AWS_EXTERNAL_ID" yaml:"external-id" description:"External ID to use when assuming role."`
-	OtherS3CompatibleProvider bool           `long:"aws-other-compatible-provider" env:"AWS_OTHER_COMPATIBLE_PROVIDER" yaml:"other-compatible-provider" description:"Enable compatibility mode to support other providers s3 compatible (MinIO for example), disable locks support & versionning"`
+	DynamoDBTable string         `long:"dynamodb-table" env:"AWS_DYNAMODB_TABLE" yaml:"dynamodb-table" description:"AWS DynamoDB table for locks."`
+	S3            S3BucketConfig `group:"S3 Options" yaml:"s3"`
+	Endpoint      string         `long:"aws-endpoint" env:"AWS_ENDPOINT" yaml:"endpoint" description:"AWS endpoint."`
+	Region        string         `long:"aws-region" env:"AWS_REGION" yaml:"region" description:"AWS region."`
+	APPRoleArn    string         `long:"aws-role-arn" env:"APP_ROLE_ARN" yaml:"app-role-arn" description:"Role ARN to Assume."`
+	ExternalID    string         `long:"aws-external-id" env:"AWS_EXTERNAL_ID" yaml:"external-id" description:"External ID to use when assuming role."`
 }
 
 // TFEConfig stores the Terraform Enterprise configuration
@@ -75,11 +74,19 @@ type WebConfig struct {
 	LogoutURL string `long:"logout-url" env:"TERRABOARD_LOGOUT_URL" yaml:"logout-url" description:"Logout URL."`
 }
 
+// ProviderConfig stores genral provider parameters
+type ProviderConfig struct {
+	NoVersioning bool `long:"no-versioning" env:"TERRABOARD_NO_VERSIONING" yaml:"no-versioning" description:"Disable versioning support from Terraboard (useful for S3 compatible providers like MinIO)"`
+	NoLocks      bool `long:"no-locks" env:"TERRABOARD_NO_LOCKS" yaml:"no-locks" description:"Disable locks support from Terraboard (useful for S3 compatible providers like MinIO)"`
+}
+
 // Config stores the handler's configuration and UI interface parameters
 type Config struct {
 	Version bool `short:"V" long:"version" description:"Display version."`
 
 	ConfigFilePath string `short:"c" long:"config-file" env:"CONFIG_FILE" description:"Config File path"`
+
+	Provider ProviderConfig `group:"General Provider Options" yaml:"provider"`
 
 	Log LogConfig `group:"Logging Options" yaml:"log"`
 

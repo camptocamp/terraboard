@@ -11,9 +11,10 @@ services:
       AWS_BUCKET: test-bucket
       AWS_REGION: eu-west-1
       AWS_ENDPOINT: http://minio:9000/
-      AWS_OTHER_COMPATIBLE_PROVIDER: "true"
       AWS_FORCE_PATH_STYLE: "true"
       TERRABOARD_LOG_LEVEL: debug
+      TERRABOARD_NO_LOCKS: "true"
+      TERRABOARD_NO_VERSIONING: "true"
       DB_PASSWORD: mypassword
       DB_SSLMODE: disable
       GODEBUG: netdns=go
