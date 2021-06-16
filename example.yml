@@ -11,6 +11,10 @@ database:
   no-sync: false
   sync-interval: 5
 
+provider:
+  no-locks: "true"
+  no-versioning: "false"
+
 aws:
   dynamodb-table: terraboard
   s3:

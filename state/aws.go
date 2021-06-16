@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	aws_sdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
@@ -25,6 +26,8 @@ type AWS struct {
 	dynamoTable   string
 	keyPrefix     string
 	fileExtension []string
+	noLocks       bool
+	noVersioning  bool
 }
 
 // NewAWS creates an AWS object
@@ -58,11 +61,18 @@ func NewAWS(c *config.Config) AWS {
 		fileExtension: c.AWS.S3.FileExtension,
 		dynamoSvc:     dynamodb.New(sess, awsConfig),
 		dynamoTable:   c.AWS.DynamoDBTable,
+		noLocks:       c.Provider.NoLocks,
+		noVersioning:  c.Provider.NoVersioning,
 	}
 }
 
 // GetLocks returns a map of locks by State path
 func (a *AWS) GetLocks() (locks map[string]LockInfo, err error) {
+	if a.noLocks {
+		locks = make(map[string]LockInfo)
+		return
+	}
+
 	if a.dynamoTable == "" {
 		err = fmt.Errorf("no dynamoDB table provided, not getting locks")
 		return
@@ -94,6 +104,7 @@ func (a *AWS) GetLocks() (locks map[string]LockInfo, err error) {
 			locks[strings.TrimPrefix(info.Path, infoPrefix)] = info
 		}
 	}
+
 	return
 }
 
@@ -138,7 +149,7 @@ func (a *AWS) GetState(st, versionID string) (sf *statefile.File, err error) {
 		Bucket: aws_sdk.String(a.bucket),
 		Key:    aws_sdk.String(st),
 	}
-	if versionID != "" {
+	if versionID != "" && !a.noVersioning {
 		input.VersionId = &versionID
 	}
 	result, err := a.svc.GetObjectWithContext(context.Background(), input)
@@ -168,6 +179,14 @@ func (a *AWS) GetState(st, versionID string) (sf *statefile.File, err error) {
 // GetVersions returns a slice of Version objects
 func (a *AWS) GetVersions(state string) (versions []Version, err error) {
 	versions = []Version{}
+	if a.noVersioning {
+		versions = append(versions, Version{
+			ID:           "1",
+			LastModified: time.Now(),
+		})
+		return
+	}
+
 	result, err := a.svc.ListObjectVersions(&s3.ListObjectVersionsInput{
 		Bucket: aws_sdk.String(a.bucket),
 		Prefix: aws_sdk.String(state),

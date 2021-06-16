@@ -74,11 +74,19 @@ type WebConfig struct {
 	LogoutURL string `long:"logout-url" env:"TERRABOARD_LOGOUT_URL" yaml:"logout-url" description:"Logout URL."`
 }
 
+// ProviderConfig stores genral provider parameters
+type ProviderConfig struct {
+	NoVersioning bool `long:"no-versioning" env:"TERRABOARD_NO_VERSIONING" yaml:"no-versioning" description:"Disable versioning support from Terraboard (useful for S3 compatible providers like MinIO)"`
+	NoLocks      bool `long:"no-locks" env:"TERRABOARD_NO_LOCKS" yaml:"no-locks" description:"Disable locks support from Terraboard (useful for S3 compatible providers like MinIO)"`
+}
+
 // Config stores the handler's configuration and UI interface parameters
 type Config struct {
 	Version bool `short:"V" long:"version" description:"Display version."`
 
 	ConfigFilePath string `short:"c" long:"config-file" env:"CONFIG_FILE" description:"Config File path"`
+
+	Provider ProviderConfig `group:"General Provider Options" yaml:"provider"`
 
 	Log LogConfig `group:"Logging Options" yaml:"log"`
 
