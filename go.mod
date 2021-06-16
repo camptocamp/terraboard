@@ -13,8 +13,8 @@ require (
 	github.com/hashicorp/go-tfe v0.12.0
 	github.com/hashicorp/go-version v1.2.1 // indirect
 	github.com/hashicorp/terraform v0.15.0
+	github.com/jackc/pgproto3/v2 v2.0.7 // indirect
 	github.com/jessevdk/go-flags v1.4.0
-	github.com/jinzhu/gorm v1.9.16
 	github.com/lib/pq v1.9.0 // indirect
 	github.com/machinebox/graphql v0.2.2
 	github.com/matryer/is v1.4.0 // indirect
@@ -25,9 +25,13 @@ require (
 	github.com/spf13/afero v1.5.1 // indirect
 	github.com/zclconf/go-cty v1.8.1
 	go.opencensus.io v0.22.6 // indirect
+	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a // indirect
 	golang.org/x/oauth2 v0.0.0-20210201163806-010130855d6c // indirect
+	golang.org/x/text v0.3.6 // indirect
 	golang.org/x/time v0.0.0-20201208040808-7e3f01d25324 // indirect
 	google.golang.org/api v0.38.0
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/datatypes v1.0.1
+	gorm.io/driver/postgres v1.1.0 // indirect
+	gorm.io/gorm v1.21.10 // indirect
 )

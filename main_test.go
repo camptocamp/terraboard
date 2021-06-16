@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/camptocamp/terraboard/db"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 func TestIsKnownStateVersion_Match(t *testing.T) {
