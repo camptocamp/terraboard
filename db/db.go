@@ -54,6 +54,19 @@ func Init(config config.DBConfig, debug bool) *Database {
 		&types.Resource{},
 		&types.Attribute{},
 		&types.OutputValue{},
+		&types.Plan{},
+		&types.PlanModel{},
+		&types.PlanModelVariable{},
+		&types.PlanOutput{},
+		&types.PlanOutputChange{},
+		&types.PlanResourceChange{},
+		&types.PlanState{},
+		&types.PlanStateModule{},
+		&types.PlanStateOutput{},
+		&types.PlanStateResource{},
+		&types.PlanStateResourceAttribute{},
+		&types.PlanStateValue{},
+		&types.Change{},
 	)
 
 	if debug {
