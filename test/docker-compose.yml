@@ -31,6 +31,7 @@ services:
     environment:
       MINIO_ROOT_USER: root
       MINIO_ROOT_PASSWORD: mypassword
+    user: "${UID}:${GID}"
     expose: 
       - "9000"
     ports:
