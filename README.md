@@ -13,8 +13,8 @@
   <a href="https://gitter.im/camptocamp/terraboard" target="_blank">
     <img alt="Gitter" src="https://img.shields.io/gitter/room/camptocamp/terraboard.svg" />
   </a>
-  <a href="https://travis-ci.org/camptocamp/terraboard" target="_blank">
-    <img alt="Build Status" src="https://travis-ci.org/camptocamp/terraboard.svg?branch=master" />
+  <a href="https://github.com/camptocamp/terraboard/actions" target="_blank">
+    <img alt="Build Status" src="https://github.com/camptocamp/terraboard/workflows/Build/badge.svg" />
   </a>
   <a href="https://coveralls.io/github/camptocamp/terraboard?branch=master" target="_blank">
     <img alt="Coverage Status" src="https://coveralls.io/repos/github/camptocamp/terraboard/badge.svg?branch=master" />
