@@ -2,6 +2,7 @@ package db
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/url"
 	"strconv"
@@ -77,7 +78,41 @@ func Init(config config.DBConfig, debug bool) *Database {
 	if debug {
 		db.Config.Logger.LogMode(logger.Info)
 	}
-	return &Database{db}
+
+	d := &Database{db}
+	if err = d.MigrateLineage(); err != nil {
+		log.Fatalf("Lineage migration failed: %v\n", err)
+	}
+
+	return d
+}
+
+// MigrateLineage is a migration function to update db and its data to the
+// new lineage db scheme. It will update State table data, delete "lineage" column
+// and add corresponding Lineage entries
+func (db *Database) MigrateLineage() error {
+	if db.Migrator().HasColumn(&types.State{}, "lineage") {
+		states := db.ListStates()
+		for _, stPath := range states {
+			// Recover State from db for update
+			var st types.State
+			res := db.First(&st, types.State{Path: stPath})
+			if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+				return fmt.Errorf("State not found in db")
+			}
+
+			if err := db.UpdateState(st); err != nil {
+				return fmt.Errorf("Failed to update %s state during lineage migration: %v", stPath, err)
+			}
+		}
+
+		// Custom migration rules
+		if err := db.Migrator().DropColumn(&types.State{}, "lineage"); err != nil {
+			return fmt.Errorf("Failed to drop lineage column during migration: %v", err)
+		}
+	}
+
+	return nil
 }
 
 type attributeValues map[string]interface{}
@@ -85,14 +120,28 @@ type attributeValues map[string]interface{}
 func (db *Database) stateS3toDB(sf *statefile.File, path string, versionID string) (st types.State) {
 	var version types.Version
 	db.First(&version, types.Version{VersionID: versionID})
-	st = types.State{
-		Path:      path,
-		Version:   version,
-		TFVersion: sf.TerraformVersion.String(),
-		Serial:    int64(sf.Serial),
-		Lineage: types.Lineage{
-			Value: sf.Lineage,
-		},
+
+	// Check if the associated lineage is already present in lineages table
+	// If so, it recovers its ID otherwise it inserts it at the same time as the state
+	var lineage types.Lineage
+	if errors.Is(db.First(&lineage, types.Lineage{Value: sf.Lineage}).Error, gorm.ErrRecordNotFound) {
+		st = types.State{
+			Path:      path,
+			Version:   version,
+			TFVersion: sf.TerraformVersion.String(),
+			Serial:    int64(sf.Serial),
+			Lineage: types.Lineage{
+				Value: sf.Lineage,
+			},
+		}
+	} else {
+		st = types.State{
+			Path:      path,
+			Version:   version,
+			TFVersion: sf.TerraformVersion.String(),
+			Serial:    int64(sf.Serial),
+			LineageID: lineage.ID,
+		}
 	}
 
 	for _, m := range sf.State.Modules {
@@ -170,6 +219,29 @@ func (db *Database) InsertState(path string, versionID string, sf *statefile.Fil
 	st := db.stateS3toDB(sf, path, versionID)
 	db.Create(&st)
 	return nil
+}
+
+// UpdateState update a Terraform State in the Database with Lineage foreign constraint
+// It will also insert Lineage entry in the db if needed
+func (db *Database) UpdateState(st types.State) error {
+	// Get lineage from old column
+	if err := db.Raw("SELECT lineage FROM states WHERE path = ?", st.Path).Scan(&st.Lineage.Value).Error; err != nil {
+		return fmt.Errorf("Error on %s lineage recovering during migration: %v", st.Path, err)
+	}
+
+	// Create Lineage entry if not exist (value column is unique)
+	db.Create(&st.Lineage)
+
+	// Get Lineage ID for foreign constraint
+	var lineage types.Lineage
+	res := db.First(&lineage, lineage)
+	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+		return fmt.Errorf("State's lineage not found in db during update")
+	}
+	st.LineageID = lineage.ID
+	st.Lineage = lineage
+
+	return db.Save(&st).Error
 }
 
 // InsertVersion inserts an AWS S3 Version in the Database
