@@ -55,6 +55,7 @@ func Init(config config.DBConfig, debug bool) *Database {
 		&types.Resource{},
 		&types.Attribute{},
 		&types.OutputValue{},
+		&types.Lineage{},
 		&types.Plan{},
 		&types.PlanModel{},
 		&types.PlanModelVariable{},
@@ -89,7 +90,9 @@ func (db *Database) stateS3toDB(sf *statefile.File, path string, versionID strin
 		Version:   version,
 		TFVersion: sf.TerraformVersion.String(),
 		Serial:    int64(sf.Serial),
-		Lineage:   sf.Lineage,
+		Lineage: types.Lineage{
+			Value: sf.Lineage,
+		},
 	}
 
 	for _, m := range sf.State.Modules {
