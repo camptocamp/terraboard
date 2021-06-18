@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/camptocamp/terraboard/auth"
@@ -276,5 +277,23 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 	if _, err := io.WriteString(w, string(j)); err != nil {
 		log.Error(err.Error())
+	}
+}
+
+// SubmitPlan insert a new Terraform plan in the database
+func SubmitPlan(w http.ResponseWriter, r *http.Request, db *db.Database) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Errorf("Failed to read body: %v", err)
+		JSONError(w, "Failed to read body during plan submit", err)
+		return
+	}
+
+	if err = db.InsertPlan(body); err != nil {
+		log.Errorf("Failed to insert plan to db: %v", err)
+		JSONError(w, "Failed to insert plan to db", err)
+		return
 	}
 }

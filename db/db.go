@@ -566,6 +566,31 @@ func (db *Database) ListAttributeKeys(resourceType string) (results []string, er
 	return
 }
 
+// InsertPlan inserts a Terraform plan with associated information in the Database
+func (db *Database) InsertPlan(plan []byte) error {
+	// Check for lineage existence
+	var lineage types.Lineage
+	if err := json.Unmarshal(plan, &lineage); err != nil {
+		return err
+	}
+
+	res := db.First(&lineage, lineage)
+	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+		return fmt.Errorf("Plan's lineage not found in db")
+	}
+
+	var p types.Plan
+	if err := json.Unmarshal(plan, &p); err != nil {
+		return err
+	}
+	if err := json.Unmarshal(p.PlanJSON, &p.ParsedPlan); err != nil {
+		return err
+	}
+
+	p.LineageID = lineage.ID
+	return db.Create(&p).Error
+}
+
 // DefaultVersion returns the detault VersionID for a given State path
 // Copied and adapted from github.com/hashicorp/terraform/command/jsonstate/state.go
 func (db *Database) DefaultVersion(path string) (version string, err error) {
