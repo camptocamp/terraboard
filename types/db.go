@@ -30,8 +30,7 @@ type State struct {
 	TFVersion  string        `gorm:"varchar(10)" json:"terraform_version"`
 	Serial     int64         `json:"serial"`
 	LineageID  uint          `gorm:"index" json:"-"`
-	Lineage    Lineage
-	Modules    []Module `json:"modules"`
+	Modules    []Module      `json:"modules"`
 }
 
 type Lineage struct {

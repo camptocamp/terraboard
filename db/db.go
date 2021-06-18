@@ -50,13 +50,13 @@ func Init(config config.DBConfig, debug bool) *Database {
 
 	log.Infof("Automigrate")
 	err = db.AutoMigrate(
+		&types.Lineage{},
 		&types.Version{},
 		&types.State{},
 		&types.Module{},
 		&types.Resource{},
 		&types.Attribute{},
 		&types.OutputValue{},
-		&types.Lineage{},
 		&types.Plan{},
 		&types.PlanModel{},
 		&types.PlanModelVariable{},
@@ -117,31 +117,25 @@ func (db *Database) MigrateLineage() error {
 
 type attributeValues map[string]interface{}
 
-func (db *Database) stateS3toDB(sf *statefile.File, path string, versionID string) (st types.State) {
+func (db *Database) stateS3toDB(sf *statefile.File, path string, versionID string) (st types.State, err error) {
 	var version types.Version
 	db.First(&version, types.Version{VersionID: versionID})
 
 	// Check if the associated lineage is already present in lineages table
 	// If so, it recovers its ID otherwise it inserts it at the same time as the state
 	var lineage types.Lineage
-	if errors.Is(db.First(&lineage, types.Lineage{Value: sf.Lineage}).Error, gorm.ErrRecordNotFound) {
-		st = types.State{
-			Path:      path,
-			Version:   version,
-			TFVersion: sf.TerraformVersion.String(),
-			Serial:    int64(sf.Serial),
-			Lineage: types.Lineage{
-				Value: sf.Lineage,
-			},
-		}
-	} else {
-		st = types.State{
-			Path:      path,
-			Version:   version,
-			TFVersion: sf.TerraformVersion.String(),
-			Serial:    int64(sf.Serial),
-			LineageID: lineage.ID,
-		}
+	err = db.FirstOrCreate(&lineage, types.Lineage{Value: sf.Lineage}).Error
+	if err != nil || lineage.ID == 0 {
+		log.Error("Unknown error in stateS3toDB during lineage finding")
+		return types.State{}, err
+	}
+
+	st = types.State{
+		Path:      path,
+		Version:   version,
+		TFVersion: sf.TerraformVersion.String(),
+		Serial:    int64(sf.Serial),
+		LineageID: lineage.ID,
 	}
 
 	for _, m := range sf.State.Modules {
@@ -176,7 +170,7 @@ func (db *Database) stateS3toDB(sf *statefile.File, path string, versionID strin
 
 		st.Modules = append(st.Modules, mod)
 	}
-	return
+	return st, nil
 }
 
 // getResourceIndex transforms an addrs.InstanceKey instance into a string representation
@@ -216,30 +210,31 @@ func marshalAttributeValues(src *states.ResourceInstanceObjectSrc) (attrs []type
 
 // InsertState inserts a Terraform State in the Database
 func (db *Database) InsertState(path string, versionID string, sf *statefile.File) error {
-	st := db.stateS3toDB(sf, path, versionID)
-	db.Create(&st)
+	st, err := db.stateS3toDB(sf, path, versionID)
+	if err == nil {
+		db.Create(&st)
+	}
 	return nil
 }
 
 // UpdateState update a Terraform State in the Database with Lineage foreign constraint
-// It will also insert Lineage entry in the db if needed
+// It will also insert Lineage entry in the db if needed.
+// This method is only use during the lineage migration since state are immutable
 func (db *Database) UpdateState(st types.State) error {
 	// Get lineage from old column
-	if err := db.Raw("SELECT lineage FROM states WHERE path = ?", st.Path).Scan(&st.Lineage.Value).Error; err != nil {
+	var lineage types.Lineage
+	if err := db.Raw("SELECT lineage FROM states WHERE path = ?", st.Path).Scan(&lineage.Value).Error; err != nil {
 		return fmt.Errorf("Error on %s lineage recovering during migration: %v", st.Path, err)
 	}
 
 	// Create Lineage entry if not exist (value column is unique)
-	db.Create(&st.Lineage)
+	tx := db.FirstOrCreate(&lineage)
+	if tx.Error != nil || lineage.ID == 0 {
+		return tx.Error
+	}
 
 	// Get Lineage ID for foreign constraint
-	var lineage types.Lineage
-	res := db.First(&lineage, lineage)
-	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-		return fmt.Errorf("State's lineage not found in db during update")
-	}
 	st.LineageID = lineage.ID
-	st.Lineage = lineage
 
 	return db.Save(&st).Error
 }
