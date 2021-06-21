@@ -80,6 +80,7 @@ type Attribute struct {
 type Plan struct {
 	gorm.Model
 	LineageID    uint           `gorm:"index" json:"-"`
+	Lineage      Lineage        `json:"lineage_data"`
 	TFVersion    string         `gorm:"varchar(10)" json:"terraform_version"`
 	GitRemote    string         `json:"git_remote"`
 	GitCommit    string         `gorm:"varchar(50)" json:"git_commit"`
@@ -214,7 +215,7 @@ type PlanStateResource struct {
 
 	//  The version of the resource type schema the "values" property
 	//  conforms to.
-	SchemaVersion uint `json:"schema_version,"`
+	SchemaVersion uint `json:"schema_version,omitempty"`
 
 	// The JSON representation of the attribute values of the resource,
 	// whose structure depends on the resource type schema. Any unknown
@@ -289,14 +290,8 @@ type PlanResourceChange struct {
 
 type PlanOutput struct {
 	gorm.Model
-	Name               string           `gorm:"index" json:"key"`
-	PlanModelID        sql.NullInt64    `gorm:"index" json:"-"`
-	PlanOutputChange   PlanOutputChange `json:"value"`
-	PlanOutputChangeID sql.NullInt64    `gorm:"index" json:"-"`
-}
-
-type PlanOutputChange struct {
-	gorm.Model
+	Name        string        `gorm:"index" json:"name"`
+	PlanModelID sql.NullInt64 `gorm:"index" json:"-"`
 	// The data describing the change that will be made to this object.
 	Change   Change        `json:"change,omitempty"`
 	ChangeID sql.NullInt64 `gorm:"index" json:"-"`

@@ -61,7 +61,6 @@ func Init(config config.DBConfig, debug bool) *Database {
 		&types.PlanModel{},
 		&types.PlanModelVariable{},
 		&types.PlanOutput{},
-		&types.PlanOutputChange{},
 		&types.PlanResourceChange{},
 		&types.PlanState{},
 		&types.PlanStateModule{},
@@ -589,6 +588,46 @@ func (db *Database) InsertPlan(plan []byte) error {
 
 	p.LineageID = lineage.ID
 	return db.Create(&p).Error
+}
+
+// GetPlans retrieves all Plan of a lineage from the database
+func (db *Database) GetPlans(lineage, limitStr string) (plans []types.Plan) {
+	var limit int
+	if limitStr == "" {
+		limit = -1
+	} else {
+		var err error
+		limit, err = strconv.Atoi(limitStr)
+		if err != nil {
+			log.Warnf("GetPlans limit ignored: %v", err)
+			limit = -1
+		}
+	}
+
+	db.Joins("JOIN lineages on plans.lineage_id=lineages.id").
+		Preload("ParsedPlan").
+		Preload("ParsedPlan.PlanStateValue").
+		Preload("ParsedPlan.PlanStateValue.PlanStateOutputs").
+		Preload("ParsedPlan.PlanStateValue.PlanStateModule").
+		Preload("ParsedPlan.PlanStateValue.PlanStateModule.PlanStateResources").
+		Preload("ParsedPlan.PlanStateValue.PlanStateModule.PlanStateResources.PlanStateResourceAttributes").
+		Preload("ParsedPlan.PlanStateValue.PlanStateModule.PlanStateModules").
+		Preload("ParsedPlan.Variables").
+		Preload("ParsedPlan.PlanResourceChanges").
+		Preload("ParsedPlan.PlanResourceChanges.Change").
+		Preload("ParsedPlan.PlanOutputs").
+		Preload("ParsedPlan.PlanOutputs.Change").
+		Preload("ParsedPlan.PlanState").
+		Preload("ParsedPlan.PlanState.PlanStateValue").
+		Preload("ParsedPlan.PlanState.PlanStateValue.PlanStateOutputs").
+		Preload("ParsedPlan.PlanState.PlanStateValue.PlanStateModule").
+		Preload("ParsedPlan.PlanState.PlanStateValue.PlanStateModule.PlanStateResources").
+		Preload("ParsedPlan.PlanState.PlanStateValue.PlanStateModule.PlanStateResources.PlanStateResourceAttributes").
+		Preload("ParsedPlan.PlanState.PlanStateValue.PlanStateModule.PlanStateModules").
+		Order("created_at desc").
+		Limit(limit).
+		Find(&plans, "lineages.value = ?", lineage)
+	return
 }
 
 // DefaultVersion returns the detault VersionID for a given State path

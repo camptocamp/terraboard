@@ -280,20 +280,46 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// SubmitPlan insert a new Terraform plan in the database
+// SubmitPlan insert a new Terraform plan in the database.
+// /api/plans POST endpoint callback
 func SubmitPlan(w http.ResponseWriter, r *http.Request, db *db.Database) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "POST" {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		log.Errorf("Failed to read body: %v", err)
-		JSONError(w, "Failed to read body during plan submit", err)
-		return
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			log.Errorf("Failed to read body: %v", err)
+			JSONError(w, "Failed to read body during plan submit", err)
+			return
+		}
+
+		if err = db.InsertPlan(body); err != nil {
+			log.Errorf("Failed to insert plan to db: %v", err)
+			JSONError(w, "Failed to insert plan to db", err)
+			return
+		}
 	}
+}
 
-	if err = db.InsertPlan(body); err != nil {
-		log.Errorf("Failed to insert plan to db: %v", err)
-		JSONError(w, "Failed to insert plan to db", err)
-		return
+// GetPlans provides all Plan by lineage.
+// Optional "&limit=X" parameter to limit requested quantity of plans.
+// Sorted by most recent to oldest.
+// /api/plans GET endpoint callback
+func GetPlans(w http.ResponseWriter, r *http.Request, db *db.Database) {
+	if r.Method == "GET" {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		lineage := r.URL.Query().Get("lineage")
+		limit := r.URL.Query().Get("limit")
+		plans := db.GetPlans(lineage, limit)
+
+		j, err := json.Marshal(plans)
+		if err != nil {
+			log.Errorf("Failed to marshal plans: %v", err)
+			JSONError(w, "Failed to marshal plans", err)
+			return
+		}
+		if _, err := io.WriteString(w, string(j)); err != nil {
+			log.Error(err.Error())
+		}
 	}
 }
