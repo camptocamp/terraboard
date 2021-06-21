@@ -1,5 +1,5 @@
 ---
-version: '3'
+version: "3.8"
 services:
   terraboard:
     build:
@@ -16,7 +16,8 @@ services:
       DB_SSLMODE: disable
       GODEBUG: netdns=go
     depends_on:
-      - "db"
+      db:
+        condition: service_healthy
     volumes:
       - ./static:/static:ro
     ports:
@@ -30,6 +31,11 @@ services:
       POSTGRES_DB: gorm
     volumes:
       - tb-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   tb-data: {}
