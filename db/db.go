@@ -567,15 +567,15 @@ func (db *Database) ListAttributeKeys(resourceType string) (results []string, er
 
 // InsertPlan inserts a Terraform plan with associated information in the Database
 func (db *Database) InsertPlan(plan []byte) error {
-	// Check for lineage existence
 	var lineage types.Lineage
 	if err := json.Unmarshal(plan, &lineage); err != nil {
 		return err
 	}
 
-	res := db.First(&lineage, lineage)
-	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-		return fmt.Errorf("Plan's lineage not found in db")
+	// Recover lineage from db if it's already exists or insert it
+	res := db.FirstOrCreate(&lineage, lineage)
+	if res.Error != nil {
+		return fmt.Errorf("Error on lineage retrival during plan insertion: %v", res.Error)
 	}
 
 	var p types.Plan

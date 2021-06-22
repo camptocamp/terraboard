@@ -196,15 +196,7 @@ func main() {
 	http.HandleFunc(util.GetFullPath("api/resource/names"), handleWithDB(api.ListResourceNames, database))
 	http.HandleFunc(util.GetFullPath("api/attribute/keys"), handleWithDB(api.ListAttributeKeys, database))
 	http.HandleFunc(util.GetFullPath("api/tf_versions"), handleWithDB(api.ListTfVersions, database))
-	http.HandleFunc(util.GetFullPath("api/plans"), func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "GET" {
-			api.GetPlans(w, r, database)
-		} else if r.Method == "POST" {
-			api.SubmitPlan(w, r, database)
-		} else {
-			http.Error(w, "Invalid request method.", 405)
-		}
-	})
+	http.HandleFunc(util.GetFullPath("api/plans"), handleWithDB(api.ManagePlans, database))
 
 	// Start server
 	log.Debugf("Listening on port %d\n", c.Web.Port)
