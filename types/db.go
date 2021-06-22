@@ -29,8 +29,15 @@ type State struct {
 	VersionID  sql.NullInt64 `gorm:"index" json:"-"`
 	TFVersion  string        `gorm:"varchar(10)" json:"terraform_version"`
 	Serial     int64         `json:"serial"`
-	Lineage    string        `json:"lineage"`
+	LineageID  uint          `gorm:"index" json:"-"`
 	Modules    []Module      `json:"modules"`
+}
+
+type Lineage struct {
+	gorm.Model
+	Value  string  `gorm:"index;unique" json:"lineage"`
+	States []State `json:"states"`
+	Plans  []Plan  `json:"plans"`
 }
 
 // Module is a Terraform module in a State
@@ -72,7 +79,7 @@ type Attribute struct {
 // Plan is a Terraform plan
 type Plan struct {
 	gorm.Model
-	Lineage      string         `json:"lineage"`
+	LineageID    uint           `gorm:"index" json:"-"`
 	TFVersion    string         `gorm:"varchar(10)" json:"terraform_version"`
 	GitRemote    string         `json:"git_remote"`
 	GitCommit    string         `gorm:"varchar(50)" json:"git_commit"`
