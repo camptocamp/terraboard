@@ -170,7 +170,7 @@ func (db *Database) stateS3toDB(sf *statefile.File, path string, versionID strin
 
 		st.Modules = append(st.Modules, mod)
 	}
-	return st, nil
+	return
 }
 
 // getResourceIndex transforms an addrs.InstanceKey instance into a string representation
