@@ -219,7 +219,7 @@ func (db *Database) InsertState(path string, versionID string, sf *statefile.Fil
 
 // UpdateState update a Terraform State in the Database with Lineage foreign constraint
 // It will also insert Lineage entry in the db if needed.
-// This method is only use during the lineage migration since state are immutable
+// This method is only use during the Lineage migration since States are immutable
 func (db *Database) UpdateState(st types.State) error {
 	// Get lineage from old column
 	var lineage types.Lineage
