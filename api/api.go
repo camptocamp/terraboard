@@ -331,3 +331,22 @@ func ManagePlans(w http.ResponseWriter, r *http.Request, db *db.Database) {
 		http.Error(w, "Invalid request method.", 405)
 	}
 }
+
+// GetLineages recover all Lineage from db.
+// Optional "&limit=X" parameter to limit requested quantity of them.
+// Sorted by most recent to oldest.
+func GetLineages(w http.ResponseWriter, r *http.Request, db *db.Database) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	limit := r.URL.Query().Get("limit")
+	lineages := db.GetLineages(limit)
+
+	j, err := json.Marshal(lineages)
+	if err != nil {
+		log.Errorf("Failed to marshal lineages: %v", err)
+		JSONError(w, "Failed to marshal lineages", err)
+		return
+	}
+	if _, err := io.WriteString(w, string(j)); err != nil {
+		log.Error(err.Error())
+	}
+}
