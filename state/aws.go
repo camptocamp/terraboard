@@ -31,39 +31,44 @@ type AWS struct {
 }
 
 // NewAWS creates an AWS object
-func NewAWS(c *config.Config) AWS {
-	sess := session.Must(session.NewSession())
+func NewAWS(c *config.Config) []*AWS {
+	var awsInstances []*AWS
+	for _, aws := range c.AWS {
+		sess := session.Must(session.NewSession())
+		awsConfig := aws_sdk.NewConfig()
+		if len(aws.APPRoleArn) > 0 {
+			log.Debugf("Using %s role", aws.APPRoleArn)
+			creds := stscreds.NewCredentials(sess, aws.APPRoleArn, func(p *stscreds.AssumeRoleProvider) {
+				if aws.ExternalID != "" {
+					p.ExternalID = aws_sdk.String(aws.ExternalID)
+				}
+			})
+			awsConfig.WithCredentials(creds)
+		}
 
-	awsConfig := aws_sdk.NewConfig()
+		if e := aws.Endpoint; e != "" {
+			awsConfig.WithEndpoint(e)
+		}
+		if e := aws.Region; e != "" {
+			awsConfig.WithRegion(e)
+		}
+		awsConfig.S3ForcePathStyle = &aws.S3.ForcePathStyle
 
-	if len(c.AWS.APPRoleArn) > 0 {
-		log.Debugf("Using %s role", c.AWS.APPRoleArn)
-		creds := stscreds.NewCredentials(sess, c.AWS.APPRoleArn, func(p *stscreds.AssumeRoleProvider) {
-			if c.AWS.ExternalID != "" {
-				p.ExternalID = aws_sdk.String(c.AWS.ExternalID)
-			}
-		})
-		awsConfig.WithCredentials(creds)
+		instance := &AWS{
+			svc:           s3.New(sess, awsConfig),
+			bucket:        aws.S3.Bucket,
+			keyPrefix:     aws.S3.KeyPrefix,
+			fileExtension: aws.S3.FileExtension,
+			dynamoSvc:     dynamodb.New(sess, awsConfig),
+			dynamoTable:   aws.DynamoDBTable,
+			noLocks:       c.Provider.NoLocks,
+			noVersioning:  c.Provider.NoVersioning,
+		}
+		log.Debugf("Instance: %+v\n", *instance)
+		awsInstances = append(awsInstances, instance)
 	}
 
-	if e := c.AWS.Endpoint; e != "" {
-		awsConfig.WithEndpoint(e)
-	}
-	if e := c.AWS.Region; e != "" {
-		awsConfig.WithRegion(e)
-	}
-	awsConfig.S3ForcePathStyle = &c.AWS.S3.ForcePathStyle
-
-	return AWS{
-		svc:           s3.New(sess, awsConfig),
-		bucket:        c.AWS.S3.Bucket,
-		keyPrefix:     c.AWS.S3.KeyPrefix,
-		fileExtension: c.AWS.S3.FileExtension,
-		dynamoSvc:     dynamodb.New(sess, awsConfig),
-		dynamoTable:   c.AWS.DynamoDBTable,
-		noLocks:       c.Provider.NoLocks,
-		noVersioning:  c.Provider.NoVersioning,
-	}
+	return awsInstances
 }
 
 // GetLocks returns a map of locks by State path

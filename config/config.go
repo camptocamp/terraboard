@@ -92,13 +92,13 @@ type Config struct {
 
 	DB DBConfig `group:"Database Options" yaml:"database"`
 
-	AWS AWSConfig `group:"AWS Options" yaml:"aws"`
+	AWS []AWSConfig `group:"AWS Options" yaml:"aws"`
 
-	TFE TFEConfig `group:"Terraform Enterprise Options" yaml:"tfe"`
+	TFE []TFEConfig `group:"Terraform Enterprise Options" yaml:"tfe"`
 
-	GCP GCPConfig `group:"Google Cloud Platform Options" yaml:"gcp"`
+	GCP []GCPConfig `group:"Google Cloud Platform Options" yaml:"gcp"`
 
-	Gitlab GitlabConfig `group:"GitLab Options" yaml:"gitlab"`
+	Gitlab []GitlabConfig `group:"GitLab Options" yaml:"gitlab"`
 
 	Web WebConfig `group:"Web" yaml:"web"`
 }

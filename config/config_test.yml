@@ -11,27 +11,27 @@ database:
   no-sync: true
 
 aws:
-  dynamodb-table: terraboard-dynamodb
-  s3:
-    bucket: terraboard-bucket
-    key-prefix: test/
-    file-extension: [.tfstate]
-    force-path-style: true
+  - dynamodb-table: terraboard-dynamodb
+    s3:
+      bucket: terraboard-bucket
+      key-prefix: test/
+      file-extension: [.tfstate]
+      force-path-style: true
 
 tfe:
-  address: https://tfe.example.com
-  token: foo
-  organization: bar
+  - address: https://tfe.example.com
+    token: foo
+    organization: bar
 
 gcp:
-  gcs-bucket:
-    - my-bucket-1
-    - my-bucket-2
-  gcp-sa-key-path: /path/to/key
+  - gcs-bucket:
+      - my-bucket-1
+      - my-bucket-2
+    gcp-sa-key-path: /path/to/key
 
 gitlab:
-  address: https://gitlab.example.com
-  token: foo
+  - address: https://gitlab.example.com
+    token: foo
 
 web:
   port: 39090

@@ -24,33 +24,40 @@ type GCP struct {
 }
 
 // NewGCP creates an GCP object
-func NewGCP(c *config.Config) (*GCP, error) {
+func NewGCP(c *config.Config) ([]*GCP, error) {
 	ctx := context.Background()
+
 	var client *storage.Client
+	var gcpInstances []*GCP
 	var err error
-	if c.GCP.GCPSAKey != "" {
+	for _, gcp := range c.GCP {
+		if gcp.GCPSAKey != "" {
+			log.WithFields(log.Fields{
+				"path": gcp.GCPSAKey,
+			}).Info("Authenticating using service account key")
+			opt := option.WithCredentialsFile(gcp.GCPSAKey)
+			client, err = storage.NewClient(ctx, opt) // Use service account key
+		} else {
+			client, err = storage.NewClient(ctx) // Use base credentials
+		}
+
+		if err != nil {
+			log.Fatalf("Failed to create client: %v", err)
+			return nil, err
+		}
+
+		instance := &GCP{
+			svc:     client,
+			buckets: gcp.GCSBuckets,
+		}
+		gcpInstances = append(gcpInstances, instance)
+
 		log.WithFields(log.Fields{
-			"path": c.GCP.GCPSAKey,
-		}).Info("Authenticating using service account key")
-		opt := option.WithCredentialsFile(c.GCP.GCPSAKey)
-		client, err = storage.NewClient(ctx, opt) // Use service account key
-	} else {
-		client, err = storage.NewClient(ctx) // Use base credentials
+			"buckets": gcp.GCSBuckets,
+		}).Info("Client successfully created")
 	}
 
-	if err != nil {
-		log.Fatalf("Failed to create client: %v", err)
-		return nil, err
-	}
-
-	log.WithFields(log.Fields{
-		"buckets": c.GCP.GCSBuckets,
-	}).Info("Client successfully created")
-
-	return &GCP{
-		svc:     client,
-		buckets: c.GCP.GCSBuckets,
-	}, nil
+	return gcpInstances, nil
 }
 
 // GetLocks returns a map of locks by State path

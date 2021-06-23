@@ -19,24 +19,29 @@ type TFE struct {
 }
 
 // NewTFE creates a new TFE object
-func NewTFE(c *config.Config) (*TFE, error) {
-	config := &tfe.Config{
-		Address: c.TFE.Address,
-		Token:   c.TFE.Token,
+func NewTFE(c *config.Config) ([]*TFE, error) {
+	var tfeInstances []*TFE
+	for _, tfeObj := range c.TFE {
+		config := &tfe.Config{
+			Address: tfeObj.Address,
+			Token:   tfeObj.Token,
+		}
+
+		client, err := tfe.NewClient(config)
+		if err != nil {
+			return nil, err
+		}
+
+		ctx := context.Background()
+		instance := &TFE{
+			Client: client,
+			org:    tfeObj.Organization,
+			ctx:    &ctx,
+		}
+		tfeInstances = append(tfeInstances, instance)
 	}
 
-	client, err := tfe.NewClient(config)
-	if err != nil {
-		return nil, err
-	}
-
-	ctx := context.Background()
-
-	return &TFE{
-		Client: client,
-		org:    c.TFE.Organization,
-		ctx:    &ctx,
-	}, nil
+	return tfeInstances, nil
 }
 
 // GetLocks returns a map of locks by State path

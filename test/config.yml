@@ -1,0 +1,26 @@
+log:
+  level: debug
+  format: plain
+
+database:
+  password: mypassword
+
+provider:
+  no-locks: true
+  no-versioning: true
+
+aws:
+  - endpoint: http://minio:9000/
+    region: eu-west-1
+    s3:
+      bucket: test-bucket
+      force-path-style: true
+      file-extension: 
+        - .tfstate
+  - endpoint: http://minio:9000/
+    region: eu-west-1
+    s3:
+      bucket: test
+      force-path-style: true
+      file-extension: 
+        - .tfstate
