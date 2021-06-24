@@ -65,7 +65,6 @@ func NewAWS(c *config.Config) []*AWS {
 				noLocks:       c.Provider.NoLocks,
 				noVersioning:  c.Provider.NoVersioning,
 			}
-			log.Debugf("Instance: %+v\n", *instance)
 			awsInstances = append(awsInstances, instance)
 		}
 	}
