@@ -45,7 +45,7 @@ func handleWithDB(apiF func(w http.ResponseWriter, r *http.Request,
 	})
 }
 
-func handleWithStateProvider(apiF func(w http.ResponseWriter, r *http.Request,
+func handleWithStateProviders(apiF func(w http.ResponseWriter, r *http.Request,
 	sps []state.Provider), sps []state.Provider) func(http.ResponseWriter, *http.Request) {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		apiF(w, r, sps)
@@ -64,7 +64,7 @@ func isKnownStateVersion(statesVersions map[string][]string, versionID, path str
 }
 
 // Refresh the DB
-// This should be the only direct bridge between the state provider and the DB
+// This should be the only direct bridge between the state providers and the DB
 func refreshDB(syncInterval uint16, d *db.Database, sps []state.Provider) {
 	interval := time.Duration(syncInterval) * time.Minute
 	log.Debugf("Providers: %+v\n", sps)
@@ -194,7 +194,7 @@ func main() {
 	http.HandleFunc(util.GetFullPath("api/state/"), handleWithDB(api.GetState, database))
 	http.HandleFunc(util.GetFullPath("api/state/activity/"), handleWithDB(api.GetStateActivity, database))
 	http.HandleFunc(util.GetFullPath("api/state/compare/"), handleWithDB(api.StateCompare, database))
-	http.HandleFunc(util.GetFullPath("api/locks"), handleWithStateProvider(api.GetLocks, sps))
+	http.HandleFunc(util.GetFullPath("api/locks"), handleWithStateProviders(api.GetLocks, sps))
 	http.HandleFunc(util.GetFullPath("api/search/attribute"), handleWithDB(api.SearchAttribute, database))
 	http.HandleFunc(util.GetFullPath("api/resource/types"), handleWithDB(api.ListResourceTypes, database))
 	http.HandleFunc(util.GetFullPath("api/resource/types/count"), handleWithDB(api.ListResourceTypesWithCount, database))

@@ -20,7 +20,7 @@ aws:
   - endpoint: http://minio:9000/
     region: eu-west-1
     s3:
-      bucket: test
+      bucket: test-bucket2
       force-path-style: true
       file-extension: 
         - .tfstate

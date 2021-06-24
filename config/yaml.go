@@ -21,7 +21,7 @@ func (s *S3BucketConfig) UnmarshalYAML(unmarshal func(interface{}) error) error 
 
 func (s *GitlabConfig) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	type rawGitlabConfig GitlabConfig
-	raw := GitlabConfig{
+	raw := rawGitlabConfig{
 		Address: "https://gitlab.com",
 	}
 	if err := unmarshal(&raw); err != nil {
