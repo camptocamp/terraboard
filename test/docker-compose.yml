@@ -28,6 +28,27 @@ services:
     ports:
       - "8080:8080"
 
+  # terraboard-dev-multi-providers:
+  #   build:
+  #     context: ../
+  #     dockerfile: ./Dockerfile
+  #   environment:
+  #     AWS_ACCESS_KEY_ID: root
+  #     AWS_SECRET_ACCESS_KEY: mypassword
+  #     DB_SSLMODE: disable
+  #     CONFIG_FILE: config/config.yml
+  #     GODEBUG: netdns=go
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #     minio:
+  #       condition: service_started
+  #   volumes:
+  #     - ../static:/static:ro
+  #     - ./config.yml:/config/config.yml:ro
+  #   ports:
+  #     - "8081:8081"
+
   minio:
     image: minio/minio:latest
     environment:

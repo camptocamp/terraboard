@@ -22,23 +22,25 @@ type TFE struct {
 func NewTFE(c *config.Config) ([]*TFE, error) {
 	var tfeInstances []*TFE
 	for _, tfeObj := range c.TFE {
-		config := &tfe.Config{
-			Address: tfeObj.Address,
-			Token:   tfeObj.Token,
-		}
+		if tfeObj.Token != "" {
+			config := &tfe.Config{
+				Address: tfeObj.Address,
+				Token:   tfeObj.Token,
+			}
 
-		client, err := tfe.NewClient(config)
-		if err != nil {
-			return nil, err
-		}
+			client, err := tfe.NewClient(config)
+			if err != nil {
+				return nil, err
+			}
 
-		ctx := context.Background()
-		instance := &TFE{
-			Client: client,
-			org:    tfeObj.Organization,
-			ctx:    &ctx,
+			ctx := context.Background()
+			instance := &TFE{
+				Client: client,
+				org:    tfeObj.Organization,
+				ctx:    &ctx,
+			}
+			tfeInstances = append(tfeInstances, instance)
 		}
-		tfeInstances = append(tfeInstances, instance)
 	}
 
 	return tfeInstances, nil

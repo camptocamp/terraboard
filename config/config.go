@@ -119,14 +119,44 @@ func (c *Config) LoadConfigFromYaml() *Config {
 	return c
 }
 
-// LoadConfig loads the config from flags & environment
-func LoadConfig(version string) *Config {
+// Initialize Config with one obj per providers arrays
+// to allow usage of flags / env variables on single provider configuration
+func initDefaultConfig() Config {
 	var c Config
-	parser := flags.NewParser(&c, flags.Default)
+	var awsInitialConfig AWSConfig
+	var tfeInitialConfig TFEConfig
+	var gcpInitialConfig GCPConfig
+	var gitlabInitialConfig GitlabConfig
+
+	parseStructFlagsAndEnv(&awsInitialConfig)
+	c.AWS = append(c.AWS, awsInitialConfig)
+
+	parseStructFlagsAndEnv(&tfeInitialConfig)
+	c.TFE = append(c.TFE, tfeInitialConfig)
+
+	parseStructFlagsAndEnv(&gcpInitialConfig)
+	c.GCP = append(c.GCP, gcpInitialConfig)
+
+	parseStructFlagsAndEnv(&gitlabInitialConfig)
+	c.Gitlab = append(c.Gitlab, gitlabInitialConfig)
+
+	return c
+}
+
+// Parse flags and env variables to given struct using go-flags
+// parser
+func parseStructFlagsAndEnv(obj interface{}) {
+	parser := flags.NewParser(obj, flags.Default)
 	if _, err := parser.Parse(); err != nil {
 		fmt.Printf("Failed to parse flags: %s", err)
 		os.Exit(1)
 	}
+}
+
+// LoadConfig loads the config from flags & environment
+func LoadConfig(version string) *Config {
+	c := initDefaultConfig()
+	parseStructFlagsAndEnv(&c)
 
 	if c.ConfigFilePath != "" {
 		if _, err := os.Stat(c.ConfigFilePath); err == nil {

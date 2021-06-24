@@ -21,10 +21,12 @@ type Gitlab struct {
 func NewGitlab(c *config.Config) []*Gitlab {
 	var gitlabInstances []*Gitlab
 	for _, gl := range c.Gitlab {
-		instance := &Gitlab{
-			Client: gitlab.NewClient(gl.Address, gl.Token),
+		if gl.Token != "" {
+			instance := &Gitlab{
+				Client: gitlab.NewClient(gl.Address, gl.Token),
+			}
+			gitlabInstances = append(gitlabInstances, instance)
 		}
-		gitlabInstances = append(gitlabInstances, instance)
 	}
 	return gitlabInstances
 }
