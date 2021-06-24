@@ -7,11 +7,9 @@ require (
 	cloud.google.com/go/storage v1.12.0
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/aws/aws-sdk-go v1.37.2
-	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-retryablehttp v0.6.8 // indirect
 	github.com/hashicorp/go-slug v0.6.0 // indirect
 	github.com/hashicorp/go-tfe v0.12.0
-	github.com/hashicorp/go-version v1.2.1 // indirect
 	github.com/hashicorp/terraform v0.15.0
 	github.com/jackc/pgproto3/v2 v2.0.7 // indirect
 	github.com/jessevdk/go-flags v1.4.0
@@ -32,6 +30,6 @@ require (
 	google.golang.org/api v0.38.0
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/datatypes v1.0.1
-	gorm.io/driver/postgres v1.1.0 // indirect
-	gorm.io/gorm v1.21.10 // indirect
+	gorm.io/driver/postgres v1.1.0
+	gorm.io/gorm v1.21.10
 )
