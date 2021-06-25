@@ -16,7 +16,7 @@ type planStateResourceAttributeList []PlanStateResourceAttribute
 type rawJSON string
 
 func (p *planOutputList) UnmarshalJSON(b []byte) error {
-	tmp := map[string]PlanOutput{}
+	tmp := map[string]Change{}
 	err := json.Unmarshal(b, &tmp)
 	if err != nil {
 		return err
@@ -24,8 +24,11 @@ func (p *planOutputList) UnmarshalJSON(b []byte) error {
 
 	var list planOutputList
 	for key, value := range tmp {
-		value.Name = key
-		list = append(list, value)
+		output := PlanOutput{
+			Name:   key,
+			Change: value,
+		}
+		list = append(list, output)
 	}
 
 	*p = list

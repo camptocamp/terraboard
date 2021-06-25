@@ -196,6 +196,7 @@ func main() {
 	http.HandleFunc(util.GetFullPath("api/resource/names"), handleWithDB(api.ListResourceNames, database))
 	http.HandleFunc(util.GetFullPath("api/attribute/keys"), handleWithDB(api.ListAttributeKeys, database))
 	http.HandleFunc(util.GetFullPath("api/tf_versions"), handleWithDB(api.ListTfVersions, database))
+	http.HandleFunc(util.GetFullPath("api/plans"), handleWithDB(api.ManagePlans, database))
 
 	// Start server
 	log.Debugf("Listening on port %d\n", c.Web.Port)
