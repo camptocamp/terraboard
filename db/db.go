@@ -630,6 +630,26 @@ func (db *Database) GetPlans(lineage, limitStr string) (plans []types.Plan) {
 	return
 }
 
+// GetLineages retrieves all Lineage from the database
+func (db *Database) GetLineages(limitStr string) (lineages []types.Lineage) {
+	var limit int
+	if limitStr == "" {
+		limit = -1
+	} else {
+		var err error
+		limit, err = strconv.Atoi(limitStr)
+		if err != nil {
+			log.Warnf("GetLineages limit ignored: %v", err)
+			limit = -1
+		}
+	}
+
+	db.Order("created_at desc").
+		Limit(limit).
+		Find(&lineages)
+	return
+}
+
 // DefaultVersion returns the detault VersionID for a given State path
 // Copied and adapted from github.com/hashicorp/terraform/command/jsonstate/state.go
 func (db *Database) DefaultVersion(path string) (version string, err error) {
