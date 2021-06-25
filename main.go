@@ -65,60 +65,55 @@ func isKnownStateVersion(statesVersions map[string][]string, versionID, path str
 
 // Refresh the DB
 // This should be the only direct bridge between the state providers and the DB
-func refreshDB(syncInterval uint16, d *db.Database, sps []state.Provider) {
+func refreshDB(syncInterval uint16, d *db.Database, sp state.Provider) {
 	interval := time.Duration(syncInterval) * time.Minute
-	log.Debugf("Providers: %+v\n", sps)
 	for {
 		log.Infof("Refreshing DB")
-		log.Debugf("Total providers: %d\n", len(sps))
-		for i, sp := range sps {
-			log.Debugf("Fetching provider %d/%d\n", i+1, len(sps))
-			states, err := sp.GetStates()
-			if err != nil {
-				log.WithFields(log.Fields{
-					"error": err,
-				}).Error("Failed to retrieve states. Retrying in 1 minute.")
-				time.Sleep(interval)
-				continue
-			}
+		states, err := sp.GetStates()
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error": err,
+			}).Error("Failed to retrieve states. Retrying in 1 minute.")
+			time.Sleep(interval)
+			continue
+		}
 
-			statesVersions := d.ListStatesVersions()
-			for _, st := range states {
-				versions, _ := sp.GetVersions(st)
-				for k, v := range versions {
-					if _, ok := statesVersions[v.ID]; ok {
-						log.WithFields(log.Fields{
-							"version_id": v.ID,
-						}).Debug("Version is already in the database, skipping")
-					} else {
-						if err := d.InsertVersion(&versions[k]); err != nil {
-							log.Error(err.Error())
-						}
+		statesVersions := d.ListStatesVersions()
+		for _, st := range states {
+			versions, _ := sp.GetVersions(st)
+			for k, v := range versions {
+				if _, ok := statesVersions[v.ID]; ok {
+					log.WithFields(log.Fields{
+						"version_id": v.ID,
+					}).Debug("Version is already in the database, skipping")
+				} else {
+					if err := d.InsertVersion(&versions[k]); err != nil {
+						log.Error(err.Error())
 					}
+				}
 
-					if isKnownStateVersion(statesVersions, v.ID, st) {
-						log.WithFields(log.Fields{
-							"path":       st,
-							"version_id": v.ID,
-						}).Debug("State is already in the database, skipping")
-						continue
-					}
-					state, err := sp.GetState(st, v.ID)
-					if err != nil {
-						log.WithFields(log.Fields{
-							"path":       st,
-							"version_id": v.ID,
-							"error":      err,
-						}).Error("Failed to fetch state from bucket")
-						continue
-					}
-					if err = d.InsertState(st, v.ID, state); err != nil {
-						log.WithFields(log.Fields{
-							"path":       st,
-							"version_id": v.ID,
-							"error":      err,
-						}).Error("Failed to insert state in the database")
-					}
+				if isKnownStateVersion(statesVersions, v.ID, st) {
+					log.WithFields(log.Fields{
+						"path":       st,
+						"version_id": v.ID,
+					}).Debug("State is already in the database, skipping")
+					continue
+				}
+				state, err := sp.GetState(st, v.ID)
+				if err != nil {
+					log.WithFields(log.Fields{
+						"path":       st,
+						"version_id": v.ID,
+						"error":      err,
+					}).Error("Failed to fetch state from bucket")
+					continue
+				}
+				if err = d.InsertState(st, v.ID, state); err != nil {
+					log.WithFields(log.Fields{
+						"path":       st,
+						"version_id": v.ID,
+						"error":      err,
+					}).Error("Failed to insert state in the database")
 				}
 			}
 		}
@@ -173,7 +168,10 @@ func main() {
 	if c.DB.NoSync {
 		log.Infof("Not syncing database, as requested.")
 	} else {
-		go refreshDB(c.DB.SyncInterval, database, sps)
+		log.Debugf("Total providers: %d\n", len(sps))
+		for _, sp := range sps {
+			go refreshDB(c.DB.SyncInterval, database, sp)
+		}
 	}
 	defer database.Close()
 

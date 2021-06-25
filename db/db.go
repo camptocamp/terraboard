@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/camptocamp/terraboard/config"
 	"github.com/camptocamp/terraboard/state"
@@ -25,6 +26,7 @@ import (
 // Database is a wrapping structure to *gorm.DB
 type Database struct {
 	*gorm.DB
+	lock sync.Mutex
 }
 
 var pageSize = 20
@@ -79,7 +81,7 @@ func Init(config config.DBConfig, debug bool) *Database {
 		db.Config.Logger.LogMode(logger.Info)
 	}
 
-	d := &Database{db}
+	d := &Database{DB: db}
 	if err = d.MigrateLineage(); err != nil {
 		log.Fatalf("Lineage migration failed: %v\n", err)
 	}
@@ -124,11 +126,14 @@ func (db *Database) stateS3toDB(sf *statefile.File, path string, versionID strin
 	// Check if the associated lineage is already present in lineages table
 	// If so, it recovers its ID otherwise it inserts it at the same time as the state
 	var lineage types.Lineage
+	db.lock.Lock()
 	err = db.FirstOrCreate(&lineage, types.Lineage{Value: sf.Lineage}).Error
 	if err != nil || lineage.ID == 0 {
-		log.Error("Unknown error in stateS3toDB during lineage finding")
+		log.WithField("error", err).
+			Error("Unknown error in stateS3toDB during lineage finding", err)
 		return types.State{}, err
 	}
+	db.lock.Unlock()
 
 	st = types.State{
 		Path:      path,
@@ -242,10 +247,12 @@ func (db *Database) UpdateState(st types.State) error {
 // InsertVersion inserts an AWS S3 Version in the Database
 func (db *Database) InsertVersion(version *state.Version) error {
 	var v types.Version
+	db.lock.Lock()
 	db.FirstOrCreate(&v, types.Version{
 		VersionID:    version.ID,
 		LastModified: version.LastModified,
 	})
+	db.lock.Unlock()
 	return nil
 }
 

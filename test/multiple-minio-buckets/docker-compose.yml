@@ -3,20 +3,13 @@ version: "3.8"
 services:
   terraboard-dev:
     build:
-      context: ../
+      context: ../../
       dockerfile: ./Dockerfile
     environment:
       AWS_ACCESS_KEY_ID: root
       AWS_SECRET_ACCESS_KEY: mypassword
-      AWS_BUCKET: test-bucket
-      AWS_REGION: eu-west-1
-      AWS_ENDPOINT: http://minio:9000/
-      AWS_FORCE_PATH_STYLE: "true"
-      TERRABOARD_LOG_LEVEL: debug
-      TERRABOARD_NO_LOCKS: "true"
-      TERRABOARD_NO_VERSIONING: "true"
-      DB_PASSWORD: mypassword
       DB_SSLMODE: disable
+      CONFIG_FILE: config/config.yml
       GODEBUG: netdns=go
     depends_on:
       db:
@@ -24,30 +17,10 @@ services:
       minio:
         condition: service_started
     volumes:
-      - ../static:/static:ro
+      - ../../static:/static:ro
+      - ./config.yml:/config/config.yml:ro
     ports:
       - "8080:8080"
-
-  # terraboard-dev-multi-providers:
-  #   build:
-  #     context: ../
-  #     dockerfile: ./Dockerfile
-  #   environment:
-  #     AWS_ACCESS_KEY_ID: root
-  #     AWS_SECRET_ACCESS_KEY: mypassword
-  #     DB_SSLMODE: disable
-  #     CONFIG_FILE: config/config.yml
-  #     GODEBUG: netdns=go
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
-  #     minio:
-  #       condition: service_started
-  #   volumes:
-  #     - ../static:/static:ro
-  #     - ./config.yml:/config/config.yml:ro
-  #   ports:
-  #     - "8081:8080"
 
   minio:
     image: minio/minio:latest
@@ -60,7 +33,7 @@ services:
     ports:
       - "9200:9000"
     volumes:
-      - ./data:/data
+      - ../data:/data
     command: server /data
 
   db:

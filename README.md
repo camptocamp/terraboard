@@ -150,19 +150,23 @@ Terraboard currently supports configuration in three different ways:
 2. CLI parameters **(only usable for mono provider configuration)**
 3. Configuration file (YAML). A configuration file example can be found in the root directory of this repository and in the `test/` subdirectory.
 
-**Important: all flags/environment variables related to the providers settings aren't compatible with multi-provider configuration! For that, you must use the Yaml config file to be able to configure multiples buckets/providers.**
+**Important: all flags/environment variables related to the providers settings aren't compatible with multi-provider configuration! Instead, you must use the YAML config file to be able to configure multiples buckets/providers.**
 
 The precedence of configurations is as described below.
 
 ### Multiple buckets/providers
 
-In order to be able to link to Terraboard multiples buckets or even providers, you must use the Yaml configuration method.
+In order for Terraboard to import states from multiples buckets or even providers, you must use the YAML configuration method:
 
-- Set the environment variable **CONFIG_FILE** or the flag **-c** / **--config-file** to a valid Yaml config file.
-
-- In the Yaml file, specify your desired providers configuration. For example with two S3 buckets:
+- Set the `CONFIG_FILE` environment variable or the `-c`/`--config-file` flag to point to a valid YAML config file.
+- In the YAML file, specify your desired providers configuration. For example with two MinIO buckets (using the AWS provider with compatible mode):
 
 ```yaml
+# Needed since MinIO doesn't support versioning or locking
+provider:
+  no-locks: true
+  no-versioning: true
+
 aws:
   - endpoint: http://minio:9000/
     region: eu-west-1
@@ -179,13 +183,12 @@ aws:
       force-path-style: true
       file-extension: 
         - .tfstate
-
 ```
 
-In the case of AWS, don't forget to set **AWS_ACCESS_KEY_ID** and **AWS_SECRET_ACCESS_KEY** environment variables.
+In the case of AWS, don't forget to set the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables.
 
 That's it! Terraboard will now fetch these two buckets on DB refresh. You can also mix providers like AWS and Gitlab or anything else.
-You can find a ready-to-use docker example with two *MinIO* buckets in the `test/` sub-folder (just swipe the two terraboard services in the docker-compose file). 
+You can find a ready-to-use Docker example with two *MinIO* buckets in the `test/multiple-minio-buckets/` sub-folder. 
 
 ### Available parameters
 
