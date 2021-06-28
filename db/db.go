@@ -500,6 +500,33 @@ func (db *Database) ListStateStats(query url.Values) (states []types.StateStat, 
 	return
 }
 
+// ListLineageStats returns a slice of LineageStat, along with paging information
+func (db *Database) ListLineageStats(query url.Values) (lineages []types.LineageStat, page int, total int) {
+	row := db.Table("lineages").Select("count(DISTINCT value)").Row()
+	if err := row.Scan(&total); err != nil {
+		log.Error(err.Error())
+	}
+
+	offset := 0
+	page = 1
+	if v := string(query.Get("page")); v != "" {
+		page, _ = strconv.Atoi(v) // TODO: err
+		offset = (page - 1) * pageSize
+	}
+
+	sql := "SELECT lineages.value as lineage_value, count(sts.*) as state_count" +
+		" FROM (SELECT DISTINCT ON(states.lineage_id) states.id, states.lineage_id FROM states ORDER BY states.lineage_id DESC) t" +
+		" JOIN lineages ON lineages.id = t.lineage_id" +
+		" JOIN states sts ON sts.lineage_id = lineages.id" +
+		" GROUP BY lineages.value" +
+		" ORDER BY state_count DESC" +
+		" LIMIT 20" +
+		" OFFSET ?"
+
+	db.Raw(sql, offset).Find(&lineages)
+	return
+}
+
 // listField is a wrapper utility method to list distinct values in Database tables.
 func (db *Database) listField(table, field string) (results []string, err error) {
 	rows, err := db.Table(table).Select(fmt.Sprintf("DISTINCT %s", field)).Rows()
