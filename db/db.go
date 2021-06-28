@@ -457,10 +457,17 @@ func (db *Database) ListStateStats(query url.Values) (states []types.StateStat, 
 		offset = (page - 1) * pageSize
 	}
 
+	var lineageClause string
+	if lineage := query.Get("lineage"); lineage != "" {
+		lineageClause = " JOIN lineages on lineages.id = t.lineage_id" +
+			" WHERE lineages.value LIKE '" + lineage + "'"
+	}
+
 	sql := "SELECT t.path, t.serial, t.tf_version, t.version_id, t.last_modified, count(resources.*) as resource_count" +
-		" FROM (SELECT DISTINCT ON(states.path) states.id, states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified FROM states JOIN versions ON versions.id = states.version_id ORDER BY states.path, versions.last_modified DESC) t" +
+		" FROM (SELECT DISTINCT ON(states.path) states.id, states.lineage_id, states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified FROM states JOIN versions ON versions.id = states.version_id ORDER BY states.path, versions.last_modified DESC) t" +
 		" JOIN modules ON modules.state_id = t.id" +
 		" JOIN resources ON resources.module_id = modules.id" +
+		lineageClause +
 		" GROUP BY t.path, t.serial, t.tf_version, t.version_id, t.last_modified" +
 		" ORDER BY last_modified DESC" +
 		" LIMIT 20" +
