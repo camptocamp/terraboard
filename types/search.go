@@ -32,3 +32,9 @@ type StateStat struct {
 	LastModified  time.Time `json:"last_modified"`
 	ResourceCount int       `json:"resource_count"`
 }
+
+// LineageStat stores Lineage stats
+type LineageStat struct {
+	LineageValue string `json:"lineage_value"`
+	StateCount   int    `json:"state_count"`
+}
