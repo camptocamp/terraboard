@@ -80,6 +80,27 @@ func ListStateStats(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	}
 }
 
+// ListLineageStats returns Lineage information list
+func ListLineageStats(w http.ResponseWriter, r *http.Request, d *db.Database) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	query := r.URL.Query()
+	lineages, page, total := d.ListLineageStats(query)
+
+	// Build response object
+	response := make(map[string]interface{})
+	response["lineages"] = lineages
+	response["page"] = page
+	response["total"] = total
+	j, err := json.Marshal(response)
+	if err != nil {
+		JSONError(w, "Failed to marshal lineages", err)
+		return
+	}
+	if _, err := io.WriteString(w, string(j)); err != nil {
+		log.Error(err.Error())
+	}
+}
+
 // GetState provides information on a State
 func GetState(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
