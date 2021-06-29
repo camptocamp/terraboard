@@ -26,12 +26,16 @@
                 Lineage
             </th>
             <th>
-                State Count
+                Latest State Path
+            </th>
+            <th>
+                Total State Count
             </th>
         </thead>
         <tbody>
             <tr ng-repeat="r in results.lineages">
                 <td><span class="glyphicon glyphicon-link" aria-hidden="true"></span> <a href="lineage/{{r.lineage_value}}">{{r.lineage_value}}</a></td>
+                <td>{{r.last_path}}</td>
                 <td>{{r.state_count}}</td>
             </tr>
         </tbody>
