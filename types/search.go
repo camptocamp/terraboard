@@ -36,5 +36,6 @@ type StateStat struct {
 // LineageStat stores Lineage stats
 type LineageStat struct {
 	LineageValue string `json:"lineage_value"`
+	LastPath     string `json:"last_path"`
 	StateCount   int    `json:"state_count"`
 }

@@ -473,6 +473,8 @@ func (db *Database) ListStateStats(query url.Values) (states []types.StateStat, 
 		" LIMIT 20" +
 		" OFFSET ?"
 
+	log.Info(sql)
+
 	db.Raw(sql, offset).Find(&states)
 	return
 }
@@ -491,11 +493,12 @@ func (db *Database) ListLineageStats(query url.Values) (lineages []types.Lineage
 		offset = (page - 1) * pageSize
 	}
 
-	sql := "SELECT lineages.value as lineage_value, count(sts.*) as state_count" +
+	sql := "SELECT lineages.value as lineage_value, last_st.path as last_path, count(sts.*) as state_count" +
 		" FROM (SELECT DISTINCT ON(states.lineage_id) states.id, states.lineage_id FROM states ORDER BY states.lineage_id DESC) t" +
 		" JOIN lineages ON lineages.id = t.lineage_id" +
 		" JOIN states sts ON sts.lineage_id = lineages.id" +
-		" GROUP BY lineages.value" +
+		" JOIN ( SELECT t1.lineage_id, max(t1.path) as path, max(t2.last_modified) as last_modified FROM states t1 JOIN versions t2 ON t2.id = t1.version_id GROUP BY t1.lineage_id) last_st ON last_st.lineage_id = lineages.id" +
+		" GROUP BY lineages.value, last_st.path" +
 		" ORDER BY state_count DESC" +
 		" LIMIT 20" +
 		" OFFSET ?"
