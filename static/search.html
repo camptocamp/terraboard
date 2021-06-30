@@ -73,6 +73,7 @@
                 <button class="clear btn btn-warning" ng-click="clearForm()">Reset</button>
             </div>
         </div>
+
     </form>
 </div>
 <hr />
@@ -95,6 +96,9 @@
                 Serial
             </th>
             <th>
+                Lineage
+            </th>
+            <th>
                 Module Path
             </th>
             <th>
@@ -113,6 +117,7 @@
                 <td>{{r.path}}</td>
                 <td>{{r.tf_version}}</td>
                 <td>{{r.serial}}</td>
+                <td>{{r.lineage_value}}</td>
                 <td>{{r.module_path}}</td>
                 <td>{{r.resource_type}}.{{r.resource_name}}{{r.resource_index}}</td>
                 <td>{{r.attribute_key}}</td>
