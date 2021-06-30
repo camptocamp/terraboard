@@ -544,6 +544,13 @@ app.controller("tbSearchCtrl",
     $http.get('api/attribute/keys').then(function(response){
         $scope.attribute_keys = response.data;
     });
+    $http.get('api/lineages').then(function(response){
+        $scope.lineages = []
+        response.data.forEach(element => {
+            console.log(element["lineage"])
+            $scope.lineages.push(element["lineage"])
+        });
+    });
 
     $scope.refreshAttrKeys = function() {
         $http.get('api/attribute/keys?resource_type='+$scope.resType).then(function(response){
@@ -569,6 +576,9 @@ app.controller("tbSearchCtrl",
         }
         if ($scope.tfVersion != undefined) {
             params.tf_version = $scope.tfVersion;
+        }
+        if ($scope.lineage != undefined) {
+            params.lineage_value = $scope.lineage;
         }
         if (page != undefined) {
             params.page = page;
@@ -602,11 +612,15 @@ app.controller("tbSearchCtrl",
     if ($location.search().tf_version != undefined) {
         $scope.tfVersion = $location.search().tf_version;
     }
+    if ($location.search().lineage != undefined) {
+        $scope.lineage = $location.search().lineage;
+    }
 
     $scope.doSearch(1);
 
     $scope.clearForm = function() {
         $scope.tfVersion = undefined;
+        $scope.lineage = undefined;
         $scope.resType = undefined;
         $scope.resID = undefined;
         $scope.attrKey = undefined;

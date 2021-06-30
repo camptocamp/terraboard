@@ -306,7 +306,8 @@ func (db *Database) SearchAttribute(query url.Values) (results []types.SearchRes
 
 	sqlQuery += " JOIN modules ON states.id = modules.state_id" +
 		" JOIN resources ON modules.id = resources.module_id" +
-		" JOIN attributes ON resources.id = attributes.resource_id"
+		" JOIN attributes ON resources.id = attributes.resource_id" +
+		" JOIN lineages ON lineages.id = states.lineage_id"
 
 	var where []string
 	var params []interface{}
@@ -340,6 +341,10 @@ func (db *Database) SearchAttribute(query url.Values) (results []types.SearchRes
 		where = append(where, fmt.Sprintf("states.tf_version LIKE '%s'", fmt.Sprintf("%%%s%%", v)))
 	}
 
+	if v := query.Get("lineage_value"); string(v) != "" {
+		where = append(where, fmt.Sprintf("lineages.value LIKE '%s'", fmt.Sprintf("%%%s%%", v)))
+	}
+
 	if len(where) > 0 {
 		sqlQuery += " WHERE " + strings.Join(where, " AND ")
 	}
@@ -352,11 +357,12 @@ func (db *Database) SearchAttribute(query url.Values) (results []types.SearchRes
 
 	// Now get results
 	// gorm doesn't support subqueries...
-	sql := "SELECT states.path, states.version_id, states.tf_version, states.serial, modules.path as module_path, resources.type, resources.name, resources.index, attributes.key, attributes.value" +
+	sql := "SELECT states.path, states.version_id, states.tf_version, states.serial, lineages.value as lineage_value, modules.path as module_path, resources.type, resources.name, resources.index, attributes.key, attributes.value" +
 		sqlQuery +
-		" ORDER BY states.path, states.serial, modules.path, resources.type, resources.name, resources.index, attributes.key" +
+		" ORDER BY states.path, states.serial, lineage_value, modules.path, resources.type, resources.name, resources.index, attributes.key" +
 		" LIMIT ?"
 
+	log.Info(sql)
 	params = append(params, pageSize)
 
 	if v := string(query.Get("page")); v != "" {
