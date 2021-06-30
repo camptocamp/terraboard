@@ -4,10 +4,7 @@ var app = angular.module("terraboard", ['ngRoute', 'ngSanitize', 'ui.select', 'c
     $routeProvider.when("/", {
         templateUrl: "static/main.html",
         controller: "tbMainCtrl"
-    }).when("/lineage/:lineage", {
-        templateUrl: "static/lineage.html",
-        controller: "tbLineageCtrl",
-    }).when("/state/:path*", {
+    }).when("/lineage/:lineage*", {
         templateUrl: "static/state.html",
         controller: "tbStateCtrl",
         reloadOnSearch: false
@@ -48,8 +45,8 @@ app.directive("sparklinechart", function () {
                     element.bind('sparklineClick', function(ev) {
                         var sparkline = ev.sparklines[0],
                         region = sparkline.getCurrentRegionFields();
-                        var path = element[0].attributes.path.value;
-                        scope.$parent.$parent.goToState(path, region.x);
+                        var lineage = element[0].attributes.lineage.value;
+                        scope.$parent.$parent.goToState(lineage, region.x);
                     });
                 });
             };
@@ -71,7 +68,8 @@ app.directive("hlcode", ['$timeout', function($timeout) {
     }
 }]);
 
-app.controller("tbMainCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
+app.controller("tbMainCtrl", ['$scope', '$http', '$location', '$routeParams',
+function($scope, $http, $location) {
     $scope.itemsPerPage = 20;
     $scope.getStats = function(page) {
         var params = {};
@@ -79,118 +77,7 @@ app.controller("tbMainCtrl", ['$scope', '$http', '$location', function($scope, $
             params.page = page;
         }
         var query = $.param(params);
-        $http.get('api/lineages/stats?'+query).then(function(response){
-            console.log(response.data);
-            $scope.results = response.data;
-            $scope.pages = Math.ceil($scope.results.total / $scope.itemsPerPage);
-            $scope.page = $scope.results.page;
-            $scope.prevPage = (page <= 1) ? undefined : $scope.page - 1;
-            $scope.nextPage = (page >= $scope.pages) ? undefined : $scope.page + 1;
-            $scope.startItems = $scope.itemsPerPage*($scope.page-1)+1;
-            $scope.itemsInPage = Math.min($scope.itemsPerPage*$scope.page, $scope.results.total)
-        });
-    };
-
-    // On page load
-    $scope.getStats(1);
-
-    $scope.goToState = function(lineage) {
-        var url = 'lineage/'+lineage;
-        $location.url(url);
-        $scope.$apply();
-    };
-
-    $http.get('api/locks').then(function(response){
-        $scope.locks = response.data;
-
-        $scope.isLocked = function(path) {
-            if (path in $scope.locks) {
-                return true;
-            }
-            return false;
-        };
-    });
-
-    pieResourceTypesLabels   = [[], [], [], [], [], [], ["Total"]];
-    pieResourceTypesData     = [0, 0, 0, 0, 0, 0, 0];
-    $http.get('api/resource/types/count').then(function(response){
-        data = response.data;
-        angular.forEach(data, function(value, i) {
-            if(i < 6) {
-                pieResourceTypesLabels[i] = value.name;
-                pieResourceTypesData[i]   = parseInt(value.count, 10);
-            } else {
-                pieResourceTypesLabels[6].push(value.name+": "+value.count);
-                pieResourceTypesData[6] += parseInt(value.count, 10);
-            }
-        });
-    });
-    $scope.pieResourceTypesData    = pieResourceTypesData;
-    $scope.pieResourceTypesLabels  = pieResourceTypesLabels;
-    $scope.pieResourceTypesOptions = { legend: { display: false } };
-    $scope.searchType = function(points, ev) {
-        var type = points[0]._chart.data.labels[points[0]._index];
-        if ($.isArray(type)) {
-            console.log("Clicked zone is an array, not searching");
-            return;
-        }
-        $location.url('search/?type='+type);
-        $scope.$apply();
-    };
-
-    pieTfVersionsLabels   = [[], [], [], [], [], [], ["Total"]];
-    pieTfVersionsData     = [0, 0, 0, 0, 0, 0, 0];
-    $http.get('api/states/tfversion/count?orderBy=version').then(function(response){
-        data = response.data;
-        angular.forEach(data, function(value, i) {
-            if(i < 6) {
-                pieTfVersionsLabels[i] = [value.name];
-                pieTfVersionsData[i]   = parseInt(value.count, 10);
-            } else {
-                pieTfVersionsData[6] += parseInt(value.count, 10);
-                pieTfVersionsLabels[6].push(value.name+": "+value.count);
-            }
-        });
-    });
-
-    $scope.pieTfVersionsLabels  = pieTfVersionsLabels;
-    $scope.pieTfVersionsData    = pieTfVersionsData;
-    $scope.pieTfVersionsOptions = { legend: { display: false } };
-    $scope.searchTfVersion = function(points, ev) {
-        var version = points[0]._chart.data.labels[points[0]._index][0];
-        if ($.isArray(version)) {
-            console.log("Clicked zone is an array, not searching");
-            return;
-        }
-        $location.url('search/?tf_version='+version);
-        $scope.$apply();
-    };
-
-
-    $scope.pieLockedStatesLabels = ["Locked", "Unlocked"];
-    $scope.pieLockedStatesData   = [0, 0];
-    $scope.$watch('locks', function(nv, ov){
-        $scope.pieLockedStatesData[0] = Object.keys(nv).length;
-        $scope.pieLockedStatesData[1] -= Object.keys(nv).length;
-    });
-    $scope.$watch('results.total', function(nv, ov){
-        $scope.pieLockedStatesData[1] = nv - $scope.pieLockedStatesData[0];
-    });
-    $scope.pieLockedStatesOptions = { legend: { display: false } };
-
-
-}]);
-
-app.controller("tbLineageCtrl", ['$scope', '$http', '$location', '$routeParams',
-function($scope, $http, $location, $routeParams) {
-    $scope.itemsPerPage = 20;
-    $scope.getStats = function(page) {
-        var params = {};
-        if (page != undefined) {
-            params.page = page;
-        }
-        var query = $.param(params);
-        $http.get('api/states/stats?'+query+'&lineage='+$routeParams.lineage).then(function(response){
+        $http.get('api/states/stats?'+query).then(function(response){
             $scope.results = response.data;
             $scope.pages = Math.ceil($scope.results.total / $scope.itemsPerPage);
             $scope.page = $scope.results.page;
@@ -206,15 +93,15 @@ function($scope, $http, $location, $routeParams) {
 
     // Version map for sparklines click events
     $scope.versionMap = {};
-    $scope.getActivity = function(idx, path) {
-        $http.get('api/state/activity/'+path).then(function(response){
+    $scope.getActivity = function(idx, lineage) {
+        $http.get('api/state/activity/'+lineage).then(function(response){
             var states = response.data;
-            $scope.versionMap[path] = {};
+            $scope.versionMap[lineage] = {};
             var activityData = [];
             for (i=0; i < states.length; i++) {
                 var date = new Date(states[i].last_modified).getTime() / 1000;
                 activityData.push(date+":"+states[i].resource_count);
-                $scope.versionMap[path][date] = states[i].version_id;
+                $scope.versionMap[lineage][date] = states[i].version_id;
             }
             var activity = activityData.join(",");
 
@@ -222,9 +109,9 @@ function($scope, $http, $location, $routeParams) {
         });
     };
 
-    $scope.goToState = function(path, epoch) {
-        var versionId = $scope.versionMap[path][epoch];
-        var url = 'state/'+path+'?versionid='+versionId;
+    $scope.goToState = function(lineage, epoch) {
+        var versionId = $scope.versionMap[lineage][epoch];
+        var url = 'lineage/'+lineage+'?versionid='+versionId;
         $location.url(url);
         $scope.$apply();
     };
@@ -377,7 +264,7 @@ app.controller("tbStateCtrl",
      * Get versions when URL is loaded
      */
     $scope.$on('$routeChangeSuccess', function() {
-        $http.get('api/state/activity/'+$routeParams.path).then(function(response){
+        $http.get('api/state/activity/'+$routeParams.lineage).then(function(response){
             $scope.versions = [];
             for (i=0; i<response.data.length; i++) {
                 var ver = {
@@ -405,8 +292,8 @@ app.controller("tbStateCtrl",
         if (versionId == undefined) {
             versionId = "";
         }
-        $http.get('api/state/'+$routeParams.path+'?versionid='+versionId+'#'+$location.hash()).then(function(response){
-            $scope.path = $routeParams.path;
+        $http.get('api/state/'+$routeParams.lineage+'?versionid='+versionId+'#'+$location.hash()).then(function(response){
+            $scope.path = response.data["path"];
             $scope.details = response.data;
 
             $scope.selectedVersion = {
@@ -434,7 +321,7 @@ app.controller("tbStateCtrl",
      * Load details on page load
      */
     $scope.$on('$routeChangeSuccess', function() {
-        $scope.getDetails($location.search().version_id);
+        $scope.getDetails($location.search().versionid);
     });
 
     /*
@@ -500,7 +387,7 @@ app.controller("tbStateCtrl",
             $location.search('compare', compareVersion.versionId);
             $scope.display.details = false;
             $scope.display.compare = true;
-            $http.get('api/state/compare/'+$routeParams.path+'?from='+selectedVersion.versionId+'&to='+compareVersion.versionId).then(function(response){
+            $http.get('api/state/compare/'+$routeParams.lineage+'?from='+selectedVersion.versionId+'&to='+compareVersion.versionId).then(function(response){
                 $scope.compare = response.data;
 
                 $scope.only_in_old = Object.keys($scope.compare.differences.only_in_old).length;
@@ -544,6 +431,12 @@ app.controller("tbSearchCtrl",
     $http.get('api/attribute/keys').then(function(response){
         $scope.attribute_keys = response.data;
     });
+    $http.get('api/lineages').then(function(response){
+        $scope.lineages = []
+        response.data.forEach(element => {
+            $scope.lineages.push(element["lineage"])
+        });
+    });
 
     $scope.refreshAttrKeys = function() {
         $http.get('api/attribute/keys?resource_type='+$scope.resType).then(function(response){
@@ -569,6 +462,9 @@ app.controller("tbSearchCtrl",
         }
         if ($scope.tfVersion != undefined) {
             params.tf_version = $scope.tfVersion;
+        }
+        if ($scope.lineage != undefined) {
+            params.lineage_value = $scope.lineage;
         }
         if (page != undefined) {
             params.page = page;
@@ -602,11 +498,15 @@ app.controller("tbSearchCtrl",
     if ($location.search().tf_version != undefined) {
         $scope.tfVersion = $location.search().tf_version;
     }
+    if ($location.search().lineage != undefined) {
+        $scope.lineage = $location.search().lineage;
+    }
 
     $scope.doSearch(1);
 
     $scope.clearForm = function() {
         $scope.tfVersion = undefined;
+        $scope.lineage = undefined;
         $scope.resType = undefined;
         $scope.resID = undefined;
         $scope.attrKey = undefined;
