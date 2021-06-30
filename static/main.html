@@ -23,20 +23,38 @@
     <table class="table table-border table-striped">
         <thead>
             <th>
+                Path
+            </th>
+            <th>
                 Lineage
             </th>
             <th>
-                Latest State Path
+                TF Version
             </th>
             <th>
-                Total State Count
+                Serial
+            </th>
+            <th>
+                Time
+            </th>
+            <th>
+                Resources
+            </th>
+            <th>
+                Activity
             </th>
         </thead>
         <tbody>
-            <tr ng-repeat="r in results.lineages">
-                <td><span class="glyphicon glyphicon-link" aria-hidden="true"></span> <a href="lineage/{{r.lineage_value}}">{{r.lineage_value}}</a></td>
-                <td>{{r.last_path}}</td>
-                <td>{{r.state_count}}</td>
+            <tr ng-repeat="r in results.states">
+                <td><span class="glyphicon glyphicon-link" aria-hidden="true"></span> <a href="lineage/{{r.lineage_value}}?versionid={{r.version_id}}">{{r.path}}</a></td>
+                <td>{{r.lineage_value}}</td>
+                <td>{{r.terraform_version}}</td>
+                <td>{{r.serial}}</td>
+                <td>{{r.last_modified | date:'medium'}}</td>
+                <td>{{r.resource_count}}</td>
+                <td ng-init="getActivity($index, r.lineage_value)">
+                    <sparklinechart lineage="{{r.lineage_value}}" data="{{r.activity}}"></sparklinechart>
+                </td>
             </tr>
         </tbody>
     </table>
