@@ -8,14 +8,14 @@
                         General Information
 
                         <span ng-if="isLocked(path)" ng-init="lock=locks[path]"
-                            class="float-right glyphicon glyphicon-lock"
+                            class="float-right fas fa-lock"
                             title="Locked by {{lock.Who}} on {{lock.Created | date:&apos;medium&apos;}} ({{lock.Operation}})"></span>
 
                     </h3>
                 </div>
                 <ul class="list-group">
                     <li class="list-group-item">
-                        <h4><span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span> Version</h4>
+                        <h4><span class="fas fa-thumbtack" aria-hidden="true"></span> Version</h4>
                         <select class="form-control" ng-model="selectedVersion"
                             ng-options="version as version.date for version in versions track by version.versionId"></select>
                         <ul>
@@ -24,7 +24,7 @@
                         </ul>
                     </li>
                     <li class="list-group-item">
-                        <h4><span class="glyphicon glyphicon-transfer" aria-hidden="true"></span> Compare with version
+                        <h4><span class="fas fa-exchange-alt" aria-hidden="true"></span> Compare with version
                         </h4>
                         <button type="button" class="btn btn-warning float-right"
                             data-ng-click="compareVersion=undefined">Reset</button>
@@ -45,7 +45,7 @@
                     <li class="list-group-item form-group" ng-init="resFilter=&apos;&apos;">
                         <input id="resFilterInput" class="form-control" type="search" ng-model="resFilter"
                             placeholder="Filter resources..."> <span id="resFilterClear"
-                            class="glyphicon glyphicon-remove-circle" ng-click="resFilter=&apos;&apos;"></span>
+                            class="far fa-times-circle" ng-click="resFilter=&apos;&apos;"></span>
                     </li>
                     <li class="list-group-item" ng-repeat="mod in details.modules">
                         <div ng-click="display.mod = (display.mod != mod) ? mod : selectedmod" class="node-name"
