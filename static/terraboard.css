@@ -80,13 +80,13 @@
   color: #337ab7;
 }
 
-#nodeslist .list-group-item .glyphicon-star, .panel-title .glyphicon-star {
+#nodeslist .list-group-item .fa-star, .panel-title .fa-star {
   float: right;
   color: orange;
   display: none;
 }
 
-#nodeslist .list-group-item.starred .glyphicon-star, .panel-title.starred .glyphicon-star {
+#nodeslist .list-group-item.starred .fa-star, .panel-title.starred .fa-star {
   display: block;
 }
 
@@ -225,10 +225,12 @@ pre.sh_sourceCode .sh_oldfile {
 }
 
 .ui-select-toggle>.btn.btn-link {
-  margin-right: 10px;
-  top: 6px;
-  position: absolute;
-  right: 10px;
+  margin-right: 15px !important;
+  margin-top: 0px !important;
+  top: 6px !important;
+  position: absolute !important;
+  right: 10px !important;
+  padding: 0 !important;
 }
 
 /*
@@ -333,4 +335,8 @@ td.attr-val {
 
 .ui-select-match.btn-default-focus>.ui-select-toggle {
   border-color: #80bdff;
+}
+
+.ui-select-bootstrap .ui-select-match-text.ui-select-allow-clear { 
+  padding-right: 2em; 
 }
