@@ -1,51 +1,47 @@
 <div id="mainrow" class="row">
     <div id="leftcol" class="col-lg-4">
-        <div class="panel-group">
-            <div class="card card-header">
-                <div class="card-header">
-                    <h3 class="card-title">
-
+        <div class="panel-group mr-4">
+            <div class="card">
+                    <h5 class="card-header">
                         General Information
-
                         <span ng-if="isLocked(path)" ng-init="lock=locks[path]"
                             class="float-right fas fa-lock"
                             title="Locked by {{lock.Who}} on {{lock.Created | date:&apos;medium&apos;}} ({{lock.Operation}})"></span>
 
-                    </h3>
-                </div>
+                    </h5>
                 <ul class="list-group">
                     <li class="list-group-item">
-                        <h4><span class="fas fa-thumbtack" aria-hidden="true"></span> Version</h4>
+                        <h5><span class="fas fa-thumbtack" aria-hidden="true"></span> Version</h5>
                         <select class="form-control" ng-model="selectedVersion"
                             ng-options="version as version.date for version in versions track by version.versionId"></select>
-                        <ul>
-                            <li class="list-group-item">Terraform version: {{details.terraform_version}}</li>
-                            <li class="list-group-item">Serial: {{details.serial}}</li>
+                        <ul class="mt-2">
+                            <li class="list-group-item no-border-item">Terraform version: {{details.terraform_version}}</li>
+                            <li class="list-group-item no-border-item">Serial: {{details.serial}}</li>
                         </ul>
                     </li>
                     <li class="list-group-item">
-                        <h4><span class="fas fa-exchange-alt" aria-hidden="true"></span> Compare with version
-                        </h4>
-                        <button type="button" class="btn btn-warning float-right"
-                            data-ng-click="compareVersion=undefined">Reset</button>
-                        <select class="form-control" ng-model="compareVersion"
+                        <h5><span class="fas fa-exchange-alt" aria-hidden="true"></span> Compare with version
+                        </h5>
+                        <div class="row justify-content-around">
+                            <select class="form-control col-8" ng-model="compareVersion"
                             ng-options="version as version.date for version in versions track by version.versionId"></select>
-                        <ul ng-if="display.compare">
-                            <li class="list-group-item">Terraform version: {{compare.stats.to.terraform_version}}</li>
-                            <li class="list-group-item">Serial: {{compare.stats.to.serial}}</li>
+                            <button type="button" class="btn btn-warning float-right col-3"
+                            data-ng-click="compareVersion=undefined">Reset</button>
+                        </div>
+                        <ul  class="mt-2" ng-if="display.compare">
+                            <li class="list-group-item no-border-item">Terraform version: {{compare.stats.to.terraform_version}}</li>
+                            <li class="list-group-item no-border-item">Serial: {{compare.stats.to.serial}}</li>
                         </ul>
                     </li>
                 </ul>
             </div>
-            <div id="nodes" class="card card-header" ng-if="display.details">
-                <div class="card-header">
-                    <h3 class="card-title">Modules</h3>
-                </div>
+            <div id="nodes" class="card mt-4" ng-if="display.details">
+                <h5 class="card-header">Modules</h5>
                 <ul id="nodeslist" class="list-group" ng-init="display.mod=selectedmod">
                     <li class="list-group-item form-group" ng-init="resFilter=&apos;&apos;">
                         <input id="resFilterInput" class="form-control" type="search" ng-model="resFilter"
                             placeholder="Filter resources..."> <span id="resFilterClear"
-                            class="far fa-times-circle" ng-click="resFilter=&apos;&apos;"></span>
+                            class="far fa-times-circle" ng-click="resFilter=&apos;&apos;" style="margin-right: 10px;"></span>
                     </li>
                     <li class="list-group-item" ng-repeat="mod in details.modules">
                         <div ng-click="display.mod = (display.mod != mod) ? mod : selectedmod" class="node-name"
@@ -71,13 +67,11 @@
             <h1>{{path}}</h1>
         </div>
         <!-- Resource details view -->
-        <div class="row" ng-if="display.details &amp;&amp; selectedres &amp;&amp; !outputs">
-            <h2 class="node-title">{{selectedres.type}}.{{selectedres.name}}{{selectedres.index}}</h2>
+        <div class="mt-3" ng-if="display.details &amp;&amp; selectedres &amp;&amp; !outputs">
+            <h3 class="node-title">{{selectedres.type}}.{{selectedres.name}}{{selectedres.index}}</h3>
             <div class="panel-group">
                 <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">Attributes</h4>
-                    </div>
+                    <h4 class="card-header">Attributes</h4>
                     <table class="table">
                         <thead>
                             <th>Attribute</th>
@@ -94,8 +88,8 @@
             </div>
         </div>
         <!-- Outputs view -->
-        <div class="row" ng-if="display.details &amp;&amp; outputs">
-            <h2 class="node-title">Outputs for {{selectedmod.path ? selectedmod.path : &quot;root&quot;}}</h2>
+        <div class="mt-3" ng-if="display.details &amp;&amp; outputs">
+            <h3 class="node-title">Outputs for {{selectedmod.path ? selectedmod.path : &quot;root&quot;}}</h3>
             <div class="panel-group">
                 <table class="table">
                     <thead>
@@ -112,22 +106,15 @@
             </div>
         </div>
         <!-- Compare view -->
-        <div class="row" ng-if="display.compare">
+        <div class="row mt-3" ng-if="display.compare">
             <div class="panel-group">
-                <div class="card bg-warning">
-                    <div class="card-header">
-                        <h4 id="card-title-diff" class="card-title">
-
-                            <a data-toggle="collapse" data-target="#card-body-diff">
-
-                                Differences
-
-                            </a>
-
-                            <span id="badge-diff" class="badge">{{differences}}</span>
-
-                        </h4>
-                    </div>
+                <div class="card mt-3">
+                    <h4 id="card-title-diff" class="card-header bg-warning">
+                        <a data-toggle="collapse" data-target="#card-body-diff">
+                            Differences
+                        </a>
+                        <span id="badge-diff" class="badge">{{differences}}</span>
+                    </h4>
                     <div id="card-body-diff" class="panel-collapse collapse show">
                         <div class="card-body">
                             <div class="list-group resource"
@@ -138,20 +125,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="card bg-danger">
-                    <div class="card-header">
-                        <h4 id="card-title-in-old" class="card-title">
-
-                            <a data-toggle="collapse" data-target="#card-body-in-old">
-
-                                Only in serial {{compare.stats.from.serial}}
-
-                            </a>
-
-                            <span id="badge-diff" class="badge">{{only_in_old}}</span>
-
-                        </h4>
-                    </div>
+                <div class="card mt-4">
+                    <h4 id="card-title-in-old" class="card-header bg-danger">
+                        <a data-toggle="collapse" data-target="#card-body-in-old">
+                            Only in serial {{compare.stats.from.serial}}
+                        </a>
+                        <span id="badge-diff" class="badge">{{only_in_old}}</span>
+                    </h4>
                     <div id="card-body-in-old" class="panel-collapse collapse show">
                         <div class="card-body">
                             <div class="list-group resource"
@@ -162,20 +142,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="card bg-success">
-                    <div class="card-header">
-                        <h4 id="card-title-in-new" class="card-title">
-
-                            <a data-toggle="collapse" data-target="#card-body-in-new">
-
-                                Only in serial {{compare.stats.to.serial}}
-
-                            </a>
-
-                            <span id="badge-diff" class="badge">{{only_in_new}}</span>
-
-                        </h4>
-                    </div>
+                <div class="card mt-4">
+                    <h4 id="card-title-in-new" class="card-header bg-success">
+                        <a data-toggle="collapse" data-target="#card-body-in-new">
+                            Only in serial {{compare.stats.to.serial}}
+                        </a>
+                        <span id="badge-diff" class="badge">{{only_in_new}}</span>
+                    </h4>
                     <div id="card-body-in-new" class="panel-collapse collapse show">
                         <div class="card-body">
                             <div class="list-group resource"
