@@ -233,6 +233,10 @@ pre.sh_sourceCode .sh_oldfile {
   padding: 0 !important;
 }
 
+.no-border-item {
+  border: 0;
+}
+
 /*
  * Node attribute table
  */

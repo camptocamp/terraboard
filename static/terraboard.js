@@ -547,7 +547,6 @@ app.controller("tbSearchCtrl",
     $http.get('api/lineages').then(function(response){
         $scope.lineages = []
         response.data.forEach(element => {
-            console.log(element["lineage"])
             $scope.lineages.push(element["lineage"])
         });
     });
