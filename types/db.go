@@ -29,7 +29,7 @@ type State struct {
 	VersionID  sql.NullInt64 `gorm:"index" json:"-"`
 	TFVersion  string        `gorm:"varchar(10)" json:"terraform_version"`
 	Serial     int64         `json:"serial"`
-	LineageID  uint          `gorm:"index" json:"-"`
+	LineageID  sql.NullInt64 `gorm:"index" json:"-"`
 	Modules    []Module      `json:"modules"`
 }
 
