@@ -10,17 +10,26 @@ provider:
   no-versioning: true
 
 aws:
-  - endpoint: http://minio:9000/
+  - access-key: root
+    secret-access-key: mypassword
+    endpoint: http://minio:9000/
     region: eu-west-1
     s3:
-      bucket: test-bucket
-      force-path-style: true
-      file-extension: 
-        - .tfstate
-  - endpoint: http://minio:9000/
+      - bucket: test-bucket
+        force-path-style: true
+        file-extension: 
+          - .tfstate
+      - bucket: test-bucket2
+        force-path-style: true
+        file-extension: 
+          - .tfstate
+
+  - access-key: admin
+    secret-access-key: password
+    endpoint: http://minio-2:9000/
     region: eu-west-1
     s3:
-      bucket: test-bucket2
-      force-path-style: true
-      file-extension: 
-        - .tfstate
+      - bucket: test-bucket
+        force-path-style: true
+        file-extension: 
+          - .tfstate

@@ -16,11 +16,13 @@ provider:
   no-versioning: false
 
 aws:
-  dynamodb-table: terraboard
-  s3:
-    bucket: terraboard
-    key-prefix:
-    file-extension: .tfstate
+  - access-key: root
+    secret-access-key: mypassword
+    dynamodb-table: terraboard
+    s3:
+      - bucket: terraboard
+        key-prefix:
+        file-extension: .tfstate
 
 web:
   port: 9090

@@ -11,12 +11,14 @@ database:
   no-sync: true
 
 aws:
-  - dynamodb-table: terraboard-dynamodb
+  - access-key: root
+    secret-access-key: mypassword
+    dynamodb-table: terraboard-dynamodb
     s3:
-      bucket: terraboard-bucket
-      key-prefix: test/
-      file-extension: [.tfstate]
-      force-path-style: true
+      - bucket: terraboard-bucket
+        key-prefix: test/
+        file-extension: [.tfstate]
+        force-path-style: true
 
 tfe:
   - address: https://tfe.example.com

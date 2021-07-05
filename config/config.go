@@ -40,12 +40,15 @@ type S3BucketConfig struct {
 
 // AWSConfig stores the DynamoDB table and S3 Bucket configuration
 type AWSConfig struct {
-	DynamoDBTable string         `long:"dynamodb-table" env:"AWS_DYNAMODB_TABLE" yaml:"dynamodb-table" description:"AWS DynamoDB table for locks."`
-	S3            S3BucketConfig `group:"S3 Options" yaml:"s3"`
-	Endpoint      string         `long:"aws-endpoint" env:"AWS_ENDPOINT" yaml:"endpoint" description:"AWS endpoint."`
-	Region        string         `long:"aws-region" env:"AWS_REGION" yaml:"region" description:"AWS region."`
-	APPRoleArn    string         `long:"aws-role-arn" env:"APP_ROLE_ARN" yaml:"app-role-arn" description:"Role ARN to Assume."`
-	ExternalID    string         `long:"aws-external-id" env:"AWS_EXTERNAL_ID" yaml:"external-id" description:"External ID to use when assuming role."`
+	AccessKey       string           `long:"aws-access-key" env:"AWS_ACCESS_KEY_ID" yaml:"access-key" description:"AWS account access key."`
+	SecretAccessKey string           `long:"aws-secret-access-key" env:"AWS_SECRET_ACCESS_KEY" yaml:"secret-access-key" description:"AWS secret account access key."`
+	SessionToken    string           `long:"aws-session-token" env:"AWS_SESSION_TOKEN" yaml:"session-token" description:"AWS session token."`
+	DynamoDBTable   string           `long:"dynamodb-table" env:"AWS_DYNAMODB_TABLE" yaml:"dynamodb-table" description:"AWS DynamoDB table for locks."`
+	S3              []S3BucketConfig `group:"S3 Options" yaml:"s3"`
+	Endpoint        string           `long:"aws-endpoint" env:"AWS_ENDPOINT" yaml:"endpoint" description:"AWS endpoint."`
+	Region          string           `long:"aws-region" env:"AWS_REGION" yaml:"region" description:"AWS region."`
+	APPRoleArn      string           `long:"aws-role-arn" env:"APP_ROLE_ARN" yaml:"app-role-arn" description:"Role ARN to Assume."`
+	ExternalID      string           `long:"aws-external-id" env:"AWS_EXTERNAL_ID" yaml:"external-id" description:"External ID to use when assuming role."`
 }
 
 // TFEConfig stores the Terraform Enterprise configuration
@@ -124,12 +127,16 @@ func (c *Config) LoadConfigFromYaml() *Config {
 func initDefaultConfig() Config {
 	var c Config
 	var awsInitialConfig AWSConfig
+	var s3InitialConfig S3BucketConfig
 	var tfeInitialConfig TFEConfig
 	var gcpInitialConfig GCPConfig
 	var gitlabInitialConfig GitlabConfig
 
 	parseStructFlagsAndEnv(&awsInitialConfig)
 	c.AWS = append(c.AWS, awsInitialConfig)
+
+	parseStructFlagsAndEnv(&s3InitialConfig)
+	c.AWS[0].S3 = append(c.AWS[0].S3, s3InitialConfig)
 
 	parseStructFlagsAndEnv(&tfeInitialConfig)
 	c.TFE = append(c.TFE, tfeInitialConfig)

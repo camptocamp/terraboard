@@ -39,7 +39,7 @@ services:
     ports:
       - "9200:9000"
     volumes:
-      - ../data:/data
+      - ../data/minio-1:/data
     command: server /data
 
   db:

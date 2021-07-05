@@ -8,6 +8,7 @@ import (
 	"time"
 
 	aws_sdk "github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -34,38 +35,46 @@ type AWS struct {
 func NewAWS(c *config.Config) []*AWS {
 	var awsInstances []*AWS
 	for _, aws := range c.AWS {
-		if aws.S3.Bucket != "" {
-			sess := session.Must(session.NewSession())
-			awsConfig := aws_sdk.NewConfig()
-			if len(aws.APPRoleArn) > 0 {
-				log.Debugf("Using %s role", aws.APPRoleArn)
-				creds := stscreds.NewCredentials(sess, aws.APPRoleArn, func(p *stscreds.AssumeRoleProvider) {
-					if aws.ExternalID != "" {
-						p.ExternalID = aws_sdk.String(aws.ExternalID)
+		for _, bucket := range aws.S3 {
+			if bucket.Bucket != "" {
+				sess := session.Must(session.NewSession())
+				awsConfig := aws_sdk.NewConfig()
+				var creds *credentials.Credentials
+				if len(aws.APPRoleArn) > 0 {
+					log.Debugf("Using %s role", aws.APPRoleArn)
+					creds = stscreds.NewCredentials(sess, aws.APPRoleArn, func(p *stscreds.AssumeRoleProvider) {
+						if aws.ExternalID != "" {
+							p.ExternalID = aws_sdk.String(aws.ExternalID)
+						}
+					})
+				} else {
+					if aws.AccessKey == "" || aws.SecretAccessKey == "" {
+						log.Fatal("Missing AccessKey or SecretAccessKey for AWS provider. Please check your configuration and retry")
 					}
-				})
+					creds = credentials.NewStaticCredentials(aws.AccessKey, aws.SecretAccessKey, aws.SessionToken)
+				}
 				awsConfig.WithCredentials(creds)
-			}
 
-			if e := aws.Endpoint; e != "" {
-				awsConfig.WithEndpoint(e)
-			}
-			if e := aws.Region; e != "" {
-				awsConfig.WithRegion(e)
-			}
-			awsConfig.S3ForcePathStyle = &aws.S3.ForcePathStyle
+				if e := aws.Endpoint; e != "" {
+					awsConfig.WithEndpoint(e)
+				}
+				if e := aws.Region; e != "" {
+					awsConfig.WithRegion(e)
+				}
+				awsConfig.S3ForcePathStyle = &bucket.ForcePathStyle
 
-			instance := &AWS{
-				svc:           s3.New(sess, awsConfig),
-				bucket:        aws.S3.Bucket,
-				keyPrefix:     aws.S3.KeyPrefix,
-				fileExtension: aws.S3.FileExtension,
-				dynamoSvc:     dynamodb.New(sess, awsConfig),
-				dynamoTable:   aws.DynamoDBTable,
-				noLocks:       c.Provider.NoLocks,
-				noVersioning:  c.Provider.NoVersioning,
+				instance := &AWS{
+					svc:           s3.New(sess, awsConfig),
+					bucket:        bucket.Bucket,
+					keyPrefix:     bucket.KeyPrefix,
+					fileExtension: bucket.FileExtension,
+					dynamoSvc:     dynamodb.New(sess, awsConfig),
+					dynamoTable:   aws.DynamoDBTable,
+					noLocks:       c.Provider.NoLocks,
+					noVersioning:  c.Provider.NoVersioning,
+				}
+				awsInstances = append(awsInstances, instance)
 			}
-			awsInstances = append(awsInstances, instance)
 		}
 	}
 

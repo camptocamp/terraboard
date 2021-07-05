@@ -6,8 +6,6 @@ services:
       context: ../../
       dockerfile: ./Dockerfile
     environment:
-      AWS_ACCESS_KEY_ID: root
-      AWS_SECRET_ACCESS_KEY: mypassword
       DB_SSLMODE: disable
       CONFIG_FILE: config/config.yml
       GODEBUG: netdns=go
@@ -33,7 +31,21 @@ services:
     ports:
       - "9200:9000"
     volumes:
-      - ../data:/data
+      - ../data/minio-1:/data
+    command: server /data
+
+  minio-2:
+    image: minio/minio:latest
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: password
+    user: "${UID}:${GID}"
+    expose: 
+      - "9000"
+    ports:
+      - "9300:9000"
+    volumes:
+      - ../data/minio-2:/data
     command: server /data
 
   db:

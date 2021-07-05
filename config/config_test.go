@@ -24,13 +24,15 @@ func TestLoadConfigFromYaml(t *testing.T) {
 		},
 		AWS: []AWSConfig{
 			{
-				DynamoDBTable: "terraboard-dynamodb",
-				S3: S3BucketConfig{
+				AccessKey:       "root",
+				SecretAccessKey: "mypassword",
+				DynamoDBTable:   "terraboard-dynamodb",
+				S3: []S3BucketConfig{{
 					Bucket:         "terraboard-bucket",
 					KeyPrefix:      "test/",
 					FileExtension:  []string{".tfstate"},
 					ForcePathStyle: true,
-				},
+				}},
 			},
 		},
 		TFE: []TFEConfig{
