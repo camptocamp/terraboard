@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/camptocamp/terraboard/config"
-	"github.com/hashicorp/terraform/states/statefile"
+	"github.com/camptocamp/terraboard/internal/terraform/states/statefile"
 	log "github.com/sirupsen/logrus"
 )
 

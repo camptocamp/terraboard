@@ -9,11 +9,11 @@ import (
 	"strings"
 
 	"github.com/camptocamp/terraboard/config"
+	"github.com/camptocamp/terraboard/internal/terraform/addrs"
+	"github.com/camptocamp/terraboard/internal/terraform/states"
+	"github.com/camptocamp/terraboard/internal/terraform/states/statefile"
 	"github.com/camptocamp/terraboard/state"
 	"github.com/camptocamp/terraboard/types"
-	"github.com/hashicorp/terraform/addrs"
-	"github.com/hashicorp/terraform/states"
-	"github.com/hashicorp/terraform/states/statefile"
 	log "github.com/sirupsen/logrus"
 
 	ctyJson "github.com/zclconf/go-cty/cty/json"

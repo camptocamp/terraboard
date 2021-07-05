@@ -8,8 +8,8 @@ import (
 	"strconv"
 
 	"github.com/camptocamp/terraboard/config"
+	"github.com/camptocamp/terraboard/internal/terraform/states/statefile"
 	"github.com/camptocamp/terraboard/pkg/client/gitlab"
-	"github.com/hashicorp/terraform/states/statefile"
 )
 
 // Gitlab is a state provider type, leveraging GitLab
