@@ -43,7 +43,7 @@ type Provider interface {
 func Configure(c *config.Config) ([]Provider, error) {
 	var providers []Provider
 	if len(c.TFE) > 0 {
-		objs, err := NewTFE(c)
+		objs, err := NewTFECollection(c)
 		if err != nil {
 			return []Provider{}, err
 		}
@@ -56,7 +56,7 @@ func Configure(c *config.Config) ([]Provider, error) {
 	}
 
 	if len(c.GCP) > 0 {
-		objs, err := NewGCP(c)
+		objs, err := NewGCPCollection(c)
 		if err != nil {
 			return []Provider{}, err
 		}
@@ -69,7 +69,7 @@ func Configure(c *config.Config) ([]Provider, error) {
 	}
 
 	if len(c.Gitlab) > 0 {
-		objs := NewGitlab(c)
+		objs := NewGitlabCollection(c)
 		if len(objs) > 0 {
 			log.Info("Using Gitab as state/locks provider")
 			for _, glObj := range objs {
@@ -79,7 +79,7 @@ func Configure(c *config.Config) ([]Provider, error) {
 	}
 
 	if len(c.AWS) > 0 {
-		objs := NewAWS(c)
+		objs := NewAWSCollection(c)
 		if len(objs) > 0 {
 			log.Info("Using AWS (S3+DynamoDB) as state/locks provider")
 			for _, awsObj := range objs {

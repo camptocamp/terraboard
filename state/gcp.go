@@ -24,39 +24,52 @@ type GCP struct {
 }
 
 // NewGCP creates an GCP object
-func NewGCP(c *config.Config) ([]*GCP, error) {
+func NewGCP(gcp config.GCPConfig) (*GCP, error) {
 	ctx := context.Background()
 
 	var client *storage.Client
-	var gcpInstances []*GCP
+	var gcpInstance *GCP
 	var err error
+	if gcp.GCSBuckets == nil || len(gcp.GCSBuckets) == 0 {
+		return nil, nil
+	}
+
+	if gcp.GCPSAKey != "" {
+		log.WithFields(log.Fields{
+			"path": gcp.GCPSAKey,
+		}).Info("Authenticating using service account key")
+		opt := option.WithCredentialsFile(gcp.GCPSAKey)
+		client, err = storage.NewClient(ctx, opt) // Use service account key
+	} else {
+		client, err = storage.NewClient(ctx) // Use base credentials
+	}
+
+	if err != nil {
+		log.Fatalf("Failed to create client: %v", err)
+		return nil, err
+	}
+
+	gcpInstance = &GCP{
+		svc:     client,
+		buckets: gcp.GCSBuckets,
+	}
+
+	log.WithFields(log.Fields{
+		"buckets": gcp.GCSBuckets,
+	}).Info("Client successfully created")
+
+	return gcpInstance, nil
+}
+
+// NewGCPCollection instantiate all needed GCP objects configurated by the user and return a slice
+func NewGCPCollection(c *config.Config) ([]*GCP, error) {
+	var gcpInstances []*GCP
 	for _, gcp := range c.GCP {
-		if gcp.GCSBuckets != nil {
-			if gcp.GCPSAKey != "" {
-				log.WithFields(log.Fields{
-					"path": gcp.GCPSAKey,
-				}).Info("Authenticating using service account key")
-				opt := option.WithCredentialsFile(gcp.GCPSAKey)
-				client, err = storage.NewClient(ctx, opt) // Use service account key
-			} else {
-				client, err = storage.NewClient(ctx) // Use base credentials
-			}
-
-			if err != nil {
-				log.Fatalf("Failed to create client: %v", err)
-				return nil, err
-			}
-
-			instance := &GCP{
-				svc:     client,
-				buckets: gcp.GCSBuckets,
-			}
-			gcpInstances = append(gcpInstances, instance)
-
-			log.WithFields(log.Fields{
-				"buckets": gcp.GCSBuckets,
-			}).Info("Client successfully created")
+		gcpInstance, err := NewGCP(gcp)
+		if err != nil || gcpInstance == nil {
+			return nil, err
 		}
+		gcpInstances = append(gcpInstances, gcpInstance)
 	}
 
 	return gcpInstances, nil

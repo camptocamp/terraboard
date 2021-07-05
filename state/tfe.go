@@ -19,28 +19,41 @@ type TFE struct {
 }
 
 // NewTFE creates a new TFE object
-func NewTFE(c *config.Config) ([]*TFE, error) {
+func NewTFE(tfeObj config.TFEConfig) (*TFE, error) {
+	var tfeInstance *TFE
+	if tfeObj.Token == "" {
+		return nil, nil
+	}
+
+	config := &tfe.Config{
+		Address: tfeObj.Address,
+		Token:   tfeObj.Token,
+	}
+
+	client, err := tfe.NewClient(config)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx := context.Background()
+	tfeInstance = &TFE{
+		Client: client,
+		org:    tfeObj.Organization,
+		ctx:    &ctx,
+	}
+
+	return tfeInstance, nil
+}
+
+// NewTFECollection instantiate all needed GCP objects configurated by the user and return a slice
+func NewTFECollection(c *config.Config) ([]*TFE, error) {
 	var tfeInstances []*TFE
-	for _, tfeObj := range c.TFE {
-		if tfeObj.Token != "" {
-			config := &tfe.Config{
-				Address: tfeObj.Address,
-				Token:   tfeObj.Token,
-			}
-
-			client, err := tfe.NewClient(config)
-			if err != nil {
-				return nil, err
-			}
-
-			ctx := context.Background()
-			instance := &TFE{
-				Client: client,
-				org:    tfeObj.Organization,
-				ctx:    &ctx,
-			}
-			tfeInstances = append(tfeInstances, instance)
+	for _, tfe := range c.TFE {
+		tfeInstance, err := NewTFE(tfe)
+		if err != nil || tfeInstance == nil {
+			return nil, err
 		}
+		tfeInstances = append(tfeInstances, tfeInstance)
 	}
 
 	return tfeInstances, nil
