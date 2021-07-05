@@ -171,18 +171,18 @@ aws:
   - endpoint: http://minio:9000/
     region: eu-west-1
     s3:
-      bucket: test-bucket
-      force-path-style: true
-      file-extension: 
-        - .tfstate
+      - bucket: test-bucket
+        force-path-style: true
+        file-extension: 
+          - .tfstate
 
   - endpoint: http://minio:9000/
     region: eu-west-1
     s3:
-      bucket: test-bucket2
-      force-path-style: true
-      file-extension: 
-        - .tfstate
+      - bucket: test-bucket2
+        force-path-style: true
+        file-extension: 
+          - .tfstate
 ```
 
 In the case of AWS, don't forget to set the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables.
@@ -243,6 +243,15 @@ You can find a ready-to-use Docker example with two *MinIO* buckets in the `test
 
 #### AWS (and S3 compatible providers) Options
 
+- `--aws-access-key` <default: *$AWS_ACCESS_KEY_ID*> AWS account access key.
+  - Env: *AWS_ACCESS_KEY_ID*
+  - Yaml: *aws.access-key*
+- `--aws-secret-access-key` <default: *$AWS_SECRET_ACCESS_KEY*> AWS secret account access key.
+  - Env: *AWS_SECRET_ACCESS_KEY*
+  - Yaml: *aws.secret-access-key*
+- `--aws-session-token` <default: *$AWS_SESSION_TOKEN*> AWS session token.
+  - Env: *AWS_SESSION_TOKEN*
+  - Yaml: *aws.session-token*
 - `--dynamodb-table` <default: *$AWS_DYNAMODB_TABLE*> AWS DynamoDB table for locks.
   - Env: *AWS_DYNAMODB_TABLE*
   - Yaml: *aws.dynamodb-table*
