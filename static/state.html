@@ -1,6 +1,6 @@
 <div id="mainrow" class="row">
-    <div id="leftcol" class="col-lg-4">
-        <div class="panel-group mr-4">
+    <div id="leftcol" class="col-xl-4 col-xxl-3">
+        <div class="mr-4">
             <div class="card">
                     <h5 class="card-header">
                         General Information
@@ -25,10 +25,10 @@
                         <div class="row justify-content-around">
                             <select class="form-control col-8" ng-model="compareVersion"
                             ng-options="version as version.date for version in versions track by version.versionId"></select>
-                            <button type="button" class="btn btn-warning float-right col-3"
+                            <button type="button" class="btn btn-warning mt-2 col-5"
                             data-ng-click="compareVersion=undefined">Reset</button>
                         </div>
-                        <ul  class="mt-2" ng-if="display.compare">
+                        <ul class="mt-2" ng-if="display.compare">
                             <li class="list-group-item no-border-item">Terraform version: {{compare.stats.to.terraform_version}}</li>
                             <li class="list-group-item no-border-item">Serial: {{compare.stats.to.serial}}</li>
                         </ul>
@@ -38,7 +38,7 @@
             <div id="nodes" class="card mt-4" ng-if="display.details">
                 <h5 class="card-header">Modules</h5>
                 <ul id="nodeslist" class="list-group" ng-init="display.mod=selectedmod">
-                    <li class="list-group-item form-group" ng-init="resFilter=&apos;&apos;">
+                    <li class="list-group-item" ng-init="resFilter=&apos;&apos;">
                         <input id="resFilterInput" class="form-control" type="search" ng-model="resFilter"
                             placeholder="Filter resources..."> <span id="resFilterClear"
                             class="far fa-times-circle" ng-click="resFilter=&apos;&apos;" style="margin-right: 10px;"></span>
@@ -62,7 +62,7 @@
             </div>
         </div>
     </div>
-    <div id="node" class="col-lg-8">
+    <div id="node" class="col-xl-8 col-xxl-9">
         <div class="row">
             <h1>{{path}}</h1>
         </div>
@@ -110,10 +110,10 @@
             <div class="panel-group">
                 <div class="card mt-3">
                     <h4 id="card-title-diff" class="card-header bg-warning">
-                        <a data-toggle="collapse" data-target="#card-body-diff">
+                        <div data-toggle="collapse" data-target="#card-body-diff">
                             Differences
-                        </a>
-                        <span id="badge-diff" class="badge">{{differences}}</span>
+                            <span id="badge-diff" class="badge rounded-pill bg-secondary float-end">{{differences}}</span>
+                        </div>
                     </h4>
                     <div id="card-body-diff" class="panel-collapse collapse show">
                         <div class="card-body">
@@ -127,10 +127,10 @@
                 </div>
                 <div class="card mt-4">
                     <h4 id="card-title-in-old" class="card-header bg-danger">
-                        <a data-toggle="collapse" data-target="#card-body-in-old">
+                        <div data-toggle="collapse" data-target="#card-body-in-old">
                             Only in serial {{compare.stats.from.serial}}
-                        </a>
-                        <span id="badge-diff" class="badge">{{only_in_old}}</span>
+                            <span id="badge-diff" class="badge rounded-pill bg-secondary float-end">{{only_in_old}}</span>
+                        </div>
                     </h4>
                     <div id="card-body-in-old" class="panel-collapse collapse show">
                         <div class="card-body">
@@ -144,10 +144,10 @@
                 </div>
                 <div class="card mt-4">
                     <h4 id="card-title-in-new" class="card-header bg-success">
-                        <a data-toggle="collapse" data-target="#card-body-in-new">
+                        <div data-toggle="collapse" data-target="#card-body-in-new">
                             Only in serial {{compare.stats.to.serial}}
-                        </a>
-                        <span id="badge-diff" class="badge">{{only_in_new}}</span>
+                            <span id="badge-diff" class="badge rounded-pill bg-secondary float-end">{{only_in_new}}</span>
+                        </div>
                     </h4>
                     <div id="card-body-in-new" class="panel-collapse collapse show">
                         <div class="card-body">

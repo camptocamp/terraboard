@@ -1,3 +1,7 @@
+a {
+  text-decoration: none !important;
+}
+
 @media (max-width:767px) {
   .navbar-toggle {
     float: left;
@@ -23,7 +27,7 @@
     height: 100%;
   }
   .container {
-    max-width: 65vw;
+    max-width: 75vw;
   }
   #maincont, #leftcol .panel-group {
     overflow: hidden;
