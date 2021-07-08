@@ -186,6 +186,7 @@ func main() {
 	http.HandleFunc(util.GetFullPath("api/version"), getVersion)
 	http.HandleFunc(util.GetFullPath("api/user"), api.GetUser)
 	http.HandleFunc(util.GetFullPath("api/states"), handleWithDB(api.ListStates, database))
+	http.HandleFunc(util.GetFullPath("api/states_lineages"), handleWithDB(api.ListStatesWithLineages, database))
 	http.HandleFunc(util.GetFullPath("api/states/stats"), handleWithDB(api.ListStateStats, database))
 	http.HandleFunc(util.GetFullPath("api/states/tfversion/count"),
 		handleWithDB(api.ListTerraformVersionsWithCount, database))

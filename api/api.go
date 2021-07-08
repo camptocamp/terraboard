@@ -42,6 +42,21 @@ func ListStates(w http.ResponseWriter, _ *http.Request, d *db.Database) {
 	}
 }
 
+// ListStatesWithLineages lists distinct State paths with associated Lineages
+func ListStatesWithLineages(w http.ResponseWriter, _ *http.Request, d *db.Database) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	states := d.ListStatesWithLineages()
+
+	j, err := json.Marshal(states)
+	if err != nil {
+		JSONError(w, "Failed to marshal states", err)
+		return
+	}
+	if _, err := io.WriteString(w, string(j)); err != nil {
+		log.Error(err.Error())
+	}
+}
+
 // ListTerraformVersionsWithCount lists Terraform versions with their associated
 // counts, sorted by the 'orderBy' parameter (version by default)
 func ListTerraformVersionsWithCount(w http.ResponseWriter, r *http.Request, d *db.Database) {

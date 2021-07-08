@@ -136,7 +136,7 @@ func (db *Database) stateS3toDB(sf *statefile.File, path string, versionID strin
 		Version:   version,
 		TFVersion: sf.TerraformVersion.String(),
 		Serial:    int64(sf.Serial),
-		LineageID: sql.NullInt64{Int64: int64(lineage.ID)},
+		LineageID: sql.NullInt64{Int64: int64(lineage.ID), Valid: true},
 	}
 
 	for _, m := range sf.State.Modules {
@@ -436,6 +436,24 @@ func (db *Database) ListStates() (states []string) {
 	for rows.Next() {
 		var state string
 		if err := rows.Scan(&state); err != nil {
+			log.Error(err.Error())
+		}
+		states = append(states, state)
+	}
+	return
+}
+
+// ListStatesWithLineages returns a slice of all distinct State paths with Lineage from the Database
+func (db *Database) ListStatesWithLineages() (states []interface{}) {
+	type jsonStateLineage struct {
+		Path    string `json:"path"`
+		Lineage string `json:"lineage"`
+	}
+	rows, _ := db.Table("states").Joins("JOIN lineages ON lineages.id = states.lineage_id").Select("DISTINCT ON(states.path) states.path, lineages.value as lineage").Rows()
+	defer rows.Close()
+	for rows.Next() {
+		var state jsonStateLineage
+		if err := rows.Scan(&state.Path, &state.Lineage); err != nil {
 			log.Error(err.Error())
 		}
 		states = append(states, state)

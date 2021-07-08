@@ -219,7 +219,7 @@ app.controller("tbNavCtrl",
         }
     });
 
-    $http.get('api/states').then(function(response){
+    $http.get('api/states_lineages').then(function(response){
         $scope.states = response.data;
     });
 

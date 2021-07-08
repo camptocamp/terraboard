@@ -127,7 +127,7 @@
         </thead>
         <tbody>
             <tr ng-repeat="r in results.results">
-                <td><a href="state/{{r.path}}?versionid={{r.version_id}}#{{r.module_path}}.{{r.resource_name}}"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></td>
+                <td><a href="lineage/{{r.lineage_value}}?versionid={{r.version_id}}#{{r.module_path}}.{{r.resource_name}}"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></td>
                 <td>{{r.path}}</td>
                 <td>{{r.tf_version}}</td>
                 <td>{{r.serial}}</td>
