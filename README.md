@@ -56,6 +56,7 @@
 - [Use with Docker](#use-with-docker)
   - [Docker-compose](#docker-compose)
   - [Docker command line](#docker-command-line)
+- [Use with Kubernetes](#use-with-kubernetes)
 - [Use with Rancher](#use-with-rancher)
 - [Authentication and base URL](#authentication-and-base-url)
 - [Install from source](#install-from-source)
@@ -335,6 +336,19 @@ docker run -p 8080:8080 \
 ```
 
 Then point your browser to http://localhost:8080.
+
+
+## Use with Kubernetes
+
+A Helm chart is available on [Camptocamp's repository](https://github.com/camptocamp/charts/tree/master/terraboard).
+
+In order to install it:
+
+```shell
+$ helm repo add c2c https://camptocamp.github.io/charts
+$ helm install -v values.yaml terraboard c2c/terraboard
+```
+
 
 ## Use with Rancher
 
