@@ -1,8 +1,8 @@
 package db
 
 import (
+	"database/sql"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/url"
 	"strconv"
@@ -91,17 +91,14 @@ func Init(config config.DBConfig, debug bool) *Database {
 // and add corresponding Lineage entries
 func (db *Database) MigrateLineage() error {
 	if db.Migrator().HasColumn(&types.State{}, "lineage") {
-		states := db.ListStates()
-		for _, stPath := range states {
-			// Recover State from db for update
-			var st types.State
-			res := db.First(&st, types.State{Path: stPath})
-			if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-				return fmt.Errorf("State not found in db")
-			}
+		var states []types.State
+		if err := db.Find(&states).Error; err != nil {
+			return err
+		}
 
+		for _, st := range states {
 			if err := db.UpdateState(st); err != nil {
-				return fmt.Errorf("Failed to update %s state during lineage migration: %v", stPath, err)
+				return fmt.Errorf("Failed to update %s state during lineage migration: %v", st.Path, err)
 			}
 		}
 
@@ -134,7 +131,7 @@ func (db *Database) stateS3toDB(sf *statefile.File, path string, versionID strin
 		Version:   version,
 		TFVersion: sf.TerraformVersion.String(),
 		Serial:    int64(sf.Serial),
-		LineageID: lineage.ID,
+		LineageID: sql.NullInt64{Int64: int64(lineage.ID)},
 	}
 
 	for _, m := range sf.State.Modules {
@@ -221,19 +218,45 @@ func (db *Database) InsertState(path string, versionID string, sf *statefile.Fil
 // This method is only use during the Lineage migration since States are immutable
 func (db *Database) UpdateState(st types.State) error {
 	// Get lineage from old column
-	var lineage types.Lineage
-	if err := db.Raw("SELECT lineage FROM states WHERE path = ?", st.Path).Scan(&lineage.Value).Error; err != nil {
+	var lineageValue sql.NullString
+	if err := db.Raw("SELECT lineage FROM states WHERE id = ?", st.ID).Scan(&lineageValue).Error; err != nil {
 		return fmt.Errorf("Error on %s lineage recovering during migration: %v", st.Path, err)
+	}
+	if lineageValue.String == "" || !lineageValue.Valid {
+		log.Warnf("Missing lineage for '%s' state, attempt to recover lineage from other states...", st.Path)
+		var lineages []string
+		db.Table("states").
+			Distinct("lineage").
+			Order("lineage desc").
+			Where("path = ?", st.Path).
+			Scan(&lineages)
+
+		for _, l := range lineages {
+			if l != "" {
+				lineageValue.String = l
+				lineageValue.Valid = true
+				log.Infof("Missing lineage for '%s' state solved!", st.Path)
+				break
+			}
+		}
+
+		if lineageValue.String == "" || !lineageValue.Valid {
+			log.Warnf("Failed to recover '%s' lineage from others states. Orphan state", st.Path)
+			return nil
+		}
 	}
 
 	// Create Lineage entry if not exist (value column is unique)
-	tx := db.FirstOrCreate(&lineage)
+	lineage := types.Lineage{
+		Value: lineageValue.String,
+	}
+	tx := db.FirstOrCreate(&lineage, lineage)
 	if tx.Error != nil || lineage.ID == 0 {
 		return tx.Error
 	}
 
 	// Get Lineage ID for foreign constraint
-	st.LineageID = lineage.ID
+	st.LineageID = sql.NullInt64{Int64: int64(lineage.ID), Valid: true}
 
 	return db.Save(&st).Error
 }
