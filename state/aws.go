@@ -14,7 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/camptocamp/terraboard/config"
-	"github.com/hashicorp/terraform/states/statefile"
+	"github.com/camptocamp/terraboard/internal/terraform/states/statefile"
 	log "github.com/sirupsen/logrus"
 )
 

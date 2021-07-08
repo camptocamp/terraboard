@@ -5,6 +5,10 @@ run:
   # Disable tests to avoid redundancy with test workflow
   tests: false
 
+  # Dirs to ignore
+  skip-dirs:
+    - internal/terraform
+
 issues:
   # Maximum issues count per one linter
   max-issues-per-linter: 0

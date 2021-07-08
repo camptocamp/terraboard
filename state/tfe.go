@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/camptocamp/terraboard/config"
+	"github.com/camptocamp/terraboard/internal/terraform/states/statefile"
 	tfe "github.com/hashicorp/go-tfe"
-	"github.com/hashicorp/terraform/states/statefile"
 )
 
 // TFE is a state provider type, leveraging Terraform Enterprise
