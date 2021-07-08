@@ -1,6 +1,5 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
 import Home from '../views/Home.vue'
-import Lineages from '../views/Lineages.vue'
 import State from '../views/State.vue'
 import Search from '../views/Search.vue'
 
@@ -9,11 +8,6 @@ const routes: Array<RouteRecordRaw> = [
     path: '/',
     name: 'Home',
     component: Home
-  },
-  {
-    path: '/lineage/:lineage',
-    name: 'Lineages',
-    component: Lineages
   },
   {
     path: '/state/:path',
