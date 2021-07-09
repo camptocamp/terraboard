@@ -196,10 +196,14 @@ func (a *AWS) GetVersions(state string) (versions []Version, err error) {
 	}
 
 	for _, v := range result.Versions {
-		versions = append(versions, Version{
-			ID:           *v.VersionId,
-			LastModified: *v.LastModified,
-		})
+        for _, ext := range a.fileExtension {
+            if strings.HasSuffix(*v.Key, ext) {
+                versions = append(versions, Version{
+                    ID:           *v.VersionId,
+                    LastModified: *v.LastModified,
+                })
+            }
+        }
 	}
 
 	return
