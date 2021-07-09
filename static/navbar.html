@@ -32,33 +32,7 @@
                         </li>
                     </ul>
                 </li>
-                <li ng-class="{active: page == &apos;search&apos;}" class="nav-item mx-2"> <a href="search"
-                        class="nav-link"><span class="fas fa-search" aria-hidden="true"></span> Search</a>
-                </li>
             </ul>
-            <ul class="nav navbar-nav ml-auto">
-                <li id="states-select" class="nav-item">
-                    <ui-select ng-model="states.selected" theme="bootstrap" ng-disabled="disabled"
-                        reset-search-input="false" style="min-width: 400px;" title="Choose a state file">
-                        <ui-select-match placeholder="{{placeholder}}">{{placeholder}}</ui-select-match>
-                        <ui-select-choices repeat="state in states | filter: $select.search | orderBy"> <a
-                                href="state/{{state}}" target="_self">{{state}}</a>
-                        </ui-select-choices>
-                    </ui-select>
-                </li>
-                <ul class="nav navbar-nav navbar-collapse collapse" id="navbar-collapse-menu" ng-if="user">
-                    <li class="dropdown nav-item"> <a data-toggle="dropdown" class="dropdown-toggle nav-link"
-                            id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"><img
-                                src="{{user.avatar_url}}" height="25px"></a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
-                            <li><a class="dropdown-item" href="#">Logged in as {{user.name}}</a>
-                            </li>
-                            <li><a class="dropdown-item" href="/oauth2/sign_in">Sign out</a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </ul>
-        </div>
+        </ul>
     </div>
 </div>

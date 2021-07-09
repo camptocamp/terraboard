@@ -1,30 +1,79 @@
 <template>
-  <div id="nav">
+  <Navbar/>
+  <!-- <div id="nav">
     <router-link to="/">Home</router-link> |
     <router-link to="/about">About</router-link>
-  </div>
+  </div> -->
   <router-view/>
+  <AppFooter/>
 </template>
 
+<script lang="ts">
+import { Options, Vue } from 'vue-class-component';
+import Navbar from '@/components/Navbar.vue'; // @ is an alias to /src
+import AppFooter from '@/components/Footer.vue';
+
+@Options({
+  components: {
+    Navbar,
+    AppFooter,
+  },
+})
+export default class App extends Vue {}
+</script>
+
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+a {
+  text-decoration: none !important;
 }
 
-#nav {
-  padding: 30px;
+@media (max-width:767px) {
+  .navbar-toggle {
+    float: left;
+  }
+  .navbar-right {
+    position: absolute;
+    top: 0;
+    right: 20px;
+  }
+  .breadcrumb {
+    display: none;
+  }
+  h2.node-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
+@media (min-width: 992px) {
+  body, html, #mainrow, #leftcol {
+    margin: 0;
+    height: 100%;
+  }
+  .container {
+    max-width: 75vw;
+  }
+  #maincont, #leftcol .panel-group {
+    overflow: hidden;
+  }
+  #maincont {
+    margin-bottom: 50px;
+  }
+  #nodes, #node {
+    overflow-y: auto;
+  }
+  #nodes {
+    max-height: calc(100% - 200px);
+  }
+  #node {
+    height: 100%;
+  }
+  #states-select {
+    margin: 10px;
+  }
+  #states-select a {
+    color: black;
   }
 }
 </style>
