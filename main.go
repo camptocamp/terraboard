@@ -45,10 +45,10 @@ func handleWithDB(apiF func(w http.ResponseWriter, r *http.Request,
 	})
 }
 
-func handleWithStateProvider(apiF func(w http.ResponseWriter, r *http.Request,
-	sp state.Provider), sp state.Provider) func(http.ResponseWriter, *http.Request) {
+func handleWithStateProviders(apiF func(w http.ResponseWriter, r *http.Request,
+	sps []state.Provider), sps []state.Provider) func(http.ResponseWriter, *http.Request) {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		apiF(w, r, sp)
+		apiF(w, r, sps)
 	})
 }
 
@@ -64,7 +64,7 @@ func isKnownStateVersion(statesVersions map[string][]string, versionID, path str
 }
 
 // Refresh the DB
-// This should be the only direct bridge between the state provider and the DB
+// This should be the only direct bridge between the state providers and the DB
 func refreshDB(syncInterval uint16, d *db.Database, sp state.Provider) {
 	interval := time.Duration(syncInterval) * time.Minute
 	for {
@@ -155,7 +155,7 @@ func main() {
 	}
 
 	// Set up the state provider
-	sp, err := state.Configure(c)
+	sps, err := state.Configure(c)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -168,7 +168,10 @@ func main() {
 	if c.DB.NoSync {
 		log.Infof("Not syncing database, as requested.")
 	} else {
-		go refreshDB(c.DB.SyncInterval, database, sp)
+		log.Debugf("Total providers: %d\n", len(sps))
+		for _, sp := range sps {
+			go refreshDB(c.DB.SyncInterval, database, sp)
+		}
 	}
 	defer database.Close()
 
@@ -189,7 +192,7 @@ func main() {
 	http.HandleFunc(util.GetFullPath("api/state/"), handleWithDB(api.GetState, database))
 	http.HandleFunc(util.GetFullPath("api/state/activity/"), handleWithDB(api.GetStateActivity, database))
 	http.HandleFunc(util.GetFullPath("api/state/compare/"), handleWithDB(api.StateCompare, database))
-	http.HandleFunc(util.GetFullPath("api/locks"), handleWithStateProvider(api.GetLocks, sp))
+	http.HandleFunc(util.GetFullPath("api/locks"), handleWithStateProviders(api.GetLocks, sps))
 	http.HandleFunc(util.GetFullPath("api/search/attribute"), handleWithDB(api.SearchAttribute, database))
 	http.HandleFunc(util.GetFullPath("api/resource/types"), handleWithDB(api.ListResourceTypes, database))
 	http.HandleFunc(util.GetFullPath("api/resource/types/count"), handleWithDB(api.ListResourceTypesWithCount, database))

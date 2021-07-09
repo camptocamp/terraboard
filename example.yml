@@ -12,15 +12,17 @@ database:
   sync-interval: 5
 
 provider:
-  no-locks: "true"
-  no-versioning: "false"
+  no-locks: true
+  no-versioning: false
 
 aws:
-  dynamodb-table: terraboard
-  s3:
-    bucket: terraboard
-    key-prefix:
-    file-extension: .tfstate
+  - access-key: root
+    secret-access-key: mypassword
+    dynamodb-table: terraboard
+    s3:
+      - bucket: terraboard
+        key-prefix:
+        file-extension: .tfstate
 
 web:
   port: 9090

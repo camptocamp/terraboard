@@ -1,2 +1,3 @@
 data/*
 !data/test-bucket
+!data/test-bucket2
