@@ -33,6 +33,7 @@
             <Multiselect
               v-model="states_select.value"
               v-bind="states_select"
+              placeholder= "Enter a state file path..."
             >
             </Multiselect>
           </li>
@@ -86,7 +87,7 @@ import axios from "axios"
     reset() {
       this.item = {};
     },
-    async fetchStates() {
+    fetchStates() {
       const url = `http://172.22.0.5:8080/api/states_lineages`
       axios.get(url)
         .then((response) => {
@@ -125,7 +126,7 @@ export default class Navbar extends Vue {}
 <style scoped lang="scss">
 #states-select {
   @media (min-width: 992px) {
-    width: 20vw;
+    width: 30vw;
   }
   @media (max-width: 992px) {
     width: 40%;
