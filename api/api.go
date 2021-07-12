@@ -42,6 +42,21 @@ func ListStates(w http.ResponseWriter, _ *http.Request, d *db.Database) {
 	}
 }
 
+// ListStatesWithLineages lists distinct State paths with associated Lineages
+func ListStatesWithLineages(w http.ResponseWriter, _ *http.Request, d *db.Database) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	states := d.ListStatesWithLineages()
+
+	j, err := json.Marshal(states)
+	if err != nil {
+		JSONError(w, "Failed to marshal states", err)
+		return
+	}
+	if _, err := io.WriteString(w, string(j)); err != nil {
+		log.Error(err.Error())
+	}
+}
+
 // ListTerraformVersionsWithCount lists Terraform versions with their associated
 // counts, sorted by the 'orderBy' parameter (version by default)
 func ListTerraformVersionsWithCount(w http.ResponseWriter, r *http.Request, d *db.Database) {
@@ -83,17 +98,17 @@ func ListStateStats(w http.ResponseWriter, r *http.Request, d *db.Database) {
 // GetState provides information on a State
 func GetState(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	st := util.TrimBasePath(r, "api/state/")
+	lineage := util.TrimBasePath(r, "api/state/")
 	versionID := r.URL.Query().Get("versionid")
-	var err error
-	if versionID == "" {
-		versionID, err = d.DefaultVersion(st)
-		if err != nil {
-			JSONError(w, "Failed to retrieve default version", err)
-			return
-		}
-	}
-	state := d.GetState(st, versionID)
+	// var err error
+	// if versionID == "" {
+	// 	versionID, err = d.DefaultVersion(st)
+	// 	if err != nil {
+	// 		JSONError(w, "Failed to retrieve default version", err)
+	// 		return
+	// 	}
+	// }
+	state := d.GetState(lineage, versionID)
 
 	j, err := json.Marshal(state)
 	if err != nil {
@@ -108,8 +123,8 @@ func GetState(w http.ResponseWriter, r *http.Request, d *db.Database) {
 // GetStateActivity returns the activity (version history) of a State
 func GetStateActivity(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	st := util.TrimBasePath(r, "api/state/activity/")
-	activity := d.GetStateActivity(st)
+	lineage := util.TrimBasePath(r, "api/state/activity/")
+	activity := d.GetStateActivity(lineage)
 
 	j, err := json.Marshal(activity)
 	if err != nil {
@@ -124,13 +139,13 @@ func GetStateActivity(w http.ResponseWriter, r *http.Request, d *db.Database) {
 // StateCompare compares two versions ('from' and 'to') of a State
 func StateCompare(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	st := util.TrimBasePath(r, "api/state/compare/")
+	lineage := util.TrimBasePath(r, "api/state/compare/")
 	query := r.URL.Query()
 	fromVersion := query.Get("from")
 	toVersion := query.Get("to")
 
-	from := d.GetState(st, fromVersion)
-	to := d.GetState(st, toVersion)
+	from := d.GetState(lineage, fromVersion)
+	to := d.GetState(lineage, toVersion)
 	compare, err := compare.Compare(from, to)
 	if err != nil {
 		JSONError(w, "Failed to compare state versions", err)

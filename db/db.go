@@ -131,7 +131,7 @@ func (db *Database) stateS3toDB(sf *statefile.File, path string, versionID strin
 		Version:   version,
 		TFVersion: sf.TerraformVersion.String(),
 		Serial:    int64(sf.Serial),
-		LineageID: sql.NullInt64{Int64: int64(lineage.ID)},
+		LineageID: sql.NullInt64{Int64: int64(lineage.ID), Valid: true},
 	}
 
 	for _, m := range sf.State.Modules {
@@ -272,25 +272,26 @@ func (db *Database) InsertVersion(version *state.Version) error {
 }
 
 // GetState retrieves a State from the database by its path and versionID
-func (db *Database) GetState(path, versionID string) (state types.State) {
-	db.Joins("JOIN versions on states.version_id=versions.id").
+func (db *Database) GetState(lineage, versionID string) (state types.State) {
+	db.Joins("JOIN lineages on states.lineage_id=lineages.id").
+		Joins("JOIN versions on states.version_id=versions.id").
 		Preload("Version").Preload("Modules").Preload("Modules.Resources").Preload("Modules.Resources.Attributes").
 		Preload("Modules.OutputValues").
-		Find(&state, "states.path = ? AND versions.version_id = ?", path, versionID)
+		Find(&state, "lineages.value = ? AND versions.version_id = ?", lineage, versionID)
 	return
 }
 
 // GetStateActivity returns a slice of StateStat from the Database
-// for a given State path representing the State activity over time (Versions)
-func (db *Database) GetStateActivity(path string) (states []types.StateStat) {
+// for a given State lineage representing the State activity over time (Versions)
+func (db *Database) GetStateActivity(lineage string) (states []types.StateStat) {
 	sql := "SELECT t.path, t.serial, t.tf_version, t.version_id, t.last_modified, count(resources.*) as resource_count" +
-		" FROM (SELECT states.id, states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified FROM states JOIN versions ON versions.id = states.version_id WHERE states.path = ? ORDER BY states.path, versions.last_modified ASC) t" +
+		" FROM (SELECT states.id, states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified FROM states JOIN lineages ON lineages.id = states.lineage_id JOIN versions ON versions.id = states.version_id WHERE lineages.value = ? ORDER BY states.path, versions.last_modified ASC) t" +
 		" JOIN modules ON modules.state_id = t.id" +
 		" JOIN resources ON resources.module_id = modules.id" +
 		" GROUP BY t.path, t.serial, t.tf_version, t.version_id, t.last_modified" +
 		" ORDER BY last_modified ASC"
 
-	db.Raw(sql, path).Find(&states)
+	db.Raw(sql, lineage).Find(&states)
 	return
 }
 
@@ -329,7 +330,8 @@ func (db *Database) SearchAttribute(query url.Values) (results []types.SearchRes
 
 	sqlQuery += " JOIN modules ON states.id = modules.state_id" +
 		" JOIN resources ON modules.id = resources.module_id" +
-		" JOIN attributes ON resources.id = attributes.resource_id"
+		" JOIN attributes ON resources.id = attributes.resource_id" +
+		" JOIN lineages ON lineages.id = states.lineage_id"
 
 	var where []string
 	var params []interface{}
@@ -363,6 +365,10 @@ func (db *Database) SearchAttribute(query url.Values) (results []types.SearchRes
 		where = append(where, fmt.Sprintf("states.tf_version LIKE '%s'", fmt.Sprintf("%%%s%%", v)))
 	}
 
+	if v := query.Get("lineage_value"); string(v) != "" {
+		where = append(where, fmt.Sprintf("lineages.value LIKE '%s'", fmt.Sprintf("%%%s%%", v)))
+	}
+
 	if len(where) > 0 {
 		sqlQuery += " WHERE " + strings.Join(where, " AND ")
 	}
@@ -375,11 +381,12 @@ func (db *Database) SearchAttribute(query url.Values) (results []types.SearchRes
 
 	// Now get results
 	// gorm doesn't support subqueries...
-	sql := "SELECT states.path, states.version_id, states.tf_version, states.serial, modules.path as module_path, resources.type, resources.name, resources.index, attributes.key, attributes.value" +
+	sql := "SELECT states.path, states.version_id, states.tf_version, states.serial, lineages.value as lineage_value, modules.path as module_path, resources.type, resources.name, resources.index, attributes.key, attributes.value" +
 		sqlQuery +
-		" ORDER BY states.path, states.serial, modules.path, resources.type, resources.name, resources.index, attributes.key" +
+		" ORDER BY states.path, states.serial, lineage_value, modules.path, resources.type, resources.name, resources.index, attributes.key" +
 		" LIMIT ?"
 
+	log.Info(sql)
 	params = append(params, pageSize)
 
 	if v := string(query.Get("page")); v != "" {
@@ -429,6 +436,24 @@ func (db *Database) ListStates() (states []string) {
 	return
 }
 
+// ListStatesWithLineages returns a slice of all distinct State paths with Lineage from the Database
+func (db *Database) ListStatesWithLineages() (states []interface{}) {
+	type jsonStateLineage struct {
+		Path    string `json:"path"`
+		Lineage string `json:"lineage"`
+	}
+	rows, _ := db.Table("states").Joins("JOIN lineages ON lineages.id = states.lineage_id").Select("DISTINCT ON(states.path) states.path, lineages.value as lineage").Rows()
+	defer rows.Close()
+	for rows.Next() {
+		var state jsonStateLineage
+		if err := rows.Scan(&state.Path, &state.Lineage); err != nil {
+			log.Error(err.Error())
+		}
+		states = append(states, state)
+	}
+	return
+}
+
 // ListTerraformVersionsWithCount returns a slice of maps of Terraform versions
 // mapped to the count of most recent State paths using them.
 // ListTerraformVersionsWithCount also takes a query with possible parameter 'orderBy'
@@ -468,7 +493,7 @@ func (db *Database) ListTerraformVersionsWithCount(query url.Values) (results []
 
 // ListStateStats returns a slice of StateStat, along with paging information
 func (db *Database) ListStateStats(query url.Values) (states []types.StateStat, page int, total int) {
-	row := db.Table("states").Select("count(DISTINCT path)").Row()
+	row := db.Raw("SELECT count(*) FROM (SELECT DISTINCT lineage_id FROM states) AS t").Row()
 	if err := row.Scan(&total); err != nil {
 		log.Error(err.Error())
 	}
@@ -480,11 +505,12 @@ func (db *Database) ListStateStats(query url.Values) (states []types.StateStat, 
 		offset = (page - 1) * pageSize
 	}
 
-	sql := "SELECT t.path, t.serial, t.tf_version, t.version_id, t.last_modified, count(resources.*) as resource_count" +
-		" FROM (SELECT DISTINCT ON(states.path) states.id, states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified FROM states JOIN versions ON versions.id = states.version_id ORDER BY states.path, versions.last_modified DESC) t" +
+	sql := "SELECT t.path, lineages.value as lineage_value, t.serial, t.tf_version, t.version_id, t.last_modified, count(resources.*) as resource_count" +
+		" FROM (SELECT DISTINCT ON(states.lineage_id) states.id, states.lineage_id, states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified FROM states JOIN versions ON versions.id = states.version_id ORDER BY states.lineage_id, versions.last_modified DESC) t" +
 		" JOIN modules ON modules.state_id = t.id" +
 		" JOIN resources ON resources.module_id = modules.id" +
-		" GROUP BY t.path, t.serial, t.tf_version, t.version_id, t.last_modified" +
+		" JOIN lineages ON lineages.id = t.lineage_id" +
+		" GROUP BY t.path, lineages.value, t.serial, t.tf_version, t.version_id, t.last_modified" +
 		" ORDER BY last_modified DESC" +
 		" LIMIT 20" +
 		" OFFSET ?"

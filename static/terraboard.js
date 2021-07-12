@@ -4,7 +4,7 @@ var app = angular.module("terraboard", ['ngRoute', 'ngSanitize', 'ui.select', 'c
     $routeProvider.when("/", {
         templateUrl: "static/main.html",
         controller: "tbMainCtrl"
-    }).when("/state/:path*", {
+    }).when("/lineage/:lineage*", {
         templateUrl: "static/state.html",
         controller: "tbStateCtrl",
         reloadOnSearch: false
@@ -45,8 +45,8 @@ app.directive("sparklinechart", function () {
                     element.bind('sparklineClick', function(ev) {
                         var sparkline = ev.sparklines[0],
                         region = sparkline.getCurrentRegionFields();
-                        var path = element[0].attributes.path.value;
-                        scope.$parent.$parent.goToState(path, region.x);
+                        var lineage = element[0].attributes.lineage.value;
+                        scope.$parent.$parent.goToState(lineage, region.x);
                     });
                 });
             };
@@ -68,7 +68,8 @@ app.directive("hlcode", ['$timeout', function($timeout) {
     }
 }]);
 
-app.controller("tbMainCtrl", ['$scope', '$http', '$location', function($scope, $http, $location) {
+app.controller("tbMainCtrl", ['$scope', '$http', '$location', '$routeParams',
+function($scope, $http, $location) {
     $scope.itemsPerPage = 20;
     $scope.getStats = function(page) {
         var params = {};
@@ -92,15 +93,15 @@ app.controller("tbMainCtrl", ['$scope', '$http', '$location', function($scope, $
 
     // Version map for sparklines click events
     $scope.versionMap = {};
-    $scope.getActivity = function(idx, path) {
-        $http.get('api/state/activity/'+path).then(function(response){
+    $scope.getActivity = function(idx, lineage) {
+        $http.get('api/state/activity/'+lineage).then(function(response){
             var states = response.data;
-            $scope.versionMap[path] = {};
+            $scope.versionMap[lineage] = {};
             var activityData = [];
             for (i=0; i < states.length; i++) {
                 var date = new Date(states[i].last_modified).getTime() / 1000;
                 activityData.push(date+":"+states[i].resource_count);
-                $scope.versionMap[path][date] = states[i].version_id;
+                $scope.versionMap[lineage][date] = states[i].version_id;
             }
             var activity = activityData.join(",");
 
@@ -108,9 +109,9 @@ app.controller("tbMainCtrl", ['$scope', '$http', '$location', function($scope, $
         });
     };
 
-    $scope.goToState = function(path, epoch) {
-        var versionId = $scope.versionMap[path][epoch];
-        var url = 'state/'+path+'?versionid='+versionId;
+    $scope.goToState = function(lineage, epoch) {
+        var versionId = $scope.versionMap[lineage][epoch];
+        var url = 'lineage/'+lineage+'?versionid='+versionId;
         $location.url(url);
         $scope.$apply();
     };
@@ -218,7 +219,7 @@ app.controller("tbNavCtrl",
         }
     });
 
-    $http.get('api/states').then(function(response){
+    $http.get('api/states_lineages').then(function(response){
         $scope.states = response.data;
     });
 
@@ -263,7 +264,7 @@ app.controller("tbStateCtrl",
      * Get versions when URL is loaded
      */
     $scope.$on('$routeChangeSuccess', function() {
-        $http.get('api/state/activity/'+$routeParams.path).then(function(response){
+        $http.get('api/state/activity/'+$routeParams.lineage).then(function(response){
             $scope.versions = [];
             for (i=0; i<response.data.length; i++) {
                 var ver = {
@@ -291,8 +292,8 @@ app.controller("tbStateCtrl",
         if (versionId == undefined) {
             versionId = "";
         }
-        $http.get('api/state/'+$routeParams.path+'?versionid='+versionId+'#'+$location.hash()).then(function(response){
-            $scope.path = $routeParams.path;
+        $http.get('api/state/'+$routeParams.lineage+'?versionid='+versionId+'#'+$location.hash()).then(function(response){
+            $scope.path = response.data["path"];
             $scope.details = response.data;
 
             $scope.selectedVersion = {
@@ -320,7 +321,7 @@ app.controller("tbStateCtrl",
      * Load details on page load
      */
     $scope.$on('$routeChangeSuccess', function() {
-        $scope.getDetails($location.search().version_id);
+        $scope.getDetails($location.search().versionid);
     });
 
     /*
@@ -386,7 +387,7 @@ app.controller("tbStateCtrl",
             $location.search('compare', compareVersion.versionId);
             $scope.display.details = false;
             $scope.display.compare = true;
-            $http.get('api/state/compare/'+$routeParams.path+'?from='+selectedVersion.versionId+'&to='+compareVersion.versionId).then(function(response){
+            $http.get('api/state/compare/'+$routeParams.lineage+'?from='+selectedVersion.versionId+'&to='+compareVersion.versionId).then(function(response){
                 $scope.compare = response.data;
 
                 $scope.only_in_old = Object.keys($scope.compare.differences.only_in_old).length;
@@ -430,6 +431,12 @@ app.controller("tbSearchCtrl",
     $http.get('api/attribute/keys').then(function(response){
         $scope.attribute_keys = response.data;
     });
+    $http.get('api/lineages').then(function(response){
+        $scope.lineages = []
+        response.data.forEach(element => {
+            $scope.lineages.push(element["lineage"])
+        });
+    });
 
     $scope.refreshAttrKeys = function() {
         $http.get('api/attribute/keys?resource_type='+$scope.resType).then(function(response){
@@ -455,6 +462,9 @@ app.controller("tbSearchCtrl",
         }
         if ($scope.tfVersion != undefined) {
             params.tf_version = $scope.tfVersion;
+        }
+        if ($scope.lineage != undefined) {
+            params.lineage_value = $scope.lineage;
         }
         if (page != undefined) {
             params.page = page;
@@ -488,11 +498,15 @@ app.controller("tbSearchCtrl",
     if ($location.search().tf_version != undefined) {
         $scope.tfVersion = $location.search().tf_version;
     }
+    if ($location.search().lineage != undefined) {
+        $scope.lineage = $location.search().lineage;
+    }
 
     $scope.doSearch(1);
 
     $scope.clearForm = function() {
         $scope.tfVersion = undefined;
+        $scope.lineage = undefined;
         $scope.resType = undefined;
         $scope.resID = undefined;
         $scope.attrKey = undefined;
