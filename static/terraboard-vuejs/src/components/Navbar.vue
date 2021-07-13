@@ -88,7 +88,7 @@ import axios from "axios"
       this.item = {};
     },
     fetchStates() {
-      const url = `http://172.22.0.5:8080/api/states_lineages`
+      const url = `http://172.18.0.5:8080/api/states_lineages`
       axios.get(url)
         .then((response) => {
           // handle success

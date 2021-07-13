@@ -1,18 +1,16 @@
 <template>
 <div class="row justify-content-around">
-    <div class="overview-chart col-6 col-md-3 col-xxl-4" style="min-width: 100px; max-width: 300px;">
+    <div class="overview-chart col-6 col-md-3 col-xxl-4 text-center" style="min-width: 100px; max-width: 300px;">
         <canvas id="chart-pie-resource-types" class="chart mb-2" chart-click="searchType"></canvas>
         <h5>Resource types</h5>
     </div>
-    <div class="overview-chart col-6 col-md-3 col-xxl-4" style="min-width: 100px; max-width: 300px;">
-        <canvas id="chart-pie-terraform-versions" class="chart chart-pie mb-2" chart-data="pieTfVersionsData"
-            chart-labels="pieTfVersionsLabels" chart-options="pieTfVersionsOptions"
+    <div class="overview-chart col-6 col-md-3 col-xxl-4 text-center" style="min-width: 100px; max-width: 300px;">
+        <canvas id="chart-pie-terraform-versions" class="chart mb-2"
             chart-click="searchTfVersion"></canvas>
         <h5>Terraform versions</h5>
     </div>
-    <div class="overview-chart col-6 col-md-3 col-xxl-4" style="min-width: 100px; max-width: 300px;">
-        <canvas id="chart-pie-ls" class="chart chart-pie mb-2" chart-data="pieLockedStatesData"
-            chart-labels="pieLockedStatesLabels" chart-options="pieLockedStatesOptions"></canvas>
+    <div class="overview-chart col-6 col-md-3 col-xxl-4 text-center" style="min-width: 100px; max-width: 300px;">
+        <canvas id="chart-pie-ls" class="chart mb-2"></canvas>
         <h5>States locked</h5>
     </div>
 </div>
@@ -68,7 +66,7 @@ const chartOptions =
       return false;
     },
     fetchResourceTypes(): void {
-      const url = `http://172.22.0.5:8080/api/resource/types/count`;
+      const url = `http://172.18.0.5:8080/api/resource/types/count`;
       axios.get(url)
         .then((response) => {
           response.data.forEach((value: any, i: number) => {
@@ -118,7 +116,7 @@ const chartOptions =
         });
     },
     fetchVersions(): void {
-      const url = `http://172.22.0.5:8080/api/states/tfversion/count?orderBy=version`;
+      const url = `http://172.18.0.5:8080/api/states/tfversion/count?orderBy=version`;
       axios.get(url)
         .then((response) => {
           response.data.forEach((value: any, i: number) => {
@@ -168,7 +166,7 @@ const chartOptions =
         });
     },
     fetchLocks(): void {
-      const url = `http://172.22.0.5:8080/api/locks`;
+      const url = `http://172.18.0.5:8080/api/locks`;
       axios.get(url)
         .then((response) => {
           this.locks = response.data;
@@ -182,8 +180,8 @@ const chartOptions =
                       label: 'States Locks Status',
                       data: this.pieLockedStates.data,
                       backgroundColor: [
-                        '#4dc9f6',
                         '#f67019',
+                        '#4dc9f6',
                       ],
                       hoverOffset: 4
                   }]
@@ -222,12 +220,12 @@ const chartOptions =
   created() {
     this.fetchResourceTypes();
     this.fetchVersions();
-    this.fetchLocks();
 
-    const url = `http://172.22.0.5:8080/api/states/stats?page=1`;
+    const url = `http://172.18.0.5:8080/api/states/stats?page=1`;
       axios.get(url)
         .then((response) => {
           this.statesTotal = response.data.total;
+          this.fetchLocks();
         })
         .catch(function (err) {
           if (err.response) {
