@@ -13,25 +13,39 @@
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
+import axios from "axios";
 
 @Options({
   data() {
     return {
-      version: String,
-      copyright: String
+      version: "",
+      copyright: "",
     };
   },
   methods: {
-    getVersion(): string {
-      return "test1"
+    fetchVersion(): void {
+      const url = `http://172.18.0.5:8080/api/version`;
+      axios.get(url)
+        .then((response) => {
+          this.version = response.data.version;
+          this.copyright = response.data.copyright;
+        })
+        .catch(function (err) {
+          if (err.response) {
+            console.log("Server Error:", err)
+          } else if (err.request) {
+            console.log("Network Error:", err)
+          } else {
+            console.log("Client Error:", err)
+          }
+        })
+        .then(function () {
+          // always executed
+        });
     },
-    getCopyright(): string {
-      return "test2"
-    }
   },
   created() {
-    this.version = this.getVersion();
-    this.copyright = this.getCopyright();
+    this.fetchVersion();
   },
 })
 export default class Footer extends Vue {
