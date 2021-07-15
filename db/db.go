@@ -288,9 +288,9 @@ func (db *Database) GetState(lineage, versionID string) (state types.State) {
 	return
 }
 
-// GetStateActivity returns a slice of StateStat from the Database
-// for a given State lineage representing the State activity over time (Versions)
-func (db *Database) GetStateActivity(lineage string) (states []types.StateStat) {
+// GetLineageActivity returns a slice of StateStat from the Database
+// for a given lineage representing the State activity over time (Versions)
+func (db *Database) GetLineageActivity(lineage string) (states []types.StateStat) {
 	sql := "SELECT t.path, t.serial, t.tf_version, t.version_id, t.last_modified, count(resources.*) as resource_count" +
 		" FROM (SELECT states.id, states.path, states.serial, states.tf_version, versions.version_id, versions.last_modified FROM states JOIN lineages ON lineages.id = states.lineage_id JOIN versions ON versions.id = states.version_id WHERE lineages.value = ? ORDER BY states.path, versions.last_modified ASC) t" +
 		" JOIN modules ON modules.state_id = t.id" +
@@ -446,14 +446,22 @@ func (db *Database) ListStates() (states []string) {
 // ListStatesWithLineages returns a slice of all distinct State paths with Lineage from the Database
 func (db *Database) ListStatesWithLineages() (states []interface{}) {
 	type jsonStateLineage struct {
-		Path    string `json:"path"`
-		Lineage string `json:"lineage"`
+		Path      string `json:"path"`
+		Lineage   string `json:"lineage"`
+		VersionID string `json:"version_id"`
 	}
-	rows, _ := db.Table("states").Joins("JOIN lineages ON lineages.id = states.lineage_id").Select("DISTINCT ON(states.path) states.path, lineages.value as lineage").Rows()
+
+	rows, _ := db.
+		Table("states").
+		Joins("JOIN lineages ON lineages.id = states.lineage_id").
+		Joins("JOIN versions ON versions.id = states.version_id").
+		Select("DISTINCT ON(states.path) states.path, versions.version_id, lineages.value as lineage").
+		Rows()
 	defer rows.Close()
+
 	for rows.Next() {
 		var state jsonStateLineage
-		if err := rows.Scan(&state.Path, &state.Lineage); err != nil {
+		if err := rows.Scan(&state.Path, &state.VersionID, &state.Lineage); err != nil {
 			log.Error(err.Error())
 		}
 		states = append(states, state)

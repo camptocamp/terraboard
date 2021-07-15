@@ -191,7 +191,7 @@ func main() {
 	http.HandleFunc(util.GetFullPath("api/states/tfversion/count"),
 		handleWithDB(api.ListTerraformVersionsWithCount, database))
 	http.HandleFunc(util.GetFullPath("api/state/"), handleWithDB(api.GetState, database))
-	http.HandleFunc(util.GetFullPath("api/state/activity/"), handleWithDB(api.GetStateActivity, database))
+	http.HandleFunc(util.GetFullPath("api/lineage/activity/"), handleWithDB(api.GetLineageActivity, database))
 	http.HandleFunc(util.GetFullPath("api/state/compare/"), handleWithDB(api.StateCompare, database))
 	http.HandleFunc(util.GetFullPath("api/locks"), handleWithStateProviders(api.GetLocks, sps))
 	http.HandleFunc(util.GetFullPath("api/search/attribute"), handleWithDB(api.SearchAttribute, database))

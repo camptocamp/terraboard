@@ -94,7 +94,7 @@ function($scope, $http, $location) {
     // Version map for sparklines click events
     $scope.versionMap = {};
     $scope.getActivity = function(idx, lineage) {
-        $http.get('api/state/activity/'+lineage).then(function(response){
+        $http.get('api/lineage/activity/'+lineage).then(function(response){
             var states = response.data;
             $scope.versionMap[lineage] = {};
             var activityData = [];
@@ -264,7 +264,7 @@ app.controller("tbStateCtrl",
      * Get versions when URL is loaded
      */
     $scope.$on('$routeChangeSuccess', function() {
-        $http.get('api/state/activity/'+$routeParams.lineage).then(function(response){
+        $http.get('api/lineage/activity/'+$routeParams.lineage).then(function(response){
             $scope.versions = [];
             for (i=0; i<response.data.length; i++) {
                 var ver = {

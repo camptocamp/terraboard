@@ -120,11 +120,11 @@ func GetState(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	}
 }
 
-// GetStateActivity returns the activity (version history) of a State
-func GetStateActivity(w http.ResponseWriter, r *http.Request, d *db.Database) {
+// GetLineageActivity returns the activity (version history) of a Lineage
+func GetLineageActivity(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	lineage := util.TrimBasePath(r, "api/state/activity/")
-	activity := d.GetStateActivity(lineage)
+	lineage := util.TrimBasePath(r, "api/lineage/activity/")
+	activity := d.GetLineageActivity(lineage)
 
 	j, err := json.Marshal(activity)
 	if err != nil {
