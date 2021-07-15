@@ -17,23 +17,26 @@
       <div class="collapse navbar-collapse" id="navbar-collapse-menu">
         <ul class="nav navbar-nav flex-grow-1 align-items-center">
           <li class="nav-item mx-2">
-            <a href="./" class="nav-link"
+            <router-link to="/" class="nav-link"
               ><span class="fas fa-th-list" aria-hidden="true"></span>
-              Overview</a
-            >
+              Overview
+            </router-link>
           </li>
           <li class="nav-item mx-2">
-            <a href="search" class="nav-link"
-              ><span class="fas fa-search" aria-hidden="true"></span> Search</a
-            >
+            <router-link to="/search" class="nav-link"
+              ><span class="fas fa-search" aria-hidden="true"></span> Search
+            </router-link>
           </li>
         </ul>
         <ul class="nav navbar-nav align-items-center ml-auto">
           <li id="states-select" class="nav-item">
             <Multiselect
+              id="states-quick-access"
               v-model="states_select.value"
               v-bind="states_select"
               placeholder= "Enter a state file path..."
+              @change="goToState"
+              ref="quickAccess"
             >
             </Multiselect>
           </li>
@@ -72,6 +75,7 @@
 import { Options, Vue } from "vue-class-component";
 import Multiselect from '@vueform/multiselect'
 import axios from "axios"
+import router from "../router";
 
 @Options({
   data() {
@@ -86,6 +90,10 @@ import axios from "axios"
   methods: {
     reset() {
       this.item = {};
+    },
+    goToState(value: any) {
+      router.push({ path: `/lineage/${value.lineage}`, query: { versionid: value.version_id } })
+      this.$refs.quickAccess.clear()
     },
     fetchStates() {
       const url = `http://172.18.0.5:8080/api/states_lineages`
@@ -114,7 +122,7 @@ import axios from "axios"
     }
   },
   mounted() {
-    this.fetchStates()
+    this.fetchStates();
   },
   components: {
     Multiselect,

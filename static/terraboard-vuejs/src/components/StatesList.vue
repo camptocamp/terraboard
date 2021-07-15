@@ -1,16 +1,14 @@
 <template>
 <div id="results" class="row">
-    <label id="navigate"> <span class="fas fa-caret-left"
+    <label id="navigate"> <span class="fas fa-caret-left" v-if="prevPage"
             v-on:click="fetchStats(prevPage)"></span> {{startItems}}-{{itemsInPage}}/{{results.total}}
-        <span class="fas fa-caret-right" v-on:click="fetchStats(nextPage)"></span>
+        <span class="fas fa-caret-right" v-if="nextPage" v-on:click="fetchStats(nextPage)"></span>
     </label>
     <table class="table table-border table-striped">
         <thead>
+            <th></th> <!-- lock -->
             <th>
                 Path
-            </th>
-            <th>
-                Lineage
             </th>
             <th>
                 TF Version
@@ -30,8 +28,8 @@
         </thead>
         <tbody>
             <tr v-for="(r, index) in results.states" :key="r">
-                <td><span class="glyphicon glyphicon-link" aria-hidden="true"></span> <a href="lineage/{{r.lineage_value}}?versionid={{r.version_id}}">{{r.path}}</a></td>
-                <td>{{r.lineage_value}}</td>
+                <td><span v-if="isLocked(r.path)" class="fa fas-lock" title="Locked by {{locks[r.path].Who}} on {{locks[r.path].Created | date:'medium'}} ({{locks[r.path].Operation}})"></span></td>
+                <td><router-link :to="`/lineage/${r.lineage_value}?versionid=${r.version_id}`">{{r.path}}</router-link></td>
                 <td>{{r.terraform_version}}</td>
                 <td>{{r.serial}}</td>
                 <td>{{formatDate(r.last_modified)}}</td>
@@ -58,6 +56,7 @@ Chart.register( CategoryScale, LineElement, LineController, LinearScale, PointEl
 @Options({
   data() {
     return {
+      locksStatus: {},
       versionMap: {},
       results: {},
       pages: 0,
@@ -70,8 +69,33 @@ Chart.register( CategoryScale, LineElement, LineController, LinearScale, PointEl
     }
   },
   methods: {
+    fetchLocks(): void {
+      const url = `http://172.18.0.5:8080/api/locks`;
+      axios.get(url)
+        .then((response) => {
+          this.locksStatus = response.data;
+        })     
+        .catch(function (err) {
+          if (err.response) {
+            console.log("Server Error:", err)
+          } else if (err.request) {
+            console.log("Network Error:", err)
+          } else {
+            console.log("Client Error:", err)
+          }
+        })
+        .then(function () {
+          // always executed
+        });
+    },
+    isLocked(path: string): boolean {
+      if (path in this.locksStatus) {
+          return true;
+      }
+      return false;
+    },
     getActivity(idx: number, lineage: string, elementId: string): void {
-      const url = `http://172.18.0.5:8080/api/state/activity/`+lineage;
+      const url = `http://172.18.0.5:8080/api/lineage/activity/`+lineage;
       axios.get(url)
         .then((response) => {
           let states = response.data;
@@ -189,6 +213,7 @@ Chart.register( CategoryScale, LineElement, LineController, LinearScale, PointEl
     }
   },
   created() {
+    this.fetchLocks();
     this.fetchStats(1);
   },
 })
