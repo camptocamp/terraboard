@@ -17,21 +17,6 @@
                 </ui-select>
             </div>
             <div class="form-group col-xs-3 col-sm-3 col-md-2">
-                <ui-select id="lineage_value"
-                        ng-model="$parent.lineage"
-                        theme="bootstrap"
-                        ng-disabled="disabled"
-                        ng-change="doSearch()"
-                        style="min-width: 200px; max-width: 300px;"
-                        reset-search-input="false"
-                        title="Lineage">
-                    <ui-select-match placeholder="Lineage" allow-clear="true">{{$parent.lineage}}</ui-select-match>
-                    <ui-select-choices repeat="k in lineages | filter: $select.search | orderBy">
-                        {{k}}
-                    </ui-select-choices>
-                </ui-select>
-            </div>
-            <div class="form-group col-xs-3 col-sm-3 col-md-2">
                 <ui-select id="resource_type"
                         ng-model="$parent.resType"
                         theme="bootstrap"
@@ -110,9 +95,6 @@
                 Serial
             </th>
             <th>
-                Lineage
-            </th>
-            <th>
                 Module Path
             </th>
             <th>
@@ -131,7 +113,6 @@
                 <td>{{r.path}}</td>
                 <td>{{r.tf_version}}</td>
                 <td>{{r.serial}}</td>
-                <td>{{r.lineage_value}}</td>
                 <td>{{r.module_path}}</td>
                 <td>{{r.resource_type}}.{{r.resource_name}}{{r.resource_index}}</td>
                 <td>{{r.attribute_key}}</td>
