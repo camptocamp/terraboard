@@ -122,6 +122,13 @@
         </div>
       </div>
     </div>
+    <div id="node" class="col-xl-8 col-xxl-9">
+        <div class="row">
+            <h1>{{state.path}}</h1>
+        </div>
+        <StateDetails v-if="display.details && !display.outputs && !display.compare" v-bind:resource="selectedRes"/>
+        <StateOutputs v-if="display.details && display.outputs" v-bind:module="selectedMod"/>
+    </div>
   </div>
 </template>
 
@@ -130,11 +137,17 @@ import { Options, Vue } from "vue-class-component";
 import router from "../router";
 import axios from "axios";
 
+import StateDetails from "../components/StateDetails.vue";
+import StateOutputs from "../components/StateOutputs.vue";
+
 const sh = require("../../public/js/sh_main.min.js"); // eslint-disable-line
 
 @Options({
   title: "States",
-  components: {},
+  components: {
+    StateDetails,
+    StateOutputs,
+  },
   data() {
     return {
       locks: {},
@@ -222,6 +235,7 @@ const sh = require("../../public/js/sh_main.min.js"); // eslint-disable-line
       this.selectedMod = mod;
       this.selectedRes = res;
       this.state.outputs = false;
+      this.display.outputs = false;
       var hash = res.type+'.'+res.name;
       router.push({ path: `/lineage/${this.url.lineage}`, query: { versionid: this.url.versionid, ressource: hash } })
       console.log(this.selectedRes == res)
@@ -230,6 +244,7 @@ const sh = require("../../public/js/sh_main.min.js"); // eslint-disable-line
       this.selectedMod = mod;
       this.selectedRes = null;
       this.state.outputs = true;
+      this.display.outputs = true;
       router.push({ path: `/lineage/${this.url.lineage}`, query: { versionid: this.url.versionid, ressource: mod.path+'.'+'outputs' } })
     },
     getDetails(versionId: string) {
