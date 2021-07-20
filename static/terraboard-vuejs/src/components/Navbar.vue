@@ -92,11 +92,13 @@ import router from "../router";
       this.item = {};
     },
     goToState(value: any) {
-      router.push({ path: `/lineage/${value.lineage}`, query: { versionid: value.version_id } })
-      this.$refs.quickAccess.clear()
+      if (value != null) {
+        router.push({name: "State", params: {lineage: value.lineage}, query: { versionid: value.version_id } })
+        this.$refs.quickAccess.clear()
+      }
     },
     fetchStates() {
-      const url = `http://172.18.0.5:8080/api/states_lineages`
+      const url = `http://localhost:8080/api/states_lineages`
       axios.get(url)
         .then((response) => {
           // handle success

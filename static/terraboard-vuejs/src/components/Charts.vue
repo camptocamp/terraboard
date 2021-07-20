@@ -66,7 +66,7 @@ const chartOptions =
       return false;
     },
     fetchResourceTypes(): void {
-      const url = `http://172.18.0.5:8080/api/resource/types/count`;
+      const url = `http://localhost:8080/api/resource/types/count`;
       axios.get(url)
         .then((response) => {
           response.data.forEach((value: any, i: number) => {
@@ -116,7 +116,7 @@ const chartOptions =
         });
     },
     fetchVersions(): void {
-      const url = `http://172.18.0.5:8080/api/states/tfversion/count?orderBy=version`;
+      const url = `http://localhost:8080/api/states/tfversion/count?orderBy=version`;
       axios.get(url)
         .then((response) => {
           response.data.forEach((value: any, i: number) => {
@@ -166,7 +166,7 @@ const chartOptions =
         });
     },
     fetchLocks(): void {
-      const url = `http://172.18.0.5:8080/api/locks`;
+      const url = `http://localhost:8080/api/locks`;
       axios.get(url)
         .then((response) => {
           this.locks = response.data;
@@ -221,7 +221,7 @@ const chartOptions =
     this.fetchResourceTypes();
     this.fetchVersions();
 
-    const url = `http://172.18.0.5:8080/api/states/stats?page=1`;
+    const url = `http://localhost:8080/api/states/stats?page=1`;
       axios.get(url)
         .then((response) => {
           this.statesTotal = response.data.total;

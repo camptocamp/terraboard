@@ -10,7 +10,7 @@ import Charts from '@/components/Charts.vue'; // @ is an alias to /src
 import StatesList from '@/components/StatesList.vue'; // @ is an alias to /src
 
 @Options({
-  title: 'Home',
+  title: 'Overview',
   components: {
     Charts,
     StatesList,

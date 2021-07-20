@@ -24,7 +24,7 @@ import axios from "axios";
   },
   methods: {
     fetchVersion(): void {
-      const url = `http://172.18.0.5:8080/api/version`;
+      const url = `http://localhost:8080/api/version`;
       axios.get(url)
         .then((response) => {
           this.version = response.data.version;
