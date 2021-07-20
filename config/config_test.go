@@ -22,27 +22,37 @@ func TestLoadConfigFromYaml(t *testing.T) {
 			Name:     "terraboard-db",
 			NoSync:   true,
 		},
-		AWS: AWSConfig{
-			DynamoDBTable: "terraboard-dynamodb",
-			S3: S3BucketConfig{
-				Bucket:         "terraboard-bucket",
-				KeyPrefix:      "test/",
-				FileExtension:  []string{".tfstate"},
-				ForcePathStyle: true,
+		AWS: []AWSConfig{
+			{
+				AccessKey:       "root",
+				SecretAccessKey: "mypassword",
+				DynamoDBTable:   "terraboard-dynamodb",
+				S3: []S3BucketConfig{{
+					Bucket:         "terraboard-bucket",
+					KeyPrefix:      "test/",
+					FileExtension:  []string{".tfstate"},
+					ForcePathStyle: true,
+				}},
 			},
 		},
-		TFE: TFEConfig{
-			Address:      "https://tfe.example.com",
-			Token:        "foo",
-			Organization: "bar",
+		TFE: []TFEConfig{
+			{
+				Address:      "https://tfe.example.com",
+				Token:        "foo",
+				Organization: "bar",
+			},
 		},
-		GCP: GCPConfig{
-			GCSBuckets: []string{"my-bucket-1", "my-bucket-2"},
-			GCPSAKey:   "/path/to/key",
+		GCP: []GCPConfig{
+			{
+				GCSBuckets: []string{"my-bucket-1", "my-bucket-2"},
+				GCPSAKey:   "/path/to/key",
+			},
 		},
-		Gitlab: GitlabConfig{
-			Address: "https://gitlab.example.com",
-			Token:   "foo",
+		Gitlab: []GitlabConfig{
+			{
+				Address: "https://gitlab.example.com",
+				Token:   "foo",
+			},
 		},
 		Web: WebConfig{
 			Port:      39090,

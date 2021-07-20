@@ -41,6 +41,7 @@
     - [AWS S3 (state) + DynamoDB (lock)](#aws-s3-state--dynamodb-lock)
     - [Terraform Cloud](#terraform-cloud)
 - [Configuration](#configuration)
+  - [Multiple buckets/providers](#multiple-bucketsproviders)
   - [Available parameters](#available-parameters)
     - [Application Options](#application-options)
     - [General Provider Options](#general-provider-options)
@@ -89,6 +90,9 @@ It currently supports several remote state backend providers:
 - [Google Cloud Storage](https://www.terraform.io/docs/backends/types/gcs.html)
 - [Terraform Cloud (remote)](https://www.terraform.io/docs/backends/types/remote.html)
 - [GitLab](https://docs.gitlab.com/ee/user/infrastructure/terraform_state.html)
+
+With the upcoming **v1.2.0** update, Terraboard will be now able to handle multiple buckets/providers configuration! 🥳
+Check *configuration* section for more details. 
 
 ### Overview
 
@@ -143,11 +147,49 @@ Data resiliency is not paramount though as this dataset can be rebuilt upon your
 
 Terraboard currently supports configuration in three different ways:
 
-1. Environment variables
-2. CLI parameters
-3. Configuration file (YAML). A configuration file example can be found in the root directory of this repository.
+1. Environment variables **(only usable for single provider configuration)**
+2. CLI parameters **(only usable for single provider configuration)**
+3. Configuration file (YAML). A configuration file example can be found in the root directory of this repository and in the `test/` subdirectory.
+
+**Important: all flags/environment variables related to the providers settings aren't compatible with multi-provider configuration! Instead, you must use the YAML config file to be able to configure multiples buckets/providers.**
 
 The precedence of configurations is as described below.
+
+### Multiple buckets/providers
+
+In order for Terraboard to import states from multiples buckets or even providers, you must use the YAML configuration method:
+
+- Set the `CONFIG_FILE` environment variable or the `-c`/`--config-file` flag to point to a valid YAML config file.
+- In the YAML file, specify your desired providers configuration. For example with two MinIO buckets (using the AWS provider with compatible mode):
+
+```yaml
+# Needed since MinIO doesn't support versioning or locking
+provider:
+  no-locks: true
+  no-versioning: true
+
+aws:
+  - endpoint: http://minio:9000/
+    region: eu-west-1
+    s3:
+      - bucket: test-bucket
+        force-path-style: true
+        file-extension: 
+          - .tfstate
+
+  - endpoint: http://minio:9000/
+    region: eu-west-1
+    s3:
+      - bucket: test-bucket2
+        force-path-style: true
+        file-extension: 
+          - .tfstate
+```
+
+In the case of AWS, don't forget to set the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables.
+
+That's it! Terraboard will now fetch these two buckets on DB refresh. You can also mix providers like AWS and Gitlab or anything else.
+You can find a ready-to-use Docker example with two *MinIO* buckets in the `test/multiple-minio-buckets/` sub-folder. 
 
 ### Available parameters
 
@@ -202,6 +244,15 @@ The precedence of configurations is as described below.
 
 #### AWS (and S3 compatible providers) Options
 
+- `--aws-access-key` <default: *$AWS_ACCESS_KEY_ID*> AWS account access key.
+  - Env: *AWS_ACCESS_KEY_ID*
+  - Yaml: *aws.access-key*
+- `--aws-secret-access-key` <default: *$AWS_SECRET_ACCESS_KEY*> AWS secret account access key.
+  - Env: *AWS_SECRET_ACCESS_KEY*
+  - Yaml: *aws.secret-access-key*
+- `--aws-session-token` <default: *$AWS_SESSION_TOKEN*> AWS session token.
+  - Env: *AWS_SESSION_TOKEN*
+  - Yaml: *aws.session-token*
 - `--dynamodb-table` <default: *$AWS_DYNAMODB_TABLE*> AWS DynamoDB table for locks.
   - Env: *AWS_DYNAMODB_TABLE*
   - Yaml: *aws.dynamodb-table*

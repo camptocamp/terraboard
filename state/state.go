@@ -40,23 +40,53 @@ type Provider interface {
 }
 
 // Configure the state provider
-func Configure(c *config.Config) (Provider, error) {
-	if len(c.TFE.Token) > 0 {
-		log.Info("Using Terraform Enterprise as the state/locks provider")
-		return NewTFE(c)
+func Configure(c *config.Config) ([]Provider, error) {
+	var providers []Provider
+	if len(c.TFE) > 0 {
+		objs, err := NewTFECollection(c)
+		if err != nil {
+			return []Provider{}, err
+		}
+		if len(objs) > 0 {
+			log.Info("Using Terraform Enterprise as state/locks provider")
+			for _, tfeObj := range objs {
+				providers = append(providers, tfeObj)
+			}
+		}
 	}
 
-	if c.GCP.GCSBuckets != nil {
-		log.Info("Using Google Cloud as the state/locks provider")
-		return NewGCP(c)
+	if len(c.GCP) > 0 {
+		objs, err := NewGCPCollection(c)
+		if err != nil {
+			return []Provider{}, err
+		}
+		if len(objs) > 0 {
+			log.Info("Using Google Cloud as state/locks provider")
+			for _, gcpObj := range objs {
+				providers = append(providers, gcpObj)
+			}
+		}
 	}
 
-	if len(c.Gitlab.Token) > 0 {
-		log.Info("Using Gitab as the state/locks provider")
-		return NewGitlab(c), nil
+	if len(c.Gitlab) > 0 {
+		objs := NewGitlabCollection(c)
+		if len(objs) > 0 {
+			log.Info("Using Gitab as state/locks provider")
+			for _, glObj := range objs {
+				providers = append(providers, glObj)
+			}
+		}
 	}
 
-	log.Info("Using AWS (S3+DynamoDB) as the state/locks provider")
-	provider := NewAWS(c)
-	return &provider, nil
+	if len(c.AWS) > 0 {
+		objs := NewAWSCollection(c)
+		if len(objs) > 0 {
+			log.Info("Using AWS (S3+DynamoDB) as state/locks provider")
+			for _, awsObj := range objs {
+				providers = append(providers, awsObj)
+			}
+		}
+	}
+
+	return providers, nil
 }

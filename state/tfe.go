@@ -19,10 +19,15 @@ type TFE struct {
 }
 
 // NewTFE creates a new TFE object
-func NewTFE(c *config.Config) (*TFE, error) {
+func NewTFE(tfeObj config.TFEConfig) (*TFE, error) {
+	var tfeInstance *TFE
+	if tfeObj.Token == "" {
+		return nil, nil
+	}
+
 	config := &tfe.Config{
-		Address: c.TFE.Address,
-		Token:   c.TFE.Token,
+		Address: tfeObj.Address,
+		Token:   tfeObj.Token,
 	}
 
 	client, err := tfe.NewClient(config)
@@ -31,12 +36,27 @@ func NewTFE(c *config.Config) (*TFE, error) {
 	}
 
 	ctx := context.Background()
-
-	return &TFE{
+	tfeInstance = &TFE{
 		Client: client,
-		org:    c.TFE.Organization,
+		org:    tfeObj.Organization,
 		ctx:    &ctx,
-	}, nil
+	}
+
+	return tfeInstance, nil
+}
+
+// NewTFECollection instantiate all needed GCP objects configurated by the user and return a slice
+func NewTFECollection(c *config.Config) ([]*TFE, error) {
+	var tfeInstances []*TFE
+	for _, tfe := range c.TFE {
+		tfeInstance, err := NewTFE(tfe)
+		if err != nil || tfeInstance == nil {
+			return nil, err
+		}
+		tfeInstances = append(tfeInstances, tfeInstance)
+	}
+
+	return tfeInstances, nil
 }
 
 // GetLocks returns a map of locks by State path

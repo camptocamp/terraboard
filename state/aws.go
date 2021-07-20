@@ -8,6 +8,7 @@ import (
 	"time"
 
 	aws_sdk "github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -31,39 +32,61 @@ type AWS struct {
 }
 
 // NewAWS creates an AWS object
-func NewAWS(c *config.Config) AWS {
+func NewAWS(aws config.AWSConfig, bucket config.S3BucketConfig, noLocks, noVersioning bool) *AWS {
+	if bucket.Bucket == "" {
+		return nil
+	}
+
 	sess := session.Must(session.NewSession())
-
 	awsConfig := aws_sdk.NewConfig()
-
-	if len(c.AWS.APPRoleArn) > 0 {
-		log.Debugf("Using %s role", c.AWS.APPRoleArn)
-		creds := stscreds.NewCredentials(sess, c.AWS.APPRoleArn, func(p *stscreds.AssumeRoleProvider) {
-			if c.AWS.ExternalID != "" {
-				p.ExternalID = aws_sdk.String(c.AWS.ExternalID)
+	var creds *credentials.Credentials
+	if len(aws.APPRoleArn) > 0 {
+		log.Debugf("Using %s role", aws.APPRoleArn)
+		creds = stscreds.NewCredentials(sess, aws.APPRoleArn, func(p *stscreds.AssumeRoleProvider) {
+			if aws.ExternalID != "" {
+				p.ExternalID = aws_sdk.String(aws.ExternalID)
 			}
 		})
-		awsConfig.WithCredentials(creds)
+	} else {
+		if aws.AccessKey == "" || aws.SecretAccessKey == "" {
+			log.Fatal("Missing AccessKey or SecretAccessKey for AWS provider. Please check your configuration and retry")
+		}
+		creds = credentials.NewStaticCredentials(aws.AccessKey, aws.SecretAccessKey, aws.SessionToken)
 	}
+	awsConfig.WithCredentials(creds)
 
-	if e := c.AWS.Endpoint; e != "" {
+	if e := aws.Endpoint; e != "" {
 		awsConfig.WithEndpoint(e)
 	}
-	if e := c.AWS.Region; e != "" {
+	if e := aws.Region; e != "" {
 		awsConfig.WithRegion(e)
 	}
-	awsConfig.S3ForcePathStyle = &c.AWS.S3.ForcePathStyle
+	awsConfig.S3ForcePathStyle = &bucket.ForcePathStyle
 
-	return AWS{
+	return &AWS{
 		svc:           s3.New(sess, awsConfig),
-		bucket:        c.AWS.S3.Bucket,
-		keyPrefix:     c.AWS.S3.KeyPrefix,
-		fileExtension: c.AWS.S3.FileExtension,
+		bucket:        bucket.Bucket,
+		keyPrefix:     bucket.KeyPrefix,
+		fileExtension: bucket.FileExtension,
 		dynamoSvc:     dynamodb.New(sess, awsConfig),
-		dynamoTable:   c.AWS.DynamoDBTable,
-		noLocks:       c.Provider.NoLocks,
-		noVersioning:  c.Provider.NoVersioning,
+		dynamoTable:   aws.DynamoDBTable,
+		noLocks:       noLocks,
+		noVersioning:  noVersioning,
 	}
+}
+
+// NewAWSCollection instantiate all needed AWS objects configurated by the user and return a slice
+func NewAWSCollection(c *config.Config) []*AWS {
+	var awsInstances []*AWS
+	for _, aws := range c.AWS {
+		for _, bucket := range aws.S3 {
+			if awsInstance := NewAWS(aws, bucket, c.Provider.NoLocks, c.Provider.NoVersioning); awsInstance != nil {
+				awsInstances = append(awsInstances, awsInstance)
+			}
+		}
+	}
+
+	return awsInstances
 }
 
 // GetLocks returns a map of locks by State path

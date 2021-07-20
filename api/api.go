@@ -148,15 +148,21 @@ func StateCompare(w http.ResponseWriter, r *http.Request, d *db.Database) {
 }
 
 // GetLocks returns information on locked States
-func GetLocks(w http.ResponseWriter, _ *http.Request, sp state.Provider) {
+func GetLocks(w http.ResponseWriter, _ *http.Request, sps []state.Provider) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	locks, err := sp.GetLocks()
-	if err != nil {
-		JSONError(w, "Failed to get locks", err)
-		return
+	allLocks := make(map[string]state.LockInfo)
+	for _, sp := range sps {
+		locks, err := sp.GetLocks()
+		if err != nil {
+			JSONError(w, "Failed to get locks on a provider", err)
+			return
+		}
+		for k, v := range locks {
+			allLocks[k] = v
+		}
 	}
 
-	j, err := json.Marshal(locks)
+	j, err := json.Marshal(allLocks)
 	if err != nil {
 		JSONError(w, "Failed to marshal locks", err)
 		return

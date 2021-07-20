@@ -3,7 +3,7 @@ version: "3.8"
 services:
   terraboard-dev:
     build:
-      context: ../
+      context: ../../
       dockerfile: ./Dockerfile
     environment:
       AWS_ACCESS_KEY_ID: root
@@ -24,7 +24,7 @@ services:
       minio:
         condition: service_started
     volumes:
-      - ../static:/static:ro
+      - ../../static:/static:ro
     ports:
       - "8080:8080"
 
@@ -39,7 +39,7 @@ services:
     ports:
       - "9200:9000"
     volumes:
-      - ./data:/data
+      - ../data/minio-1:/data
     command: server /data
 
   db:

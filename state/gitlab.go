@@ -18,10 +18,28 @@ type Gitlab struct {
 }
 
 // NewGitlab creates a new Gitlab object
-func NewGitlab(c *config.Config) *Gitlab {
-	return &Gitlab{
-		Client: gitlab.NewClient(c.Gitlab.Address, c.Gitlab.Token),
+func NewGitlab(gl config.GitlabConfig) *Gitlab {
+	var instance *Gitlab
+	if gl.Token == "" {
+		return nil
 	}
+
+	instance = &Gitlab{
+		Client: gitlab.NewClient(gl.Address, gl.Token),
+	}
+	return instance
+}
+
+// NewGitlabCollection instantiate all needed Gitlab objects configurated by the user and return a slice
+func NewGitlabCollection(c *config.Config) []*Gitlab {
+	var gitlabInstances []*Gitlab
+	for _, gitlab := range c.Gitlab {
+		if glInstance := NewGitlab(gitlab); glInstance != nil {
+			gitlabInstances = append(gitlabInstances, glInstance)
+		}
+	}
+
+	return gitlabInstances
 }
 
 // GetLocks returns a map of locks by State path
