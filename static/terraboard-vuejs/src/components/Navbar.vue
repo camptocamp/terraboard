@@ -105,12 +105,10 @@ import router from "../router";
       axios.get(url)
         .then((response) => {
           // handle success
-          console.log(response);
           response.data.forEach((obj: any) => {
             let entry = {value: obj, label: obj.path}
             this.states_select.options.push(entry)
           });
-          console.log(this.states_select)
         })
         .catch(function (err) {
           if (err.response) {

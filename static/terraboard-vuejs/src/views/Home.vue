@@ -15,6 +15,9 @@ import StatesList from '@/components/StatesList.vue'; // @ is an alias to /src
     Charts,
     StatesList,
   },
+  created() {
+    this.updateTitle();
+  },
 })
 export default class Home extends Vue {}
 </script>

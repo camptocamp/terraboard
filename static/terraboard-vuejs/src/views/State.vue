@@ -64,13 +64,13 @@
                   Reset
                 </button>
               </div>
-              <ul class="mt-2" v-if="display.compare">
-                <!-- <li class="list-group-item no-border-item">
+              <ul class="mt-2" v-if="display.compare && compare.stats">
+                <li class="list-group-item no-border-item">
                   Terraform version: {{ compare.stats.to.terraform_version }}
                 </li>
                 <li class="list-group-item no-border-item">
                   Serial: {{ compare.stats.to.serial }}
-                </li> -->
+                </li>
               </ul>
             </li>
           </ul>
@@ -225,7 +225,6 @@ import StatesCompare from "../components/StatesCompare.vue";
       axios
         .get(url)
         .then((response) => {
-          console.log(response.data);
           for (let i = 0; i < response.data.length; i++) {
             const version = {
               versionId: response.data[i].version_id,
@@ -233,7 +232,6 @@ import StatesCompare from "../components/StatesCompare.vue";
             };
             this.versions.unshift(version);
           }
-          console.log("versions: ", this.versions);
         })
         .catch(function(err) {
           if (err.response) {
@@ -310,7 +308,6 @@ import StatesCompare from "../components/StatesCompare.vue";
         });
     },
     compareVersions(): void {
-      console.log("compareVersions", this.compareVersion);
       if (
         this.compareVersion != undefined
       ) {
@@ -332,7 +329,6 @@ import StatesCompare from "../components/StatesCompare.vue";
           this.selectedVersion +
           "&to=" +
           this.compareVersion;
-        console.log(url);
         axios
           .get(url)
           .then((response) => {
@@ -427,10 +423,13 @@ import StatesCompare from "../components/StatesCompare.vue";
       },
     },
     "$data.compareVersion": {
-      handler: function(nv, ov) {
+      handler: function() {
         this.compareVersions();
       },
     },
+  },
+  created() {
+    this.updateTitle();
   },
   mounted() {
     this.url.lineage = this.$route.params.lineage;

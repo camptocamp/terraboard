@@ -268,7 +268,6 @@ import router from "../router";
     },
     doSearch(page?: number) {
       let params: any = {};
-      console.log(this.search);
       if (this.search.tf_version != null) {
         params.tf_version = this.search.tf_version;
       }
@@ -334,6 +333,7 @@ import router from "../router";
     },
   },
   created() {
+    this.updateTitle();
     this.fetchTfVersions();
     this.fetchResourceTypes();
     this.fetchResourceIDs();
