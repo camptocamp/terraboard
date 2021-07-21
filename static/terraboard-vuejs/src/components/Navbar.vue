@@ -36,6 +36,7 @@
               v-bind="states_select"
               placeholder= "Enter a state file path..."
               @change="goToState"
+              @select="clearSelect"
               ref="quickAccess"
             >
             </Multiselect>
@@ -93,9 +94,11 @@ import router from "../router";
     },
     goToState(value: any) {
       if (value != null) {
-        router.push({name: "State", params: {lineage: value.lineage}, query: { versionid: value.version_id } })
-        this.$refs.quickAccess.clear()
+        router.push({name: "State", params: {lineage: value.lineage}, query: { versionid: value.version_id } });
       }
+    },
+    clearSelect() {
+      this.$refs.quickAccess.clear()
     },
     fetchStates() {
       const url = `http://localhost:8080/api/states_lineages`

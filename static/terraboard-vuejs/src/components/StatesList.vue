@@ -27,15 +27,15 @@
             </th>
         </thead>
         <tbody>
-            <tr v-for="(r, index) in results.states" :key="r">
-                <td><span v-if="isLocked(r.path)" class="fa fas-lock" title="Locked by {{locks[r.path].Who}} on {{locks[r.path].Created | date:'medium'}} ({{locks[r.path].Operation}})"></span></td>
-                <td><router-link :to="`/lineage/${r.lineage_value}?versionid=${r.version_id}`">{{r.path}}</router-link></td>
-                <td>{{r.terraform_version}}</td>
-                <td>{{r.serial}}</td>
-                <td>{{formatDate(r.last_modified)}}</td>
-                <td>{{r.resource_count}}</td>
-                <td class="text-center">
-                    <canvas v-bind:id="'spark-'+index" width="200" height="80" style="max-width: 200px; max-height: 80px;">
+            <tr v-for="(r, index) in results.states" v-bind:key="r">
+                <td class="align-middle"><span v-if="isLocked(r.path)" class="fa fas-lock" title="Locked by {{locks[r.path].Who}} on {{locks[r.path].Created | date:'medium'}} ({{locks[r.path].Operation}})"></span></td>
+                <td class="align-middle"><router-link :to="`/lineage/${r.lineage_value}?versionid=${r.version_id}`">{{r.path}}</router-link></td>
+                <td class="align-middle">{{r.terraform_version}}</td>
+                <td class="align-middle">{{r.serial}}</td>
+                <td class="align-middle">{{formatDate(r.last_modified)}}</td>
+                <td class="align-middle">{{r.resource_count}}</td>
+                <td class="text-center align-middle p-0">
+                    <canvas v-bind:id="'spark-'+index" width="200" height="70" style="max-width: 200px; max-height: 70px;">
                       {{getActivity(index, r.lineage_value, 'spark-'+index)}}
                     </canvas>
                 </td>
