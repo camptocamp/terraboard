@@ -338,6 +338,14 @@ import router from "../router";
     this.fetchResourceTypes();
     this.fetchResourceIDs();
     this.fetchAttributeKeys();
+
+    if(router.currentRoute.value.query.tf_version != null) {
+      this.search.tf_version = router.currentRoute.value.query.tf_version;
+    }
+    if(router.currentRoute.value.query.type != null) {
+      this.search.resType = router.currentRoute.value.query.type;
+    }
+
     this.doSearch();
   },
 })

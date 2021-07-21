@@ -1,12 +1,11 @@
 <template>
 <div class="row justify-content-around">
     <div class="overview-chart col-6 col-md-3 col-xxl-4 text-center" style="min-width: 100px; max-width: 300px;">
-        <canvas id="chart-pie-resource-types" class="chart mb-2" chart-click="searchType"></canvas>
+        <canvas id="chart-pie-resource-types" class="chart mb-2"></canvas>
         <h5>Resource types</h5>
     </div>
     <div class="overview-chart col-6 col-md-3 col-xxl-4 text-center" style="min-width: 100px; max-width: 300px;">
-        <canvas id="chart-pie-terraform-versions" class="chart mb-2"
-            chart-click="searchTfVersion"></canvas>
+        <canvas id="chart-pie-terraform-versions" class="chart mb-2"></canvas>
         <h5>Terraform versions</h5>
     </div>
     <div class="overview-chart col-6 col-md-3 col-xxl-4 text-center" style="min-width: 100px; max-width: 300px;">
@@ -20,11 +19,38 @@
 import { Options, Vue } from 'vue-class-component';
 import { Chart, ChartItem, PieController, ArcElement, Tooltip } from 'chart.js'
 import axios from "axios"
+import router from "../router";
 
 Chart.register( PieController, ArcElement, Tooltip )
 
-const chartOptions = 
-{ 
+const chartOptionsVersions = 
+{
+  onClick: undefined,
+  responsive: true,
+  plugins: {
+    legend: {
+      display: false,
+    },
+    tooltip: {
+      display: true,
+    },
+  } 
+}
+const chartOptionsResTypes = 
+{
+  onClick: undefined,
+  responsive: true,
+  plugins: {
+    legend: {
+      display: false,
+    },
+    tooltip: {
+      display: true,
+    },
+  } 
+}
+const chartOptionsLocked = 
+{
   responsive: true,
   plugins: {
     legend: {
@@ -44,17 +70,17 @@ const chartOptions =
       pieResourceTypes: {
         labels: [[], [], [], [], [], [], ["Total"]],
         data: [0, 0, 0, 0, 0, 0, 0],
-        options: chartOptions,
+        options: chartOptionsResTypes,
       },
       pieTfVersions: {
         labels: [[], [], [], [], [], [], ["Total"]],
         data: [0, 0, 0, 0, 0, 0, 0],
-        options: chartOptions,
+        options: chartOptionsVersions,
       },
       pieLockedStates: {
         labels: ["Locked", "Unlocked"],
         data: [0, 0],
-        options: chartOptions,
+        options: chartOptionsLocked,
       },
     };
   },
@@ -64,6 +90,14 @@ const chartOptions =
           return true;
       }
       return false;
+    },
+    searchType(evt: any, element: any) {
+      let valueIndex = element[0].index;
+      router.push({name: "Search", query: { type: this.pieResourceTypes.labels[valueIndex] }});
+    },
+    searchVersion(evt: any, element: any) {
+      let valueIndex = element[0].index;
+      router.push({name: "Search", query: { tf_version: this.pieTfVersions.labels[valueIndex] }});
     },
     fetchResourceTypes(): void {
       const url = `http://localhost:8080/api/resource/types/count`;
@@ -78,6 +112,8 @@ const chartOptions =
                 this.pieResourceTypes.data[6] += parseInt(value.count, 10);
             }
           });
+
+          this.pieResourceTypes.options.onClick = this.searchType;
 
           const ctx = document.getElementById('chart-pie-resource-types') as ChartItem;
           const resourcesChart = new Chart(ctx, {
@@ -128,6 +164,8 @@ const chartOptions =
                 this.pieTfVersions.data[6] += parseInt(value.count, 10);
             }
           });
+
+          this.pieTfVersions.options.onClick = this.searchVersion;
 
           const ctx = document.getElementById('chart-pie-terraform-versions') as ChartItem;
           const versionsChart = new Chart(ctx, {
