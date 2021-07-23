@@ -429,46 +429,6 @@ func (db *Database) ListStatesVersions() (statesVersions map[string][]string) {
 	return
 }
 
-// ListStates returns a slice of all State paths from the Database
-func (db *Database) ListStates() (states []string) {
-	rows, _ := db.Table("states").Select("DISTINCT path").Rows()
-	defer rows.Close()
-	for rows.Next() {
-		var state string
-		if err := rows.Scan(&state); err != nil {
-			log.Error(err.Error())
-		}
-		states = append(states, state)
-	}
-	return
-}
-
-// ListStatesWithLineages returns a slice of all distinct State paths with Lineage from the Database
-func (db *Database) ListStatesWithLineages() (states []interface{}) {
-	type jsonStateLineage struct {
-		Path      string `json:"path"`
-		Lineage   string `json:"lineage"`
-		VersionID string `json:"version_id"`
-	}
-
-	rows, _ := db.
-		Table("states").
-		Joins("JOIN lineages ON lineages.id = states.lineage_id").
-		Joins("JOIN versions ON versions.id = states.version_id").
-		Select("DISTINCT ON(states.path) states.path, versions.version_id, lineages.value as lineage").
-		Rows()
-	defer rows.Close()
-
-	for rows.Next() {
-		var state jsonStateLineage
-		if err := rows.Scan(&state.Path, &state.VersionID, &state.Lineage); err != nil {
-			log.Error(err.Error())
-		}
-		states = append(states, state)
-	}
-	return
-}
-
 // ListTerraformVersionsWithCount returns a slice of maps of Terraform versions
 // mapped to the count of most recent State paths using them.
 // ListTerraformVersionsWithCount also takes a query with possible parameter 'orderBy'
@@ -513,11 +473,16 @@ func (db *Database) ListStateStats(query url.Values) (states []types.StateStat, 
 		log.Error(err.Error())
 	}
 
-	offset := 0
+	var paginationQuery string
+	var params []interface{}
 	page = 1
 	if v := string(query.Get("page")); v != "" {
 		page, _ = strconv.Atoi(v) // TODO: err
-		offset = (page - 1) * pageSize
+		offset := (page - 1) * pageSize
+		params = append(params, offset)
+		paginationQuery = " LIMIT 20 OFFSET ?"
+	} else {
+		page = -1
 	}
 
 	sql := "SELECT t.path, lineages.value as lineage_value, t.serial, t.tf_version, t.version_id, t.last_modified, count(resources.*) as resource_count" +
@@ -527,10 +492,9 @@ func (db *Database) ListStateStats(query url.Values) (states []types.StateStat, 
 		" JOIN lineages ON lineages.id = t.lineage_id" +
 		" GROUP BY t.path, lineages.value, t.serial, t.tf_version, t.version_id, t.last_modified" +
 		" ORDER BY last_modified DESC" +
-		" LIMIT 20" +
-		" OFFSET ?"
+		paginationQuery
 
-	db.Raw(sql, offset).Find(&states)
+	db.Raw(sql, params...).Find(&states)
 	return
 }
 
@@ -716,14 +680,15 @@ func (db *Database) GetLineages(limitStr string) (lineages []types.Lineage) {
 
 // DefaultVersion returns the detault VersionID for a given State path
 // Copied and adapted from github.com/hashicorp/terraform/command/jsonstate/state.go
-func (db *Database) DefaultVersion(path string) (version string, err error) {
+func (db *Database) DefaultVersion(lineage string) (version string, err error) {
 	sqlQuery := "SELECT versions.version_id FROM" +
 		" (SELECT states.path, max(states.serial) as mx FROM states GROUP BY states.path) t" +
 		" JOIN states ON t.path = states.path AND t.mx = states.serial" +
 		" JOIN versions on states.version_id=versions.id" +
-		" WHERE states.path = ?"
+		" JOIN lineages on lineages.id=states.lineage_id" +
+		" WHERE lineages.value = ?"
 
-	row := db.Raw(sqlQuery, path).Row()
+	row := db.Raw(sqlQuery, lineage).Row()
 	err = row.Scan(&version)
 	return
 }

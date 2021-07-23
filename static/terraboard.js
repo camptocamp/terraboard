@@ -77,7 +77,8 @@ function($scope, $http, $location) {
             params.page = page;
         }
         var query = $.param(params);
-        $http.get('api/states/stats?'+query).then(function(response){
+        $http.get('api/lineages/stats?'+query).then(function(response){
+            console.log('api/lineages/stats?'+query);
             $scope.results = response.data;
             $scope.pages = Math.ceil($scope.results.total / $scope.itemsPerPage);
             $scope.page = $scope.results.page;
@@ -94,7 +95,7 @@ function($scope, $http, $location) {
     // Version map for sparklines click events
     $scope.versionMap = {};
     $scope.getActivity = function(idx, lineage) {
-        $http.get('api/lineage/activity/'+lineage).then(function(response){
+        $http.get('api/lineages/'+lineage+'/activity').then(function(response){
             var states = response.data;
             $scope.versionMap[lineage] = {};
             var activityData = [];
@@ -158,7 +159,7 @@ function($scope, $http, $location) {
 
     pieTfVersionsLabels   = [[], [], [], [], [], [], ["Total"]];
     pieTfVersionsData     = [0, 0, 0, 0, 0, 0, 0];
-    $http.get('api/states/tfversion/count?orderBy=version').then(function(response){
+    $http.get('api/lineages/tfversion/count?orderBy=version').then(function(response){
         data = response.data;
         angular.forEach(data, function(value, i) {
             if(i < 6) {
@@ -219,8 +220,8 @@ app.controller("tbNavCtrl",
         }
     });
 
-    $http.get('api/states_lineages').then(function(response){
-        $scope.states = response.data;
+    $http.get('api/lineages/stats').then(function(response){
+        $scope.states = response.data.states;
     });
 
     $http.get('api/user').then(function(response){
@@ -264,7 +265,7 @@ app.controller("tbStateCtrl",
      * Get versions when URL is loaded
      */
     $scope.$on('$routeChangeSuccess', function() {
-        $http.get('api/lineage/activity/'+$routeParams.lineage).then(function(response){
+        $http.get('api/lineages/'+$routeParams.lineage+'/activity').then(function(response){
             $scope.versions = [];
             for (i=0; i<response.data.length; i++) {
                 var ver = {
@@ -292,7 +293,7 @@ app.controller("tbStateCtrl",
         if (versionId == undefined) {
             versionId = "";
         }
-        $http.get('api/state/'+$routeParams.lineage+'?versionid='+versionId+'#'+$location.hash()).then(function(response){
+        $http.get('api/lineages/'+$routeParams.lineage+'?versionid='+versionId+'#'+$location.hash()).then(function(response){
             $scope.path = response.data["path"];
             $scope.details = response.data;
 
@@ -387,7 +388,7 @@ app.controller("tbStateCtrl",
             $location.search('compare', compareVersion.versionId);
             $scope.display.details = false;
             $scope.display.compare = true;
-            $http.get('api/state/compare/'+$routeParams.lineage+'?from='+selectedVersion.versionId+'&to='+compareVersion.versionId).then(function(response){
+            $http.get('api/lineages/'+$routeParams.lineage+'/compare?from='+selectedVersion.versionId+'&to='+compareVersion.versionId).then(function(response){
                 $scope.compare = response.data;
 
                 $scope.only_in_old = Object.keys($scope.compare.differences.only_in_old).length;

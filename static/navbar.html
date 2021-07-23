@@ -32,7 +32,7 @@
                            title="Choose a state file">
                     <ui-select-match placeholder="{{placeholder}}">{{placeholder}}</ui-select-match>
                     <ui-select-choices repeat="state in states | filter: $select.search | orderBy">
-                        <a href="lineage/{{state.lineage}}?versionid={{state.version_id}}" target="_self">{{state.path}}</a>
+                        <a href="lineage/{{state.lineage_value}}?versionid={{state.version_id}}" target="_self">{{state.path}}</a>
                     </ui-select-choices>
                 </ui-select>
             </li>
