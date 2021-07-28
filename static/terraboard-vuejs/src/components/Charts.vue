@@ -152,7 +152,7 @@ const chartOptionsLocked =
         });
     },
     fetchVersions(): void {
-      const url = `http://localhost:8080/api/states/tfversion/count?orderBy=version`;
+      const url = `http://localhost:8080/api/lineages/tfversion/count?orderBy=version`;
       axios.get(url)
         .then((response) => {
           response.data.forEach((value: any, i: number) => {
@@ -259,7 +259,7 @@ const chartOptionsLocked =
     this.fetchResourceTypes();
     this.fetchVersions();
 
-    const url = `http://localhost:8080/api/states/stats?page=1`;
+    const url = `http://localhost:8080/api/lineages/stats?page=1`;
       axios.get(url)
         .then((response) => {
           this.statesTotal = response.data.total;

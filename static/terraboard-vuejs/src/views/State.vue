@@ -221,7 +221,7 @@ import StatesCompare from "../components/StatesCompare.vue";
     },
     getVersions(): void {
       const url =
-        `http://localhost:8080/api/lineage/activity/` + this.url.lineage;
+        `http://localhost:8080/api/lineages/` + this.url.lineage + `/activity`;
       axios
         .get(url)
         .then((response) => {
@@ -281,7 +281,7 @@ import StatesCompare from "../components/StatesCompare.vue";
         versionId = "";
       }
       const url =
-        "http://localhost:8080/api/state/" +
+        "http://localhost:8080/api/lineages/" +
         this.url.lineage +
         "?versionid=" +
         versionId +
@@ -323,9 +323,9 @@ import StatesCompare from "../components/StatesCompare.vue";
         this.display.compare = true;
 
         const url =
-          `http://localhost:8080/api/state/compare/` +
+          `http://localhost:8080/api/lineages/` +
           this.url.lineage +
-          "?from=" +
+          "/compare?from=" +
           this.selectedVersion +
           "&to=" +
           this.compareVersion;
@@ -411,7 +411,7 @@ import StatesCompare from "../components/StatesCompare.vue";
     },
     "$data.selectedVersion": {
       handler: function(nv, ov) {
-        router.replace({
+        router.push({
           name: "State",
           params: { lineage: this.url.lineage },
           query: { versionid: nv },

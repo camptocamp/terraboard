@@ -95,7 +95,7 @@ Chart.register( CategoryScale, LineElement, LineController, LinearScale, PointEl
       return false;
     },
     getActivity(idx: number, lineage: string, elementId: string): void {
-      const url = `http://localhost:8080/api/lineage/activity/`+lineage;
+      const url = `http://localhost:8080/api/lineages/` + lineage + `/activity`;
       axios.get(url)
         .then((response) => {
           let states = response.data;
@@ -193,7 +193,7 @@ Chart.register( CategoryScale, LineElement, LineController, LinearScale, PointEl
       this.itemsInPage = Math.min(this.itemsPerPage * this.page, this.results.total);
     },
     fetchStats(page: number): void {
-      const url = `http://localhost:8080/api/states/stats?page=`+page;
+      const url = `http://localhost:8080/api/lineages/stats?page=`+page;
       axios.get(url)
         .then((response) => {
           this.updatePager(response);

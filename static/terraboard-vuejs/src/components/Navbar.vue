@@ -94,18 +94,18 @@ import router from "../router";
     },
     goToState(value: any) {
       if (value != null) {
-        router.push({name: "State", params: {lineage: value.lineage}, query: { versionid: value.version_id } });
+        router.push({name: "State", params: {lineage: value.lineage_value}, query: { versionid: value.version_id } });
       }
     },
     clearSelect() {
       this.$refs.quickAccess.clear()
     },
     fetchStates() {
-      const url = `http://localhost:8080/api/states_lineages`
+      const url = `http://localhost:8080/api/lineages/stats`
       axios.get(url)
         .then((response) => {
           // handle success
-          response.data.forEach((obj: any) => {
+          response.data.states.forEach((obj: any) => {
             let entry = {value: obj, label: obj.path}
             this.states_select.options.push(entry)
           });
