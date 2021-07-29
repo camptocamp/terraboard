@@ -2,6 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Home from '../views/Home.vue'
 import State from '../views/State.vue'
 import Search from '../views/Search.vue'
+import PlansExplorer from '../views/PlansExplorer.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -18,6 +19,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/search',
     name: 'Search',
     component: Search
+  },
+  {
+    path: '/plans',
+    name: 'Plans',
+    component: PlansExplorer
   },
   {
     path: "/:catchAll(.*)",

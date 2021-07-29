@@ -620,7 +620,12 @@ func (db *Database) InsertPlan(plan []byte) error {
 }
 
 // GetPlans retrieves all Plan of a lineage from the database
-func (db *Database) GetPlans(lineage, limitStr string) (plans []types.Plan) {
+func (db *Database) GetPlans(lineage, limitStr, pageStr string) (plans []types.Plan, page int, total int) {
+	row := db.Raw("SELECT count(*) FROM plans AS t").Row()
+	if err := row.Scan(&total); err != nil {
+		log.Error(err.Error())
+	}
+
 	var limit int
 	if limitStr == "" {
 		limit = -1
@@ -633,7 +638,25 @@ func (db *Database) GetPlans(lineage, limitStr string) (plans []types.Plan) {
 		}
 	}
 
-	db.Joins("JOIN lineages on plans.lineage_id=lineages.id").
+	var offset int
+	if pageStr == "" {
+		offset = -1
+	} else {
+		var err error
+		page, err = strconv.Atoi(pageStr)
+		if err != nil {
+			log.Warnf("GetPlans offset ignored: %v", err)
+		} else {
+			offset = (page - 1) * pageSize
+		}
+	}
+
+	var whereClause []interface{}
+	if lineage != "" {
+		whereClause = append(whereClause, `"Lineage"."value" = ?`, lineage)
+	}
+
+	db.Joins("Lineage").
 		Preload("ParsedPlan").
 		Preload("ParsedPlan.PlanStateValue").
 		Preload("ParsedPlan.PlanStateValue.PlanStateOutputs").
@@ -655,7 +678,9 @@ func (db *Database) GetPlans(lineage, limitStr string) (plans []types.Plan) {
 		Preload("ParsedPlan.PlanState.PlanStateValue.PlanStateModule.PlanStateModules").
 		Order("created_at desc").
 		Limit(limit).
-		Find(&plans, "lineages.value = ?", lineage)
+		Offset(offset).
+		Find(&plans, whereClause...)
+
 	return
 }
 

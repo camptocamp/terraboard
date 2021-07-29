@@ -23,6 +23,12 @@
             </router-link>
           </li>
           <li class="nav-item mx-2">
+            <router-link to="/plans" class="nav-link"
+              ><span class="fas fa-file-alt" aria-hidden="true"></span>
+              Plans
+            </router-link>
+          </li>
+          <li class="nav-item mx-2">
             <router-link to="/search" class="nav-link"
               ><span class="fas fa-search" aria-hidden="true"></span> Search
             </router-link>
