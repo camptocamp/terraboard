@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -14,26 +13,10 @@ import (
 	"github.com/camptocamp/terraboard/db"
 	"github.com/camptocamp/terraboard/state"
 	"github.com/camptocamp/terraboard/util"
+	"github.com/gorilla/mux"
 	tfversion "github.com/hashicorp/terraform/version"
 	log "github.com/sirupsen/logrus"
 )
-
-// idx serves index.html, always,
-// so as to let AngularJS manage the app routing.
-// The <base> HTML tag is edited on the fly
-// to reflect the proper base URL
-func idx(w http.ResponseWriter, _ *http.Request) {
-	idx, err := ioutil.ReadFile("static/index.html")
-	if err != nil {
-		log.Errorf("Failed to open index.html: %v", err)
-		// TODO: Return error page
-	}
-	idxStr := string(idx)
-	idxStr = util.ReplaceBasePath(idxStr, "base href=\"/\"", "base href=\"%s\"")
-	if _, err := io.WriteString(w, idxStr); err != nil {
-		log.Error(err.Error())
-	}
-}
 
 // Pass the DB to API handlers
 // This takes a callback and returns a HandlerFunc
@@ -126,8 +109,6 @@ func refreshDB(syncInterval uint16, d *db.Database, sp state.Provider) {
 var version = "undefined"
 
 func getVersion(w http.ResponseWriter, _ *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
 	j, err := json.Marshal(map[string]string{
 		"version":   version,
 		"copyright": "Copyright © 2017-2021 Camptocamp",
@@ -139,6 +120,15 @@ func getVersion(w http.ResponseWriter, _ *http.Request) {
 	if _, err := io.WriteString(w, string(j)); err != nil {
 		log.Error(err.Error())
 	}
+}
+
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding")
+		next.ServeHTTP(w, r)
+	})
 }
 
 // Main
@@ -175,34 +165,42 @@ func main() {
 	}
 	defer database.Close()
 
-	// Index is a wildcard for all paths
-	http.HandleFunc(util.GetFullPath(""), idx)
+	// Instantiate gorilla/mux router instance
+	r := mux.NewRouter()
+
+	// Handle API endpoints
+	apiRouter := r.PathPrefix("/api/").Subrouter()
+	apiRouter.HandleFunc(util.GetFullPath("version"), getVersion)
+	apiRouter.HandleFunc(util.GetFullPath("user"), api.GetUser)
+	apiRouter.HandleFunc(util.GetFullPath("lineages"), handleWithDB(api.GetLineages, database))
+	apiRouter.HandleFunc(util.GetFullPath("lineages/stats"), handleWithDB(api.ListStateStats, database))
+	apiRouter.HandleFunc(util.GetFullPath("lineages/tfversion/count"),
+		handleWithDB(api.ListTerraformVersionsWithCount, database))
+	apiRouter.HandleFunc(util.GetFullPath("lineages/{lineage}"), handleWithDB(api.GetState, database))
+	apiRouter.HandleFunc(util.GetFullPath("lineages/{lineage}/activity"), handleWithDB(api.GetLineageActivity, database))
+	apiRouter.HandleFunc(util.GetFullPath("lineages/{lineage}/compare"), handleWithDB(api.StateCompare, database))
+	apiRouter.HandleFunc(util.GetFullPath("locks"), handleWithStateProviders(api.GetLocks, sps))
+	apiRouter.HandleFunc(util.GetFullPath("search/attribute"), handleWithDB(api.SearchAttribute, database))
+	apiRouter.HandleFunc(util.GetFullPath("resource/types"), handleWithDB(api.ListResourceTypes, database))
+	apiRouter.HandleFunc(util.GetFullPath("resource/types/count"), handleWithDB(api.ListResourceTypesWithCount, database))
+	apiRouter.HandleFunc(util.GetFullPath("resource/names"), handleWithDB(api.ListResourceNames, database))
+	apiRouter.HandleFunc(util.GetFullPath("attribute/keys"), handleWithDB(api.ListAttributeKeys, database))
+	apiRouter.HandleFunc(util.GetFullPath("tf_versions"), handleWithDB(api.ListTfVersions, database))
+	apiRouter.HandleFunc(util.GetFullPath("plans"), handleWithDB(api.ManagePlans, database))
 
 	// Serve static files (CSS, JS, images) from dir
 	staticFs := http.FileServer(http.Dir("static"))
-	http.Handle(util.GetFullPath("static/"), http.StripPrefix(util.GetFullPath("static"), staticFs))
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", staticFs))
 
-	// Handle API points
-	http.HandleFunc(util.GetFullPath("api/version"), getVersion)
-	http.HandleFunc(util.GetFullPath("api/user"), api.GetUser)
-	http.HandleFunc(util.GetFullPath("api/states"), handleWithDB(api.ListStates, database))
-	http.HandleFunc(util.GetFullPath("api/states/stats"), handleWithDB(api.ListStateStats, database))
-	http.HandleFunc(util.GetFullPath("api/states/tfversion/count"),
-		handleWithDB(api.ListTerraformVersionsWithCount, database))
-	http.HandleFunc(util.GetFullPath("api/state/"), handleWithDB(api.GetState, database))
-	http.HandleFunc(util.GetFullPath("api/state/activity/"), handleWithDB(api.GetStateActivity, database))
-	http.HandleFunc(util.GetFullPath("api/state/compare/"), handleWithDB(api.StateCompare, database))
-	http.HandleFunc(util.GetFullPath("api/locks"), handleWithStateProviders(api.GetLocks, sps))
-	http.HandleFunc(util.GetFullPath("api/search/attribute"), handleWithDB(api.SearchAttribute, database))
-	http.HandleFunc(util.GetFullPath("api/resource/types"), handleWithDB(api.ListResourceTypes, database))
-	http.HandleFunc(util.GetFullPath("api/resource/types/count"), handleWithDB(api.ListResourceTypesWithCount, database))
-	http.HandleFunc(util.GetFullPath("api/resource/names"), handleWithDB(api.ListResourceNames, database))
-	http.HandleFunc(util.GetFullPath("api/attribute/keys"), handleWithDB(api.ListAttributeKeys, database))
-	http.HandleFunc(util.GetFullPath("api/tf_versions"), handleWithDB(api.ListTfVersions, database))
-	http.HandleFunc(util.GetFullPath("api/plans"), handleWithDB(api.ManagePlans, database))
-	http.HandleFunc(util.GetFullPath("api/lineages"), handleWithDB(api.GetLineages, database))
+	// Serve index page on all unhandled routes
+	r.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./static/index.html")
+	})
+
+	// Add CORS Middleware to mux router
+	r.Use(corsMiddleware)
 
 	// Start server
 	log.Debugf("Listening on port %d\n", c.Web.Port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", c.Web.Port), nil))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", c.Web.Port), r))
 }

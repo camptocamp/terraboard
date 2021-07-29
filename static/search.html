@@ -1,89 +1,78 @@
-<div class="row">
-    <div class="col-xs-2 col-sm-2 col-md-2">
-        <label for="resource_type">Terraform Version</label>
-    </div>
-    <div class="col-xs-2 col-sm-2 col-md-2">
-        <label for="resource_type">Resource Type</label>
-    </div>
-    <div class="col-xs-2 col-sm-2 col-md-2">
-        <label for="resource_id">Resource ID</label>
-    </div>
-    <div class="col-xs-2 col-sm-2 col-md-2">
-        <label for="attribute_key">Attribute Key</label>
-    </div>
-    <div class="col-xs-2 col-sm-2 col-md-2">
-        <label for="attribute_value">Attribute Value</label>
-    </div>
-</div>
-<div class="row">
+<div class="row justify-content-around">
     <form class="form-inline" role="form">
-        <div class="form-group col-xs-2 col-sm-2 col-md-2">
-            <ui-select id="tf_version"
-                       ng-model="$parent.tfVersion"
-                       theme="bootstrap"
-                       ng-disabled="disabled"
-                       ng-change="doSearch()"
-                       style="min-width: 200px;"
-                       reset-search-input="false"
-                       title="Terraform Version">
-                <ui-select-match placeholder="Terraform Version" allow-clear="true">{{$parent.tfVersion}}</ui-select-match>
-                <ui-select-choices repeat="k in tf_versions | filter: $select.search | orderBy">
-                    {{k}}
-                </ui-select-choices>
-            </ui-select>
+        <div class="row" style="display: flex; justify-content: center; margin-bottom: 15px;">
+            <div class="form-group col-xs-3 col-sm-3 col-md-2">
+                <ui-select id="tf_version"
+                        ng-model="$parent.tfVersion"
+                        theme="bootstrap"
+                        ng-disabled="disabled"
+                        ng-change="doSearch()"
+                        style="min-width: 200px; max-width: 300px;"
+                        reset-search-input="false"
+                        title="Terraform Version">
+                    <ui-select-match placeholder="Terraform Version" allow-clear="true">{{$parent.tfVersion}}</ui-select-match>
+                    <ui-select-choices repeat="k in tf_versions | filter: $select.search | orderBy">
+                        {{k}}
+                    </ui-select-choices>
+                </ui-select>
+            </div>
+            <div class="form-group col-xs-3 col-sm-3 col-md-2">
+                <ui-select id="resource_type"
+                        ng-model="$parent.resType"
+                        theme="bootstrap"
+                        ng-disabled="disabled"
+                        ng-change="doSearch()"
+                        style="min-width: 200px; max-width: 300px;"
+                        reset-search-input="false"
+                        title="Resource Type">
+                    <ui-select-match placeholder="Resource Type" allow-clear="true">{{$parent.resType}}</ui-select-match>
+                    <ui-select-choices repeat="k in resource_keys | filter: $select.search | orderBy">
+                        {{k}}
+                    </ui-select-choices>
+                </ui-select>
+            </div>
+            <div class="form-group col-xs-3 col-sm-3 col-md-2">
+                <ui-select id="resource_id"
+                        ng-model="$parent.resID"
+                        theme="bootstrap"
+                        ng-disabled="disabled"
+                        ng-change="doSearch()"
+                        style="min-width: 200px; max-width: 300px;"
+                        reset-search-input="false"
+                        title="Resource ID">
+                    <ui-select-match placeholder="Resource ID" allow-clear="true">{{$parent.resID}}</ui-select-match>
+                    <ui-select-choices repeat="k in resource_names | filter: $parent.resType | filter: $select.search | orderBy">
+                        {{k}}
+                    </ui-select-choices>
+                </ui-select>
+            </div>
+            <div class="form-group col-xs-3 col-sm-3 col-md-2">
+                <ui-select id="attribute_key"
+                        ng-model="$parent.attrKey"
+                        theme="bootstrap"
+                        ng-disabled="disabled"
+                        ng-change="doSearch()"
+                        style="min-width: 200px; max-width: 300px;"
+                        reset-search-input="false"
+                        title="Attribute Key">
+                    <ui-select-match placeholder="Attribute Key" allow-clear="true">{{$parent.attrKey}}</ui-select-match>
+                    <ui-select-choices
+                        repeat="k in attribute_keys | filter: $select.search | orderBy"
+                        refresh="refreshAttrKeys()"
+                        refresh-delay="0">
+                        {{k}}
+                    </ui-select-choices>
+                </ui-select>
+            </div>
         </div>
-        <div class="form-group col-xs-2 col-sm-2 col-md-2">
-            <ui-select id="resource_type"
-                       ng-model="$parent.resType"
-                       theme="bootstrap"
-                       ng-disabled="disabled"
-                       ng-change="doSearch()"
-                       style="min-width: 200px;"
-                       reset-search-input="false"
-                       title="Resource Type">
-                <ui-select-match placeholder="Resource Type" allow-clear="true">{{$parent.resType}}</ui-select-match>
-                <ui-select-choices repeat="k in resource_keys | filter: $select.search | orderBy">
-                    {{k}}
-                </ui-select-choices>
-            </ui-select>
+        <div class="row" style="display: flex; justify-content: center;">
+            <div class="form-group col-xs-2 col-sm-2 col-md-2">
+                <input id="attribute_value" type="text" class="form-control" placeholder="Attribute Value" ng-model="attrVal" ng-change="doSearch()" />
+            </div>
+            <div class="col-xs-3 col-sm-2 col-md-1">
+                <button class="clear btn btn-warning" ng-click="clearForm()">Reset</button>
+            </div>
         </div>
-        <div class="form-group col-xs-2 col-sm-2 col-md-2">
-            <ui-select id="resource_id"
-                       ng-model="$parent.resID"
-                       theme="bootstrap"
-                       ng-disabled="disabled"
-                       ng-change="doSearch()"
-                       style="min-width: 200px;"
-                       reset-search-input="false"
-                       title="Resource ID">
-                <ui-select-match placeholder="Resource ID" allow-clear="true">{{$parent.resID}}</ui-select-match>
-                <ui-select-choices repeat="k in resource_names | filter: $parent.resType | filter: $select.search | orderBy">
-                    {{k}}
-                </ui-select-choices>
-            </ui-select>
-        </div>
-        <div class="form-group col-xs-2 col-sm-2 col-md-2">
-            <ui-select id="attribute_key"
-                       ng-model="$parent.attrKey"
-                       theme="bootstrap"
-                       ng-disabled="disabled"
-                       ng-change="doSearch()"
-                       style="min-width: 200px;"
-                       reset-search-input="false"
-                       title="Attribute Key">
-                <ui-select-match placeholder="Attribute Key" allow-clear="true">{{$parent.attrKey}}</ui-select-match>
-                <ui-select-choices
-                    repeat="k in attribute_keys | filter: $select.search | orderBy"
-                    refresh="refreshAttrKeys()"
-                    refresh-delay="0">
-                    {{k}}
-                </ui-select-choices>
-            </ui-select>
-        </div>
-        <div class="form-group col-xs-2 col-sm-2 col-md-2">
-            <input id="attribute_value" type="text" class="form-control" placeholder="Attribute Value" ng-model="attrVal" ng-change="doSearch()" />
-        </div>
-        <button class="clear btn btn-warning" ng-click="clearForm()">Reset</button>
     </form>
 </div>
 <hr />
@@ -120,7 +109,7 @@
         </thead>
         <tbody>
             <tr ng-repeat="r in results.results">
-                <td><a href="state/{{r.path}}?versionid={{r.version_id}}#{{r.module_path}}.{{r.resource_name}}"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></td>
+                <td><a href="lineage/{{r.lineage_value}}?versionid={{r.version_id}}#{{r.module_path}}.{{r.resource_name}}"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></td>
                 <td>{{r.path}}</td>
                 <td>{{r.tf_version}}</td>
                 <td>{{r.serial}}</td>

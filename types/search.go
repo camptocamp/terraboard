@@ -14,6 +14,7 @@ type SearchResult struct {
 	VersionID      string `gorm:"column:version_id" json:"version_id"`
 	TFVersion      string `gorm:"column:tf_version" json:"tf_version"`
 	Serial         int64  `gorm:"column:serial" json:"serial"`
+	LineageValue   string `json:"lineage_value"`
 	ModulePath     string `gorm:"column:module_path" json:"module_path"`
 	ResourceType   string `gorm:"column:type" json:"resource_type"`
 	ResourceName   string `gorm:"column:name" json:"resource_name"`
@@ -26,6 +27,7 @@ type SearchResult struct {
 // NOTE: do we want to merge this with StateInfo?
 type StateStat struct {
 	Path          string    `json:"path"`
+	LineageValue  string    `json:"lineage_value"`
 	TFVersion     string    `json:"terraform_version"`
 	Serial        int64     `json:"serial"`
 	VersionID     string    `json:"version_id"`

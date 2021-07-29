@@ -1,36 +1,19 @@
 <div class="row">
-   <div class="overview-chart col-xs-6 col-sm-3 col-md-3 col-md-offset-1">
-      <canvas height="200px"
-              id="chart-pie-resource-types"
-              class="chart chart-pie"
-              chart-data="pieResourceTypesData"
-              chart-labels="pieResourceTypesLabels"
-              chart-options="pieResourceTypesOptions"
-              chart-click="searchType">
+    <div class="overview-chart col-xs-6 col-sm-3 col-md-3 col-md-offset-1">
+        <canvas height="200px" id="chart-pie-resource-types" class="chart chart-pie" chart-data="pieResourceTypesData" chart-labels="pieResourceTypesLabels" chart-options="pieResourceTypesOptions" chart-click="searchType">
       </canvas>
-      <h4>Resource types</h4>
-   </div>
-   <div class="overview-chart col-xs-6 col-sm-4">
-      <canvas height="150px"
-              id="chart-pie-terraform-versions"
-              class="chart chart-pie"
-              chart-data="pieTfVersionsData"
-              chart-labels="pieTfVersionsLabels"
-              chart-options="pieTfVersionsOptions"
-              chart-click="searchTfVersion">
+        <h4>Resource types</h4>
+    </div>
+    <div class="overview-chart col-xs-6 col-sm-4">
+        <canvas height="150px" id="chart-pie-terraform-versions" class="chart chart-pie" chart-data="pieTfVersionsData" chart-labels="pieTfVersionsLabels" chart-options="pieTfVersionsOptions" chart-click="searchTfVersion">
       </canvas>
-      <h4>Terraform versions</h4>
-   </div>
-   <div class="overview-chart col-xs-6 col-sm-3">
-      <canvas height="200px"
-              id="chart-pie-ls"
-              class="chart chart-pie"
-              chart-data="pieLockedStatesData"
-              chart-labels="pieLockedStatesLabels"
-              chart-options="pieLockedStatesOptions">
+        <h4>Terraform versions</h4>
+    </div>
+    <div class="overview-chart col-xs-6 col-sm-3">
+        <canvas height="200px" id="chart-pie-ls" class="chart chart-pie" chart-data="pieLockedStatesData" chart-labels="pieLockedStatesLabels" chart-options="pieLockedStatesOptions">
       </canvas>
-      <h4>States locked</h4>
-   </div>
+        <h4>States locked</h4>
+    </div>
 </div>
 <hr />
 <div id="results" class="row">
@@ -62,13 +45,13 @@
         <tbody>
             <tr ng-repeat="r in results.states">
                 <td><span ng-if="isLocked(r.path)" ng-init="lock=locks[r.path]" class="glyphicon glyphicon-lock" title="Locked by {{lock.Who}} on {{lock.Created | date:'medium'}} ({{lock.Operation}})"></span></td>
-                <td><span class="glyphicon glyphicon-link" aria-hidden="true"></span> <a href="state/{{r.path}}?versionid={{r.version_id}}">{{r.path}}</a></td>
+                <td><span class="glyphicon glyphicon-link" aria-hidden="true"></span> <a href="lineage/{{r.lineage_value}}?versionid={{r.version_id}}">{{r.path}}</a></td>
                 <td>{{r.terraform_version}}</td>
                 <td>{{r.serial}}</td>
                 <td>{{r.last_modified | date:'medium'}}</td>
                 <td>{{r.resource_count}}</td>
-                <td ng-init="getActivity($index, r.path)">
-                    <sparklinechart path="{{r.path}}" data="{{r.activity}}"></sparklinechart>
+                <td ng-init="getActivity($index, r.lineage_value)">
+                    <sparklinechart lineage="{{r.lineage_value}}" data="{{r.activity}}"></sparklinechart>
                 </td>
             </tr>
         </tbody>

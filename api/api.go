@@ -11,7 +11,7 @@ import (
 	"github.com/camptocamp/terraboard/compare"
 	"github.com/camptocamp/terraboard/db"
 	"github.com/camptocamp/terraboard/state"
-	"github.com/camptocamp/terraboard/util"
+	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -27,25 +27,9 @@ func JSONError(w http.ResponseWriter, message string, err error) {
 	}
 }
 
-// ListStates lists States
-func ListStates(w http.ResponseWriter, _ *http.Request, d *db.Database) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	states := d.ListStates()
-
-	j, err := json.Marshal(states)
-	if err != nil {
-		JSONError(w, "Failed to marshal states", err)
-		return
-	}
-	if _, err := io.WriteString(w, string(j)); err != nil {
-		log.Error(err.Error())
-	}
-}
-
 // ListTerraformVersionsWithCount lists Terraform versions with their associated
 // counts, sorted by the 'orderBy' parameter (version by default)
 func ListTerraformVersionsWithCount(w http.ResponseWriter, r *http.Request, d *db.Database) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 	query := r.URL.Query()
 	versions, _ := d.ListTerraformVersionsWithCount(query)
 
@@ -61,7 +45,6 @@ func ListTerraformVersionsWithCount(w http.ResponseWriter, r *http.Request, d *d
 
 // ListStateStats returns State information for a given path as parameter
 func ListStateStats(w http.ResponseWriter, r *http.Request, d *db.Database) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 	query := r.URL.Query()
 	states, page, total := d.ListStateStats(query)
 
@@ -82,18 +65,17 @@ func ListStateStats(w http.ResponseWriter, r *http.Request, d *db.Database) {
 
 // GetState provides information on a State
 func GetState(w http.ResponseWriter, r *http.Request, d *db.Database) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	st := util.TrimBasePath(r, "api/state/")
+	params := mux.Vars(r)
 	versionID := r.URL.Query().Get("versionid")
 	var err error
 	if versionID == "" {
-		versionID, err = d.DefaultVersion(st)
+		versionID, err = d.DefaultVersion(params["lineage"])
 		if err != nil {
 			JSONError(w, "Failed to retrieve default version", err)
 			return
 		}
 	}
-	state := d.GetState(st, versionID)
+	state := d.GetState(params["lineage"], versionID)
 
 	j, err := json.Marshal(state)
 	if err != nil {
@@ -105,11 +87,10 @@ func GetState(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	}
 }
 
-// GetStateActivity returns the activity (version history) of a State
-func GetStateActivity(w http.ResponseWriter, r *http.Request, d *db.Database) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	st := util.TrimBasePath(r, "api/state/activity/")
-	activity := d.GetStateActivity(st)
+// GetLineageActivity returns the activity (version history) of a Lineage
+func GetLineageActivity(w http.ResponseWriter, r *http.Request, d *db.Database) {
+	params := mux.Vars(r)
+	activity := d.GetLineageActivity(params["lineage"])
 
 	j, err := json.Marshal(activity)
 	if err != nil {
@@ -123,14 +104,13 @@ func GetStateActivity(w http.ResponseWriter, r *http.Request, d *db.Database) {
 
 // StateCompare compares two versions ('from' and 'to') of a State
 func StateCompare(w http.ResponseWriter, r *http.Request, d *db.Database) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	st := util.TrimBasePath(r, "api/state/compare/")
+	params := mux.Vars(r)
 	query := r.URL.Query()
 	fromVersion := query.Get("from")
 	toVersion := query.Get("to")
 
-	from := d.GetState(st, fromVersion)
-	to := d.GetState(st, toVersion)
+	from := d.GetState(params["lineage"], fromVersion)
+	to := d.GetState(params["lineage"], toVersion)
 	compare, err := compare.Compare(from, to)
 	if err != nil {
 		JSONError(w, "Failed to compare state versions", err)
@@ -149,7 +129,6 @@ func StateCompare(w http.ResponseWriter, r *http.Request, d *db.Database) {
 
 // GetLocks returns information on locked States
 func GetLocks(w http.ResponseWriter, _ *http.Request, sps []state.Provider) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 	allLocks := make(map[string]state.LockInfo)
 	for _, sp := range sps {
 		locks, err := sp.GetLocks()
@@ -175,7 +154,6 @@ func GetLocks(w http.ResponseWriter, _ *http.Request, sps []state.Provider) {
 // SearchAttribute performs a search on Resource Attributes
 // by various parameters
 func SearchAttribute(w http.ResponseWriter, r *http.Request, d *db.Database) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 	query := r.URL.Query()
 	result, page, total := d.SearchAttribute(query)
 
@@ -197,7 +175,6 @@ func SearchAttribute(w http.ResponseWriter, r *http.Request, d *db.Database) {
 
 // ListResourceTypes lists all Resource types
 func ListResourceTypes(w http.ResponseWriter, _ *http.Request, d *db.Database) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 	result, _ := d.ListResourceTypes()
 	j, err := json.Marshal(result)
 	if err != nil {
@@ -211,7 +188,6 @@ func ListResourceTypes(w http.ResponseWriter, _ *http.Request, d *db.Database) {
 
 // ListResourceTypesWithCount lists all Resource types with their associated count
 func ListResourceTypesWithCount(w http.ResponseWriter, _ *http.Request, d *db.Database) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 	result, _ := d.ListResourceTypesWithCount()
 	j, err := json.Marshal(result)
 	if err != nil {
@@ -225,7 +201,6 @@ func ListResourceTypesWithCount(w http.ResponseWriter, _ *http.Request, d *db.Da
 
 // ListResourceNames lists all Resource names
 func ListResourceNames(w http.ResponseWriter, _ *http.Request, d *db.Database) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 	result, _ := d.ListResourceNames()
 	j, err := json.Marshal(result)
 	if err != nil {
@@ -240,7 +215,6 @@ func ListResourceNames(w http.ResponseWriter, _ *http.Request, d *db.Database) {
 // ListAttributeKeys lists all Resource Attribute Keys,
 // optionally filtered by resource_type
 func ListAttributeKeys(w http.ResponseWriter, r *http.Request, d *db.Database) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 	resourceType := r.URL.Query().Get("resource_type")
 	result, _ := d.ListAttributeKeys(resourceType)
 	j, err := json.Marshal(result)
@@ -255,7 +229,6 @@ func ListAttributeKeys(w http.ResponseWriter, r *http.Request, d *db.Database) {
 
 // ListTfVersions lists all Terraform versions
 func ListTfVersions(w http.ResponseWriter, _ *http.Request, d *db.Database) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 	result, _ := d.ListTfVersions()
 	j, err := json.Marshal(result)
 	if err != nil {
@@ -269,8 +242,6 @@ func ListTfVersions(w http.ResponseWriter, _ *http.Request, d *db.Database) {
 
 // GetUser returns information about the logged user
 func GetUser(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
 	name := r.Header.Get("X-Forwarded-User")
 	email := r.Header.Get("X-Forwarded-Email")
 
@@ -289,8 +260,6 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 // SubmitPlan inserts a new Terraform plan in the database.
 // /api/plans POST endpoint callback
 func SubmitPlan(w http.ResponseWriter, r *http.Request, db *db.Database) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Errorf("Failed to read body: %v", err)
@@ -310,7 +279,6 @@ func SubmitPlan(w http.ResponseWriter, r *http.Request, db *db.Database) {
 // Sorted by most recent to oldest.
 // /api/plans GET endpoint callback
 func GetPlans(w http.ResponseWriter, r *http.Request, db *db.Database) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 	lineage := r.URL.Query().Get("lineage")
 	limit := r.URL.Query().Get("limit")
 	plans := db.GetPlans(lineage, limit)
@@ -342,7 +310,6 @@ func ManagePlans(w http.ResponseWriter, r *http.Request, db *db.Database) {
 // Optional "&limit=X" parameter to limit requested quantity of them.
 // Sorted by most recent to oldest.
 func GetLineages(w http.ResponseWriter, r *http.Request, db *db.Database) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 	limit := r.URL.Query().Get("limit")
 	lineages := db.GetLineages(limit)
 

@@ -204,7 +204,7 @@ func (a *AWS) GetVersions(state string) (versions []Version, err error) {
 	versions = []Version{}
 	if a.noVersioning {
 		versions = append(versions, Version{
-			ID:           "1",
+			ID:           state,
 			LastModified: time.Now(),
 		})
 		return
