@@ -15,7 +15,6 @@ services:
       minio:
         condition: service_started
     volumes:
-      - ../../static:/static:ro
       - ./config.yml:/config/config.yml:ro
     ports:
       - "8080:8080"

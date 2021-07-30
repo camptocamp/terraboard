@@ -18,8 +18,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    volumes:
-      - ./static:/static:ro
     ports:
       - "8080:8080"
 

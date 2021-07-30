@@ -338,7 +338,8 @@ func (db *Database) SearchAttribute(query url.Values) (results []types.SearchRes
 	sqlQuery += " JOIN modules ON states.id = modules.state_id" +
 		" JOIN resources ON modules.id = resources.module_id" +
 		" JOIN attributes ON resources.id = attributes.resource_id" +
-		" JOIN lineages ON lineages.id = states.lineage_id"
+		" JOIN lineages ON lineages.id = states.lineage_id" +
+		" JOIN versions ON states.version_id = versions.id"
 
 	var where []string
 	var params []interface{}
@@ -388,7 +389,7 @@ func (db *Database) SearchAttribute(query url.Values) (results []types.SearchRes
 
 	// Now get results
 	// gorm doesn't support subqueries...
-	sql := "SELECT states.path, states.version_id, states.tf_version, states.serial, lineages.value as lineage_value, modules.path as module_path, resources.type, resources.name, resources.index, attributes.key, attributes.value" +
+	sql := "SELECT states.path, versions.version_id, states.tf_version, states.serial, lineages.value as lineage_value, modules.path as module_path, resources.type, resources.name, resources.index, attributes.key, attributes.value" +
 		sqlQuery +
 		" ORDER BY states.path, states.serial, lineage_value, modules.path, resources.type, resources.name, resources.index, attributes.key" +
 		" LIMIT ?"
@@ -678,7 +679,7 @@ func (db *Database) GetLineages(limitStr string) (lineages []types.Lineage) {
 	return
 }
 
-// DefaultVersion returns the detault VersionID for a given State path
+// DefaultVersion returns the default VersionID for a given Lineage
 // Copied and adapted from github.com/hashicorp/terraform/command/jsonstate/state.go
 func (db *Database) DefaultVersion(lineage string) (version string, err error) {
 	sqlQuery := "SELECT versions.version_id FROM" +
@@ -686,7 +687,8 @@ func (db *Database) DefaultVersion(lineage string) (version string, err error) {
 		" JOIN states ON t.path = states.path AND t.mx = states.serial" +
 		" JOIN versions on states.version_id=versions.id" +
 		" JOIN lineages on lineages.id=states.lineage_id" +
-		" WHERE lineages.value = ?"
+		" WHERE lineages.value = ?" +
+		" ORDER BY versions.last_modified DESC"
 
 	row := db.Raw(sqlQuery, lineage).Row()
 	err = row.Scan(&version)
