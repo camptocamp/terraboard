@@ -63,7 +63,7 @@
           <td>{{ r.git_commit }}</td>
           <td>{{ r.ci_url }}</td>
           <td>{{ r.source }}</td>
-          <td>{{ r.CreatedAt }}</td>
+          <td>{{ this.formatDate(r.CreatedAt) }}</td>
         </tr>
       </tbody>
     </table>
@@ -110,7 +110,9 @@ import router from "../router";
     },
     resetSearch() {
       this.clearPath();
-      this.refreshList();
+    },
+    formatDate(date: string): string {
+      return new Date(date).toLocaleString();
     },
     fetchStates() {
       const url = `http://localhost:8080/api/lineages/stats`
