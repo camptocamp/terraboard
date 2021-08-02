@@ -201,6 +201,7 @@ import StatePlan from "../components/StatePlan.vue";
       url: {
         lineage: "",
         versionid: "",
+        planid: "",
         compare: "",
       },
       display: {
@@ -234,6 +235,30 @@ import StatePlan from "../components/StatePlan.vue";
       }
       return modules;
     },
+    showDetailsPanel() {
+      this.display.details = true;
+      this.display.outputs = false;
+      this.display.compare = false;
+      this.display.plan = false;
+    },
+    showComparePanel() {
+      this.display.details = false;
+      this.display.outputs = false;
+      this.display.compare = true;
+      this.display.plan = false;
+    },
+    showOutputPanel() {
+      this.display.details = true;
+      this.display.outputs = true;
+      this.display.compare = false;
+      this.display.plan = false;
+    },
+    showPlanPanel() {
+      this.display.details = true;
+      this.display.outputs = false;
+      this.display.compare = false;
+      this.display.plan = true;
+    },
     formatDate(date: string): string {
         return new Date(date).toLocaleString();
     },
@@ -263,6 +288,16 @@ import StatePlan from "../components/StatePlan.vue";
         .get(url)
         .then((response) => {
           this.plans = response.data.plans;
+          if (router.currentRoute.value.query.planid !== undefined) {
+            this.url.planid = router.currentRoute.value.query.planid;
+            console.log(this.plans)
+            this.plans.forEach((plan: any) => {
+              console.log(plan.ID, this.url.planid)
+              if (plan.ID == this.url.planid) {
+              this.setPlanSelected(plan); 
+              }
+            });
+          }
         })
         .catch(function(err) {
           if (err.response) {
@@ -314,12 +349,9 @@ import StatePlan from "../components/StatePlan.vue";
       this.selectedMod = mod;
       this.selectedRes = res;
       this.state.outputs = false;
-      this.display.details = true;
-      this.display.outputs = false;
-      this.display.compare = false;
-      this.display.plan = false;
+      this.showDetailsPanel();
       var hash = res.type + "." + res.name;
-      router.push({
+      router.replace({
         path: `/lineage/${this.url.lineage}`,
         query: { versionid: this.url.versionid, ressource: hash },
       });
@@ -327,19 +359,20 @@ import StatePlan from "../components/StatePlan.vue";
     setPlanSelected(plan: any): void {
       this.selectedPlan = plan;
       this.state.outputs = false;
-      this.display.details = true;
-      this.display.outputs = false;
-      this.display.compare = false;
-      this.display.plan = true;
+      this.showPlanPanel();
+      router.replace({
+        path: `/lineage/${this.url.lineage}`,
+        query: { 
+          versionid: this.url.versionid,
+          planid: plan.ID 
+        },
+      });
     },
     setOutputs(mod: any): void {
       this.selectedMod = mod;
       this.state.outputs = true;
-      this.display.details = true;
-      this.display.outputs = true;
-      this.display.compare = false;
-      this.display.plan = false;
-      router.push({
+      this.showOutputPanel();
+      router.replace({
         path: `/lineage/${this.url.lineage}`,
         query: {
           versionid: this.url.versionid,
@@ -390,9 +423,7 @@ import StatePlan from "../components/StatePlan.vue";
             compare: this.compareVersion.versionId,
           },
         });
-        this.display.details = false;
-        this.display.compare = true;
-        this.display.plan = false;
+        this.showComparePanel();
 
         const url =
           `/api/lineages/` +
@@ -428,15 +459,6 @@ import StatePlan from "../components/StatePlan.vue";
           .then(function() {
             // always executed
           });
-      } else {
-        router.replace({
-          name: "State",
-          params: { lineage: this.url.lineage },
-          query: { versionid: this.url.versionid },
-        });
-        this.display.details = true;
-        this.display.compare = false;
-        this.display.plan = false;
       }
     },
   },
@@ -484,10 +506,10 @@ import StatePlan from "../components/StatePlan.vue";
     },
     "$data.selectedVersion": {
       handler: function(nv, ov) {
-        router.push({
+        router.replace({
           name: "State",
           params: { lineage: this.url.lineage },
-          query: { versionid: nv },
+          query: { ...this.$route.query, versionid: nv },
         });
         if (nv != ov) {
           this.getDetails(nv);
@@ -510,10 +532,11 @@ import StatePlan from "../components/StatePlan.vue";
     this.selectedVersion = this.url.versionid;
     this.compareVersion = router.currentRoute.value.query.compare;
     this.fetchLocks();
-    this.fetchLatestPlans(10);
     this.getVersions();
     this.getDetails(router.currentRoute.value.query.versionid);
     this.display.mod = this.selectedMod;
+
+    this.fetchLatestPlans(10);
   },
   updated() {
     hljs.highlightAll();

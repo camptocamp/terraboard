@@ -51,7 +51,7 @@
           <td>
             <router-link
               :to="
-                `/lineage/${r.lineage_value}?versionid=${r.version_id}`
+                `/lineage/${r.lineage_data.lineage}?planid=${r.ID}`
               "
             >
               <span class="fas fa-link" aria-hidden="true"></span>
