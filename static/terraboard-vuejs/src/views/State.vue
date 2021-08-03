@@ -17,7 +17,7 @@
                 <span class="fas fa-thumbtack" aria-hidden="true"></span>
                 Version
               </h5>
-              <select class="form-control" v-model="selectedVersion">
+              <select class="form-control" @change="this.setVersion">
                 <option
                   v-for="version in versions"
                   v-bind:key="version"
@@ -345,6 +345,12 @@ import StatePlan from "../components/StatePlan.vue";
       }
       return false;
     },
+    setVersion(versionID: Event): void {
+      router.replace({
+        path: `/lineage/${this.url.lineage}`,
+        query: { versionid: (versionID.target as HTMLSelectElement).value },
+      });
+    },
     setSelected(mod: any, res: any): void {
       this.selectedMod = mod;
       this.selectedRes = res;
@@ -354,6 +360,7 @@ import StatePlan from "../components/StatePlan.vue";
       router.replace({
         path: `/lineage/${this.url.lineage}`,
         query: { versionid: this.url.versionid, ressource: hash },
+
       });
     },
     setPlanSelected(plan: any): void {
@@ -504,14 +511,13 @@ import StatePlan from "../components/StatePlan.vue";
         }
       },
     },
-    "$data.selectedVersion": {
+    "$route.query.versionid": {
       handler: function(nv, ov) {
-        router.replace({
-          name: "State",
-          params: { lineage: this.url.lineage },
-          query: { ...this.$route.query, versionid: nv },
-        });
+        if (this.url.lineage != this.$route.params.lineage) {
+          this.$emit("refresh");
+        }
         if (nv != ov) {
+          this.url.versionid = nv;
           this.getDetails(nv);
         }
         this.compareVersions();

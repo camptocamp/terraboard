@@ -1,7 +1,7 @@
 <template>
   <Navbar/>
-  <div id="maincont" class="container vh-100">
-    <router-view/>
+  <div id="maincont" class="container">
+    <router-view @refresh="this.refresh()" :key="this.hash"/>
   </div>
   <AppFooter/>
 </template>
@@ -15,6 +15,16 @@ import AppFooter from '@/components/Footer.vue';
   components: {
     Navbar,
     AppFooter,
+  },
+  data() {
+    return {
+      hash: 1
+    }
+  },
+  methods: {
+    refresh() {
+      this.hash++;
+    }
   },
 })
 export default class App extends Vue {}
