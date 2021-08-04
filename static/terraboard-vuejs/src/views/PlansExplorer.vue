@@ -81,6 +81,7 @@ import router from "../router";
   components: {
     Multiselect,
   },
+  emits: ["refresh"],
   data() {
     return {
       data: {
