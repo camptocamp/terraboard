@@ -119,7 +119,86 @@
           role="tabpanel"
           aria-labelledby="parsedPlan-tab"
         >
-          ...
+          <table class="table">
+            <tbody>
+              <tr>
+                <td>Format version:</td>
+                <td>{{ plan.parsed_plan.format_version }}</td>
+              </tr>
+              <tr>
+                <td>Terraform version:</td>
+                <td>{{ plan.parsed_plan.terraform_version }}</td>
+              </tr>
+              <tr>
+                <td>Output changes:</td>
+                <td>
+                  <ul>
+                    <li class="my-2" v-for="output in plan.parsed_plan.output_changes" :key="output">
+                      Name: {{ output.name }} <br>
+                      Changes:
+                      <a class="link-primary" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse-'+output.name" aria-expanded="false" :aria-controls="'collapse-'+output.name">
+                        Show changes
+                      </a>
+                      <ul class="collapse" :id="'collapse-'+output.name">
+                        <li>Actions: {{ output.change.actions }}</li>
+                        <li>After: {{ output.change.after }}</li>
+                        <li>After sensitive: {{ output.change.after_sensitive }}</li>
+                        <li>After unknown: {{ output.change.after_unknown }}</li>
+                        <li>Before: {{ output.change.before }}</li>
+                        <li>Before sensitive: {{ output.change.before_sensitive }}</li>
+                      </ul>
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td>Resource changes:</td>
+                <td>
+                  <ul>
+                    <li class="my-2" v-for="resource in plan.parsed_plan.resource_changes" :key="resource">
+                      Name: {{ resource.name }} <br>
+                      Address: {{ resource.address }} <br>
+                      Type: {{ resource.type }} <br>
+                      Provider: {{ resource.provider_name }} <br>
+                      Mode: {{ resource.mode }} <br>
+                      Changes:
+                      <a class="link-primary" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse-'+resource.name" aria-expanded="false" :aria-controls="'collapse-'+resource.name">
+                        Show changes
+                      </a>
+                      <ul class="collapse" :id="'collapse-'+resource.name">
+                        <li>Actions: {{ resource.change.actions }}</li>
+                        <li>After: 
+                          <ul>
+                            <li v-for="(value, attr) in JSON.parse(resource.change.after)" :key="attr">{{attr}}: {{value}}</li>
+                          </ul>
+                        </li>
+                        <li>After sensitive:
+                          <ul>
+                            <li v-for="(value, attr) in JSON.parse(resource.change.after_sensitive)" :key="attr">{{attr}}: {{value}}</li>
+                          </ul>
+                        </li>
+                        <li>After unknown:
+                          <ul>
+                            <li v-for="(value, attr) in JSON.parse(resource.change.after_unknown)" :key="attr">{{attr}}: {{value}}</li>
+                          </ul>
+                        </li>
+                        <li>Before:
+                          <ul>
+                            <li v-for="(value, attr) in JSON.parse(resource.change.before)" :key="attr">{{attr}}: {{value}}</li>
+                          </ul>
+                        </li>
+                        <li>Before sensitive:
+                          <ul>
+                            <li v-for="(value, attr) in JSON.parse(resource.change.before_sensitive)" :key="attr">{{attr}}: {{value}}</li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <div
           class="tab-pane fade p-2"
