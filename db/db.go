@@ -621,7 +621,14 @@ func (db *Database) InsertPlan(plan []byte) error {
 
 // GetPlans retrieves all Plan of a lineage from the database
 func (db *Database) GetPlans(lineage, limitStr, pageStr string) (plans []types.Plan, page int, total int) {
-	row := db.Raw("SELECT count(*) FROM plans AS t").Row()
+	var whereClause []interface{}
+	var whereClauseTotal string
+	if lineage != "" {
+		whereClause = append(whereClause, `"Lineage"."value" = ?`, lineage)
+		whereClauseTotal = ` JOIN lineages on lineages.id=t.lineage_id WHERE lineages.value = ?`
+	}
+
+	row := db.Raw("SELECT count(*) FROM plans AS t"+whereClauseTotal, lineage).Row()
 	if err := row.Scan(&total); err != nil {
 		log.Error(err.Error())
 	}
@@ -649,11 +656,6 @@ func (db *Database) GetPlans(lineage, limitStr, pageStr string) (plans []types.P
 		} else {
 			offset = (page - 1) * pageSize
 		}
-	}
-
-	var whereClause []interface{}
-	if lineage != "" {
-		whereClause = append(whereClause, `"Lineage"."value" = ?`, lineage)
 	}
 
 	db.Joins("Lineage").

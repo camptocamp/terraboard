@@ -187,8 +187,12 @@ Chart.register( CategoryScale, LineElement, LineController, LinearScale, PointEl
       this.results = response.data;
       this.pages = Math.ceil(this.results.total / this.itemsPerPage);
       this.page = this.results.page;
-      this.prevPage = (this.page <= 1) ? undefined : this.page - 1;
-      this.nextPage = (this.page >= this.pages) ? undefined : this.page + 1;
+      this.prevPage = (this.page <= 1) 
+      ? undefined 
+      : this.page - 1;
+      this.nextPage = (this.page >= this.pages) 
+      ? undefined 
+      : this.page + 1;
       this.startItems = this.itemsPerPage * (this.page - 1) + 1;
       this.itemsInPage = Math.min(this.itemsPerPage * this.page, this.results.total);
     },

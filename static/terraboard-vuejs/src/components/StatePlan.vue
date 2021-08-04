@@ -29,7 +29,7 @@
             aria-controls="parsedPlan"
             aria-selected="false"
           >
-            Parsed Plan
+            Details
           </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -43,7 +43,7 @@
             aria-controls="rawJsonPlan"
             aria-selected="false"
           >
-            Raw JSON
+            Plan Raw JSON
           </button>
         </li>
       </ul>
@@ -87,27 +87,23 @@
               <tr>
                 <td>Changes:</td>
                 <td>
-                  <ul>
-                    <li>Resources:</li>
-                    <ul>
-                      <li>Added: {{ this.changes.resources.added }}</li>
-                      <li>Changed: {{ this.changes.resources.changed }}</li>
-                      <li>Deleted: {{ this.changes.resources.deleted }}</li>
-                    </ul>
-                    <li>Outputs:</li>
-                    <ul>
-                      <li>Added: {{ this.changes.outputs.added }}</li>
-                      <li>Changed: {{ this.changes.outputs.changed }}</li>
-                      <li>Deleted: {{ this.changes.outputs.deleted }}</li>
-                    </ul>
-                  </ul>
+                  <div class="row justify-content-middle align-middle">
+                    <div class="overview-chart col-5 text-center" style="min-width: 150px; max-width: 240px;">
+                        <canvas id="chart-pie-resource-changes" class="chart mb-2"></canvas>
+                        <p>Resource changes</p>
+                    </div>
+                    <div class="overview-chart col-5 text-center" style="min-width: 150px; max-width: 240px;">
+                        <canvas id="chart-pie-output-changes" class="chart mb-2"></canvas>
+                        <p>Output changes</p>
+                    </div>
+                  </div>
                 </td>
               </tr>
               <tr>
                 <td class="align-middle">Status:</td>
-                <td>
-                  <i v-if="isStatusValid" class="fas fa-check-circle fa-2x text-success"></i>
-                  <i v-if="!isStatusValid" class="fas fa-exclamation-circle fa-2x text-danger"></i>
+                <td class="align-middle">
+                  <div v-if="isStatusValid"><i class="fas fa-check-circle fa-2x text-success me-1"></i><div> Convergent</div></div>
+                  <div v-if="!isStatusValid"><i class="fas fa-exclamation-circle fa-2x text-warning me-1"></i><div> Divergent</div></div>
                 </td>
               </tr>
             </tbody>
@@ -141,11 +137,31 @@
                       </a>
                       <ul class="collapse" :id="'collapse-'+output.name">
                         <li>Actions: {{ output.change.actions }}</li>
-                        <li>After: {{ output.change.after }}</li>
-                        <li>After sensitive: {{ output.change.after_sensitive }}</li>
-                        <li>After unknown: {{ output.change.after_unknown }}</li>
-                        <li>Before: {{ output.change.before }}</li>
-                        <li>Before sensitive: {{ output.change.before_sensitive }}</li>
+                        <li>After: {{ output.change.after }}
+                          <ul>
+                            <li v-for="(value, attr) in JSON.parse(output.change.after)" :key="attr">{{attr}}: {{value}}</li>
+                          </ul>
+                        </li>
+                        <li>After sensitive: {{ output.change.after_sensitive }}
+                          <ul>
+                            <li v-for="(value, attr) in JSON.parse(output.change.after_sensitive)" :key="attr">{{attr}}: {{value}}</li>
+                          </ul>
+                        </li>
+                        <li>After unknown: {{ output.change.after_unknown }}
+                          <ul>
+                            <li v-for="(value, attr) in JSON.parse(output.change.after_unknown)" :key="attr">{{attr}}: {{value}}</li>
+                          </ul>
+                        </li>
+                        <li>Before: {{ output.change.before }}
+                          <ul>
+                            <li v-for="(value, attr) in JSON.parse(output.change.before)" :key="attr">{{attr}}: {{value}}</li>
+                          </ul>
+                        </li>
+                        <li>Before sensitive: {{ output.change.before_sensitive }}
+                          <ul>
+                            <li v-for="(value, attr) in JSON.parse(output.change.before_sensitive)" :key="attr">{{attr}}: {{value}}</li>
+                          </ul>
+                        </li>
                       </ul>
                     </li>
                   </ul>
@@ -215,6 +231,9 @@
 
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
+import { Chart, ChartItem, PieController, ArcElement, Tooltip } from 'chart.js'
+
+Chart.register( PieController, ArcElement, Tooltip )
 
 @Options({
   props: {
@@ -227,12 +246,26 @@ import { Options, Vue } from "vue-class-component";
           added: 0,
           changed: 0,
           deleted: 0,
+          none: 0,
         },
         outputs: {
           added: 0,
           changed: 0,
           deleted: 0,
+          none: 0,
         },
+      },
+      chartOptions:
+      {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            display: true,
+          },
+        } 
       },
     };
   },
@@ -249,6 +282,8 @@ import { Options, Vue } from "vue-class-component";
           this.changes.outputs.changed++;
         } else if (actions.includes("delete")) {
           this.changes.outputs.deleted++;
+        } else {
+          this.changes.outputs.none++;
         }
       });
       this.plan.parsed_plan.resource_changes.forEach((change: any) => {
@@ -259,6 +294,8 @@ import { Options, Vue } from "vue-class-component";
           this.changes.resources.changed++;
         } else if (actions.includes("delete")) {
           this.changes.resources.deleted++;
+        } else {
+          this.changes.resources.none++;
         }
       });
     },
@@ -285,6 +322,48 @@ import { Options, Vue } from "vue-class-component";
   created() {
     console.log(this.plan);
     this.checkPlannedChanges();
+    console.log(this.changes)
+  },
+  mounted() {
+    const ctxResources = document.getElementById('chart-pie-resource-changes') as ChartItem;
+    const resourceChangesChart = new Chart(ctxResources, {
+        type: 'pie',
+        data: {
+            labels: ["No changes", "Added", "Updated", "Deleted"],
+            datasets: [{
+                label: 'Resource Changes',
+                data: [this.changes.resources.none, this.changes.resources.added, this.changes.resources.changed, this.changes.resources.deleted],
+                backgroundColor: [
+                  '#0d6efd',
+                  '#198754',
+                  '#fd7e14',
+                  '#dc3545',
+                ],
+                hoverOffset: 4
+            }]
+        },
+        options: this.chartOptions
+    });
+
+    const ctxOutputs = document.getElementById('chart-pie-output-changes') as ChartItem;
+    const outputChangesChart = new Chart(ctxOutputs, {
+        type: 'pie',
+        data: {
+            labels: ["No changes", "Added", "Updated", "Deleted"],
+            datasets: [{
+                label: 'Output Changes',
+                data: [this.changes.outputs.none, this.changes.outputs.added, this.changes.outputs.changed, this.changes.outputs.deleted],
+                backgroundColor: [
+                  '#0d6efd',
+                  '#198754',
+                  '#fd7e14',
+                  '#dc3545',
+                ],
+                hoverOffset: 4
+            }]
+        },
+        options: this.chartOptions
+    });
   },
 })
 export default class StatePlan extends Vue {}

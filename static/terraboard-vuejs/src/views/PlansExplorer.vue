@@ -123,6 +123,7 @@ import router from "../router";
             let entry = {value: obj.lineage_value, label: obj.path}
             this.data.paths.options.push(entry)
           });
+          this.refreshList();
         })
         .catch(function (err) {
           if (err.response) {
@@ -167,9 +168,11 @@ import router from "../router";
           );
           this.pager.page = this.results.page;
           this.pager.prevPage =
-            page != undefined && page <= 1 ? undefined : this.pager.page - 1;
+            this.pager.page <= 1 
+            ? undefined 
+            : this.pager.page - 1;
           this.pager.nextPage =
-            page != undefined && page >= this.pager.pages
+            this.pager.page >= this.pager.pages
               ? undefined
               : this.pager.page + 1;
           this.pager.startItems =
@@ -195,8 +198,9 @@ import router from "../router";
   },
   created() {
     this.updateTitle();
+  },
+  mounted() {
     this.fetchStates();
-    this.refreshList();
   },
 })
 export default class PlansExplorer extends Vue {}

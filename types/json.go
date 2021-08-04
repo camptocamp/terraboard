@@ -72,12 +72,6 @@ func (p *planStateResourceAttributeList) UnmarshalJSON(b []byte) error {
 }
 
 func (p *rawJSON) UnmarshalJSON(b []byte) error {
-	var tmp interface{}
-	err := json.Unmarshal(b, &tmp)
-	if err != nil {
-		return err
-	}
-
-	*p = rawJSON(fmt.Sprintf("%v", tmp))
+	*p = rawJSON(string(b))
 	return nil
 }
