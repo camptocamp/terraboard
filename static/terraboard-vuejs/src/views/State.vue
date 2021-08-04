@@ -290,15 +290,40 @@ import StatePlan from "../components/StatePlan.vue";
         .get(url)
         .then((response) => {
           this.plans = response.data.plans;
-          console.log(this.plans)
           if (router.currentRoute.value.query.planid !== undefined) {
             this.url.planid = router.currentRoute.value.query.planid;
+
+            let planFinded = false;
             this.plans.forEach((plan: any) => {
-              console.log(plan.ID, this.url.planid)
               if (plan.ID == this.url.planid) {
+                planFinded = true;
                 this.setPlanSelected(plan); 
               }
             });
+            if (planFinded === false) {
+              const url = `http://localhost:8080/api/plans?lineage=`+this.url.lineage;
+              axios
+                .get(url)
+                .then((response) => {
+                  response.data.plans.forEach((plan: any) => {
+                    if (plan.ID == this.url.planid) {
+                      this.setPlanSelected(plan); 
+                    }
+                  });
+                })
+                .catch(function(err) {
+                  if (err.response) {
+                    console.log("Server Error:", err);
+                  } else if (err.request) {
+                    console.log("Network Error:", err);
+                  } else {
+                    console.log("Client Error:", err);
+                  }
+                })
+                .then(function() {
+                  // always executed
+                });
+            }
           }
         })
         .catch(function(err) {

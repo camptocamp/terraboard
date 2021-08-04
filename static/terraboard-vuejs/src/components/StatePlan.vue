@@ -137,31 +137,11 @@
                       </a>
                       <ul class="collapse" :id="'collapse-'+output.name">
                         <li>Actions: {{ output.change.actions }}</li>
-                        <li>After: {{ output.change.after }}
-                          <ul>
-                            <li v-for="(value, attr) in JSON.parse(output.change.after)" :key="attr">{{attr}}: {{value}}</li>
-                          </ul>
-                        </li>
-                        <li>After sensitive: {{ output.change.after_sensitive }}
-                          <ul>
-                            <li v-for="(value, attr) in JSON.parse(output.change.after_sensitive)" :key="attr">{{attr}}: {{value}}</li>
-                          </ul>
-                        </li>
-                        <li>After unknown: {{ output.change.after_unknown }}
-                          <ul>
-                            <li v-for="(value, attr) in JSON.parse(output.change.after_unknown)" :key="attr">{{attr}}: {{value}}</li>
-                          </ul>
-                        </li>
-                        <li>Before: {{ output.change.before }}
-                          <ul>
-                            <li v-for="(value, attr) in JSON.parse(output.change.before)" :key="attr">{{attr}}: {{value}}</li>
-                          </ul>
-                        </li>
-                        <li>Before sensitive: {{ output.change.before_sensitive }}
-                          <ul>
-                            <li v-for="(value, attr) in JSON.parse(output.change.before_sensitive)" :key="attr">{{attr}}: {{value}}</li>
-                          </ul>
-                        </li>
+                        <li>After: {{ output.change.after }}</li>
+                        <li>After sensitive: {{ output.change.after_sensitive }}</li>
+                        <li>After unknown: {{ output.change.after_unknown }}</li>
+                        <li>Before: {{ output.change.before }}</li>
+                        <li>Before sensitive: {{ output.change.before_sensitive }}</li>
                       </ul>
                     </li>
                   </ul>
@@ -320,9 +300,7 @@ Chart.register( PieController, ArcElement, Tooltip )
     },
   },
   created() {
-    console.log(this.plan);
     this.checkPlannedChanges();
-    console.log(this.changes)
   },
   mounted() {
     const ctxResources = document.getElementById('chart-pie-resource-changes') as ChartItem;
