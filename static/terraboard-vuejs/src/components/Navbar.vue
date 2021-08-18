@@ -52,14 +52,14 @@
                 id="dropdownMenuButton"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
-                ><img src="" height="25px"
+                ><img :src="user.avatar_url" height="25px"
               /></a>
 
               <ul
                 class="dropdown-menu dropdown-menu-end"
                 aria-labelledby="dropdownMenuButton1"
               >
-                <li><a class="dropdown-item" href="#">Logged in as </a></li>
+                <li><a class="dropdown-item" href="#">Logged in as {{user.name}}</a></li>
                 <li>
                   <a class="dropdown-item" href="/oauth2/sign_in">Sign out</a>
                 </li>
@@ -85,7 +85,8 @@ import router from "../router";
         options: [],
         value: null,
         searchable: true,
-      }
+      },
+      user: {}
     };
   },
   methods: {
@@ -122,7 +123,29 @@ import router from "../router";
         .then(function () {
           // always executed
         });
+    },
+    fetchUser() {
+      const url = `/api/user`
+      axios.get(url)
+        .then((response) => {
+          this.user = response.data;
+        })
+        .catch(function (err) {
+          if (err.response) {
+            console.log("Server Error:", err)
+          } else if (err.request) {
+            console.log("Network Error:", err)
+          } else {
+            console.log("Client Error:", err)
+          }
+        })
+        .then(function () {
+          // always executed
+        });
     }
+  },
+  created() {
+    this.fetchUser();
   },
   mounted() {
     this.fetchStates();
