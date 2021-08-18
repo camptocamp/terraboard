@@ -1,8 +1,8 @@
 <template>
 <div id="results" class="row">
-    <label id="navigate"> <span class="fas fa-caret-left" v-if="prevPage"
+    <label id="navigate"> <span class="fas fa-caret-left" role="button" v-if="prevPage"
             v-on:click="fetchStats(prevPage)"></span> {{startItems}}-{{itemsInPage}}/{{results.total}}
-        <span class="fas fa-caret-right" v-if="nextPage" v-on:click="fetchStats(nextPage)"></span>
+        <span class="fas fa-caret-right" role="button" v-if="nextPage" v-on:click="fetchStats(nextPage)"></span>
     </label>
     <table class="table table-border table-striped">
         <thead>
