@@ -228,7 +228,7 @@ import StatesCompare from "../components/StatesCompare.vue";
           for (let i = 0; i < response.data.length; i++) {
             const version = {
               versionId: response.data[i].version_id,
-              date: new Date(response.data[i].last_modified).toLocaleString(),
+              date: new Date(response.data[i].last_modified).toUTCString(),
             };
             this.versions.unshift(version);
           }
