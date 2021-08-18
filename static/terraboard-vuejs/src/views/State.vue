@@ -262,7 +262,7 @@ import StatePlan from "../components/StatePlan.vue";
       this.display.plan = true;
     },
     formatDate(date: string): string {
-        return new Date(date).toLocaleString();
+        return new Date(date).toUTCString();
     },
     fetchLocks(): void {
       const url = `/api/locks`;
@@ -285,7 +285,7 @@ import StatePlan from "../components/StatePlan.vue";
         });
     },
     fetchLatestPlans(limit: number): void {
-      const url = `http://localhost:8080/api/plans?limit=`+limit+`&lineage=`+this.url.lineage;
+      const url = `/api/plans?limit=`+limit+`&lineage=`+this.url.lineage;
       axios
         .get(url)
         .then((response) => {
@@ -301,7 +301,7 @@ import StatePlan from "../components/StatePlan.vue";
               }
             });
             if (planFinded === false) {
-              const url = `http://localhost:8080/api/plans?lineage=`+this.url.lineage;
+              const url = `/api/plans?lineage=`+this.url.lineage;
               axios
                 .get(url)
                 .then((response) => {

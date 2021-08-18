@@ -24,12 +24,14 @@
   <label id="navigate" v-if="results.length != 0">
     <span
       class="fas fa-caret-left"
+      role="button"
       v-on:click="refreshList(pager.prevPage)"
       v-if="pager.prevPage"
     ></span>
     {{ pager.startItems }}-{{ pager.itemsInPage }}/{{ results.total }}
     <span
       class="fas fa-caret-right"
+      role="button"
       v-on:click="refreshList(pager.nextPage)"
       v-if="pager.nextPage"
     ></span>
@@ -113,10 +115,10 @@ import router from "../router";
       this.clearPath();
     },
     formatDate(date: string): string {
-      return new Date(date).toLocaleString();
+      return new Date(date).toUTCString();
     },
     fetchStates() {
-      const url = `http://localhost:8080/api/lineages/stats`
+      const url = `/api/lineages/stats`
       axios.get(url)
         .then((response) => {
           // handle success
@@ -159,7 +161,7 @@ import router from "../router";
         .join("&");
 
       router.push({ name: "Plans", query: params });
-      const url = `http://localhost:8080/api/plans?` + query;
+      const url = `/api/plans?` + query;
       axios
         .get(url)
         .then((response) => {
