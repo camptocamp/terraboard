@@ -1,5 +1,12 @@
 # Changelog
 
+### [2.0.1](https://www.github.com/camptocamp/terraboard/compare/v2.0.0...v2.0.1) (2021-08-18)
+
+
+### Bug Fixes
+
+* remove localhost from URLs ([#196](https://www.github.com/camptocamp/terraboard/issues/196)) ([7dd34ed](https://www.github.com/camptocamp/terraboard/commit/7dd34ed6fdd1781a6c76a6753e406fb7dc25d33f))
+
 ## [2.0.0-alpha](https://www.github.com/camptocamp/terraboard/compare/v1.1.0...v2.0.0-alpha) (2021-07-31)
 
 
