@@ -60,7 +60,7 @@
           class="form-control"
           placeholder="Attribute Value"
           v-model="search.attrVal"
-          v-on:change="doSearch(1)"
+          v-on:input="doSearch(1)"
         />
       </div>
       <div class="col-3 col-md-2 col-lg-1">
