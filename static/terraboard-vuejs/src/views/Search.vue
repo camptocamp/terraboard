@@ -73,13 +73,13 @@
   <hr />
   <label id="navigate" v-if="results.length != 0">
     <span
-      class="fas fa-caret-left"
+      class="fas fa-caret-left" role="button"
       v-on:click="doSearch(pager.prevPage)"
       v-if="pager.prevPage"
     ></span>
     {{ pager.startItems }}-{{ pager.itemsInPage }}/{{ results.total }}
     <span
-      class="fas fa-caret-right"
+      class="fas fa-caret-right" role="button"
       v-on:click="doSearch(pager.nextPage)"
       v-if="pager.nextPage"
     ></span>
