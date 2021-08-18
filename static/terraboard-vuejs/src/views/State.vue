@@ -449,6 +449,10 @@ export default class State extends Vue {}
 </script>
 
 <style lang="scss">
+#nodeslist .list-group-item {
+  cursor: pointer;
+}
+
 #nodeslist .list-group-item .resource:hover,
 #only-in-old .list-group-item:hover,
 #only-in-new .list-group-item:hover {
