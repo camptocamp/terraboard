@@ -90,26 +90,20 @@
             <li
               class="list-group-item"
               v-for="mod in state.details.modules"
-              v-bind:key="mod"
+              v-bind:key="mod.path"
             >
               <div
                 @click="display.mod = display.mod != mod ? mod : selectedMod"
                 class="node-name"
                 v-bind:class="{ selected: mod == selectedMod }"
               >
-                <h4>{{mod.path ? mod.path : &quot;root&quot;}}</h4>
-                <span class="badge float-right"
-                  >{{resFilter == &quot;&quot; ? &apos;&apos; : filteredRes.length+&apos;/&apos;
-
-
-
-                  }}{{ mod.resources.keys().length }}</span
-                >
+                <h4>{{mod.path ? mod.path : "root"}}<span class="badge bg-secondary float-end w-5"
+                  >{{(this.resFilter == "" ? "" : this.filteredResLength+"/")+mod.resources.length}}</span
+                ></h4>
               </div>
-              <!-- | filter = {name:resFilter} as filteredRes -->
               <ul v-show="display.mod == mod" class="list-group">
                 <li
-                  v-for="r in mod.resources"
+                  v-for="r in filterModules(mod.resources, resFilter)"
                   v-bind:key="r"
                   v-bind:class="{ selected: r == selectedRes }"
                   @click="setSelected(mod, r)"
@@ -178,6 +172,8 @@ import StatesCompare from "../components/StatesCompare.vue";
       selectedRes: {},
       selectedMod: {},
       resFilter: "",
+      filteredRes: {},
+      filteredResLength: 0,
       compare: {},
       compareDiff: {},
       url: {
@@ -199,6 +195,21 @@ import StatesCompare from "../components/StatesCompare.vue";
     };
   },
   methods: {
+    filterModules(modules: any, filter: string) {
+      if(filter != "") {
+        let res: any[] = [];
+        modules.forEach((mod: any) => {
+          if (mod.name.lastIndexOf(filter, 0) === 0) {
+            res.push(mod);
+          }
+        });
+          
+        this.filteredRes = res;
+        this.filteredResLength = res.length;
+        return res;
+      }
+      return modules;
+    },
     fetchLocks(): void {
       const url = `/api/locks`;
       axios
