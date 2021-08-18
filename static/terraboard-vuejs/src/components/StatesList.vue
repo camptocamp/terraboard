@@ -134,7 +134,7 @@ Chart.register( CategoryScale, LineElement, LineController, LinearScale, PointEl
         });
     },
     formatDate(date: string): string {
-        return new Date(date).toLocaleString();
+        return new Date(date).toUTCString();
     },
     createSparkChart(id: string, labels: string[], data: string[]): void {
       const ctx = document.getElementById(id) as ChartItem;
