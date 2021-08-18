@@ -200,7 +200,7 @@ import StatesCompare from "../components/StatesCompare.vue";
   },
   methods: {
     fetchLocks(): void {
-      const url = `http://localhost:8080/api/locks`;
+      const url = `/api/locks`;
       axios
         .get(url)
         .then((response) => {
@@ -221,7 +221,7 @@ import StatesCompare from "../components/StatesCompare.vue";
     },
     getVersions(): void {
       const url =
-        `http://localhost:8080/api/lineages/` + this.url.lineage + `/activity`;
+        `/api/lineages/` + this.url.lineage + `/activity`;
       axios
         .get(url)
         .then((response) => {
@@ -281,7 +281,7 @@ import StatesCompare from "../components/StatesCompare.vue";
         versionId = "";
       }
       const url =
-        "http://localhost:8080/api/lineages/" +
+        "/api/lineages/" +
         this.url.lineage +
         "?versionid=" +
         versionId +
@@ -323,7 +323,7 @@ import StatesCompare from "../components/StatesCompare.vue";
         this.display.compare = true;
 
         const url =
-          `http://localhost:8080/api/lineages/` +
+          `/api/lineages/` +
           this.url.lineage +
           "/compare?from=" +
           this.selectedVersion +

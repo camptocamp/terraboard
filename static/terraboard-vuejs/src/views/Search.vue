@@ -187,7 +187,7 @@ import router from "../router";
       this.doSearch();
     },
     fetchTfVersions() {
-      const url = `http://localhost:8080/api/tf_versions`;
+      const url = `/api/tf_versions`;
       axios
         .get(url)
         .then((response) => {
@@ -207,7 +207,7 @@ import router from "../router";
         });
     },
     fetchResourceTypes() {
-      const url = `http://localhost:8080/api/resource/types`;
+      const url = `/api/resource/types`;
       axios
         .get(url)
         .then((response) => {
@@ -227,7 +227,7 @@ import router from "../router";
         });
     },
     fetchResourceIDs() {
-      const url = `http://localhost:8080/api/resource/names`;
+      const url = `/api/resource/names`;
       axios
         .get(url)
         .then((response) => {
@@ -247,7 +247,7 @@ import router from "../router";
         });
     },
     fetchAttributeKeys() {
-      const url = `http://localhost:8080/api/attribute/keys`;
+      const url = `/api/attribute/keys`;
       axios
         .get(url)
         .then((response) => {
@@ -296,7 +296,7 @@ import router from "../router";
         .join("&");
 
       router.push({ name: "Search", query: params });
-      const url = `http://localhost:8080/api/search/attribute?` + query;
+      const url = `/api/search/attribute?` + query;
       axios
         .get(url)
         .then((response) => {
