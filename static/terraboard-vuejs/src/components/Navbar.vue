@@ -101,7 +101,7 @@ import router from "../router";
       this.$refs.quickAccess.clear()
     },
     fetchStates() {
-      const url = `http://localhost:8080/api/lineages/stats`
+      const url = `/api/lineages/stats`
       axios.get(url)
         .then((response) => {
           // handle success

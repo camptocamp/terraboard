@@ -100,7 +100,7 @@ const chartOptionsLocked =
       router.push({name: "Search", query: { tf_version: this.pieTfVersions.labels[valueIndex] }});
     },
     fetchResourceTypes(): void {
-      const url = `http://localhost:8080/api/resource/types/count`;
+      const url = `/api/resource/types/count`;
       axios.get(url)
         .then((response) => {
           response.data.forEach((value: any, i: number) => {
@@ -152,7 +152,7 @@ const chartOptionsLocked =
         });
     },
     fetchVersions(): void {
-      const url = `http://localhost:8080/api/lineages/tfversion/count?orderBy=version`;
+      const url = `/api/lineages/tfversion/count?orderBy=version`;
       axios.get(url)
         .then((response) => {
           response.data.forEach((value: any, i: number) => {
@@ -204,7 +204,7 @@ const chartOptionsLocked =
         });
     },
     fetchLocks(): void {
-      const url = `http://localhost:8080/api/locks`;
+      const url = `/api/locks`;
       axios.get(url)
         .then((response) => {
           this.locks = response.data;
@@ -259,7 +259,7 @@ const chartOptionsLocked =
     this.fetchResourceTypes();
     this.fetchVersions();
 
-    const url = `http://localhost:8080/api/lineages/stats?page=1`;
+    const url = `/api/lineages/stats?page=1`;
       axios.get(url)
         .then((response) => {
           this.statesTotal = response.data.total;
