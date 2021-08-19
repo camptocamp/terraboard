@@ -52,7 +52,7 @@
                 id="dropdownMenuButton"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
-                ><img :src="user.avatar_url" height="25px"
+                ><img :src="user.avatar_url" height="25"
               /></a>
 
               <ul
