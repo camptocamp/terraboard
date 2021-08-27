@@ -251,7 +251,7 @@ Chart.register( PieController, ArcElement, Tooltip )
   },
   methods: {
     formatDate(date: string): string {
-      return new Date(date).toLocaleString();
+      return new Date(date).toUTCString();
     },
     checkPlannedChanges() {
       this.plan.parsed_plan.output_changes.forEach((change: any) => {
@@ -344,7 +344,7 @@ Chart.register( PieController, ArcElement, Tooltip )
     });
   },
 })
-export default class StatePlan extends Vue {}
+export default class PlanContent extends Vue {}
 </script>
 
 <style lang="scss"></style>

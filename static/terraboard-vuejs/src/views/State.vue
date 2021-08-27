@@ -106,14 +106,14 @@
                 <li
                   v-for="r in filterModules(mod.resources, resFilter)"
                   v-bind:key="r"
-                  v-bind:class="{ selected: r == selectedRes && !display.plan && !state.outputs }"
+                  v-bind:class="{ selected: r == selectedRes && !state.outputs }"
                   @click="setSelected(mod, r)"
                   class="list-group-item resource"
                 >
                   {{ r.type }}.{{ r.name }}{{ r.index }}
                 </li>
                 <li
-                  v-bind:class="{ selected: state.outputs && !display.plan}"
+                  v-bind:class="{ selected: state.outputs}"
                   v-if="mod.outputs.length &gt; 0"
                   @click="setOutputs(mod)"
                   class="list-group-item resource"
@@ -124,20 +124,6 @@
             </li>
           </ul>
         </div>
-        <div id="nodes" class="card mt-4" v-if="display.details || display.plan">
-          <h5 class="card-header">Plans</h5>
-              <ul id="nodeslist" class="list-group m-3">
-                <li
-                  v-for="plan in plans"
-                  v-bind:key="plan"
-                  v-bind:class="{ selected: plan == selectedPlan && display.plan }"
-                  @click="setPlanSelected(plan)"
-                  class="list-group-item plan"
-                >
-                  {{ this.formatDate(plan.CreatedAt) }}
-                </li>
-              </ul>
-        </div>
       </div>
     </div>
     <div id="node" class="col-xl-8 col-xxl-9">
@@ -145,22 +131,17 @@
         <h1>{{ state.path }}</h1>
       </div>
       <StateDetails
-        v-if="display.details && !display.outputs && !display.compare && !display.plan"
+        v-if="display.details && !display.outputs && !display.compare"
         v-bind:resource="selectedRes"
       />
       <StateOutputs
-        v-if="display.details && display.outputs && !display.plan"
+        v-if="display.details && display.outputs"
         v-bind:module="selectedMod"
       />
       <StatesCompare
-        v-if="!display.details && display.compare && !display.plan"
+        v-if="!display.details && display.compare"
         v-bind:compare="compare"
         v-bind:compareDiff="compareDiff"
-      />
-      <StatePlan
-        v-if="display.details && display.plan"
-        v-bind:plan="selectedPlan"
-        v-bind:key="selectedPlan"
       />
     </div>
   </div>
@@ -175,7 +156,6 @@ import hljs from "highlight.js";
 import StateDetails from "../components/StateDetails.vue";
 import StateOutputs from "../components/StateOutputs.vue";
 import StatesCompare from "../components/StatesCompare.vue";
-import StatePlan from "../components/StatePlan.vue";
 
 @Options({
   title: "States",
@@ -183,7 +163,6 @@ import StatePlan from "../components/StatePlan.vue";
     StateDetails,
     StateOutputs,
     StatesCompare,
-    StatePlan,
   },
   emits: ["refresh"],
   data() {
@@ -194,7 +173,6 @@ import StatePlan from "../components/StatePlan.vue";
       compareVersion: "",
       selectedRes: {},
       selectedMod: {},
-      selectedPlan: {},
       resFilter: "",
       filteredRes: {},
       filteredResLength: 0,
@@ -203,7 +181,6 @@ import StatePlan from "../components/StatePlan.vue";
       url: {
         lineage: "",
         versionid: "",
-        planid: "",
         compare: "",
       },
       display: {
@@ -211,14 +188,12 @@ import StatePlan from "../components/StatePlan.vue";
         compare: false,
         outputs: false,
         mod: {},
-        plan: false,
       },
       state: {
         details: {},
         path: {},
         outputs: false,
       },
-      plans: [],
     };
   },
   methods: {
@@ -241,25 +216,16 @@ import StatePlan from "../components/StatePlan.vue";
       this.display.details = true;
       this.display.outputs = false;
       this.display.compare = false;
-      this.display.plan = false;
     },
     showComparePanel() {
       this.display.details = false;
       this.display.outputs = false;
       this.display.compare = true;
-      this.display.plan = false;
     },
     showOutputPanel() {
       this.display.details = true;
       this.display.outputs = true;
       this.display.compare = false;
-      this.display.plan = false;
-    },
-    showPlanPanel() {
-      this.display.details = true;
-      this.display.outputs = false;
-      this.display.compare = false;
-      this.display.plan = true;
     },
     formatDate(date: string): string {
         return new Date(date).toUTCString();
@@ -270,61 +236,6 @@ import StatePlan from "../components/StatePlan.vue";
         .get(url)
         .then((response) => {
           this.locks = response.data;
-        })
-        .catch(function(err) {
-          if (err.response) {
-            console.log("Server Error:", err);
-          } else if (err.request) {
-            console.log("Network Error:", err);
-          } else {
-            console.log("Client Error:", err);
-          }
-        })
-        .then(function() {
-          // always executed
-        });
-    },
-    fetchLatestPlans(limit: number): void {
-      const url = `/api/plans?limit=`+limit+`&lineage=`+this.url.lineage;
-      axios
-        .get(url)
-        .then((response) => {
-          this.plans = response.data.plans;
-          if (router.currentRoute.value.query.planid !== undefined) {
-            this.url.planid = router.currentRoute.value.query.planid;
-
-            let planFinded = false;
-            this.plans.forEach((plan: any) => {
-              if (plan.ID == this.url.planid) {
-                planFinded = true;
-                this.setPlanSelected(plan); 
-              }
-            });
-            if (planFinded === false) {
-              const url = `/api/plans?lineage=`+this.url.lineage;
-              axios
-                .get(url)
-                .then((response) => {
-                  response.data.plans.forEach((plan: any) => {
-                    if (plan.ID == this.url.planid) {
-                      this.setPlanSelected(plan); 
-                    }
-                  });
-                })
-                .catch(function(err) {
-                  if (err.response) {
-                    console.log("Server Error:", err);
-                  } else if (err.request) {
-                    console.log("Network Error:", err);
-                  } else {
-                    console.log("Client Error:", err);
-                  }
-                })
-                .then(function() {
-                  // always executed
-                });
-            }
-          }
         })
         .catch(function(err) {
           if (err.response) {
@@ -374,7 +285,7 @@ import StatePlan from "../components/StatePlan.vue";
     },
     setVersion(versionID: Event): void {
       router.replace({
-        path: `/lineage/${this.url.lineage}`,
+        path: `/lineage/${this.url.lineage}/states`,
         query: { versionid: (versionID.target as HTMLSelectElement).value },
       });
     },
@@ -385,21 +296,9 @@ import StatePlan from "../components/StatePlan.vue";
       this.showDetailsPanel();
       var hash = res.type + "." + res.name;
       router.replace({
-        path: `/lineage/${this.url.lineage}`,
+        path: `/lineage/${this.url.lineage}/states`,
         query: { versionid: this.url.versionid, ressource: hash },
 
-      });
-    },
-    setPlanSelected(plan: any): void {
-      this.selectedPlan = plan;
-      this.state.outputs = false;
-      this.showPlanPanel();
-      router.replace({
-        path: `/lineage/${this.url.lineage}`,
-        query: { 
-          versionid: this.url.versionid,
-          planid: plan.ID 
-        },
       });
     },
     setOutputs(mod: any): void {
@@ -407,7 +306,7 @@ import StatePlan from "../components/StatePlan.vue";
       this.state.outputs = true;
       this.showOutputPanel();
       router.replace({
-        path: `/lineage/${this.url.lineage}`,
+        path: `/lineage/${this.url.lineage}/states`,
         query: {
           versionid: this.url.versionid,
           ressource: mod.path + "." + "outputs",
@@ -450,7 +349,7 @@ import StatePlan from "../components/StatePlan.vue";
         this.compareVersion != undefined
       ) {
         router.replace({
-          name: "State",
+          name: "States",
           params: { lineage: this.url.lineage },
           query: {
             versionid: this.url.versionid,
@@ -568,8 +467,6 @@ import StatePlan from "../components/StatePlan.vue";
     this.getVersions();
     this.getDetails(router.currentRoute.value.query.versionid);
     this.display.mod = this.selectedMod;
-
-    this.fetchLatestPlans(10);
   },
   updated() {
     hljs.highlightAll();
@@ -585,7 +482,6 @@ export default class State extends Vue {}
 
 #nodeslist .list-group-item .resource:hover,
 #nodeslist .list-group-item.resource:hover,
-#nodeslist .list-group-item.plan:hover,
 #only-in-old .list-group-item:hover,
 #only-in-new .list-group-item:hover {
   background-color: #d9edf7;

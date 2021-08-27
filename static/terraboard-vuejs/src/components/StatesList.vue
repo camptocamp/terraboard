@@ -29,7 +29,7 @@
         <tbody>
             <tr v-for="(r, index) in results.states" v-bind:key="r">
                 <td class="align-middle"><span v-if="isLocked(r.path)" class="fa fas-lock" title="Locked by {{locks[r.path].Who}} on {{locks[r.path].Created | date:'medium'}} ({{locks[r.path].Operation}})"></span></td>
-                <td class="align-middle"><router-link :to="`/lineage/${r.lineage_value}?versionid=${r.version_id}`">{{r.path}}</router-link></td>
+                <td class="align-middle"><router-link :to="`/lineage/${r.lineage_value}`">{{r.path}}</router-link></td>
                 <td class="align-middle">{{r.terraform_version}}</td>
                 <td class="align-middle">{{r.serial}}</td>
                 <td class="align-middle">{{formatDate(r.last_modified)}}</td>

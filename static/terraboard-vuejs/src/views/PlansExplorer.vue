@@ -53,7 +53,7 @@
           <td>
             <router-link
               :to="
-                `/lineage/${r.lineage_data.lineage}?planid=${r.ID}`
+                `/lineage/${r.lineage_data.lineage}/plans?planid=${r.ID}`
               "
             >
               <span class="fas fa-link" aria-hidden="true"></span>
@@ -160,7 +160,7 @@ import router from "../router";
         })
         .join("&");
 
-      router.push({ name: "Plans", query: params });
+      router.push({ name: "PlansExplorer", query: params });
       const url = `/api/plans?` + query;
       axios
         .get(url)

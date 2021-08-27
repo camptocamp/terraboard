@@ -101,7 +101,7 @@ import router from "../router";
     },
     goToState(value: any) {
       if (value != null) {
-        router.push({name: "State", params: {lineage: value.lineage_value}, query: { versionid: value.version_id } });
+        router.push({name: "States", params: {lineage: value.lineage_value}, query: { versionid: value.version_id } });
       }
     },
     clearSelect() {
