@@ -54,6 +54,7 @@
     - [GitLab Options](#gitlab-options)
     - [Web](#web)
     - [Help Options](#help-options)
+- [Push plans to Terraboard](#push-plans-to-terraboard)
 - [Use with Docker](#use-with-docker)
   - [Docker-compose](#docker-compose)
   - [Docker command line](#docker-command-line)
@@ -328,6 +329,23 @@ You can find a ready-to-use Docker example with two *MinIO* buckets in the `test
 #### Help Options
 
 - `-h`, `--help` Show this help message
+
+## Push plans to Terraboard
+
+In order to send Terraform plans to Terraboard, you must wrap it in this JSON format:
+```json
+{
+    "lineage": "<Plan's lineage>",
+    "terraform_version": "<Terraform version>",
+    "git_remote": "<The URL of the remote that generated this plan>",
+    "git_commit": "<Commit hash>",
+    "ci_url": "<The URL of the CI that sent this plan>",
+    "source": "<Free field for the triggering event>",
+    "plan_json": "<Terraform plan JSON export>"
+}
+```
+
+And send it to `/api/plans` using **POST** method
 
 ## Use with Docker
 
