@@ -276,14 +276,21 @@ func SubmitPlan(w http.ResponseWriter, r *http.Request, db *db.Database) {
 
 // GetPlans provides all Plan by lineage.
 // Optional "&limit=X" parameter to limit requested quantity of plans.
+// Optional "&page=X" parameter to add an offset to the query and enable pagination.
 // Sorted by most recent to oldest.
 // /api/plans GET endpoint callback
+// Also return pagination informations (current page ans total items count in database)
 func GetPlans(w http.ResponseWriter, r *http.Request, db *db.Database) {
 	lineage := r.URL.Query().Get("lineage")
 	limit := r.URL.Query().Get("limit")
-	plans := db.GetPlans(lineage, limit)
+	page := r.URL.Query().Get("page")
+	plans, currentPage, total := db.GetPlans(lineage, limit, page)
 
-	j, err := json.Marshal(plans)
+	response := make(map[string]interface{})
+	response["plans"] = plans
+	response["page"] = currentPage
+	response["total"] = total
+	j, err := json.Marshal(response)
 	if err != nil {
 		log.Errorf("Failed to marshal plans: %v", err)
 		JSONError(w, "Failed to marshal plans", err)

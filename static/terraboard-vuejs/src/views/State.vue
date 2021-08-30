@@ -17,7 +17,7 @@
                 <span class="fas fa-thumbtack" aria-hidden="true"></span>
                 Version
               </h5>
-              <select class="form-control" v-model="selectedVersion">
+              <select class="form-control" @change="this.setVersion">
                 <option
                   v-for="version in versions"
                   v-bind:key="version"
@@ -59,6 +59,7 @@
                   @click="
                     compareVersion = undefined;
                     display.compare = false;
+                    display.details = true;
                   "
                 >
                   Reset
@@ -105,14 +106,14 @@
                 <li
                   v-for="r in filterResources(mod)"
                   v-bind:key="r"
-                  v-bind:class="{ selected: r == selectedRes }"
+                  v-bind:class="{ selected: r == selectedRes && !state.outputs }"
                   @click="setSelected(mod, r)"
                   class="list-group-item resource"
                 >
                   {{ r.type }}.{{ r.name }}{{ r.index }}
                 </li>
                 <li
-                  v-bind:class="{ selected: state.outputs }"
+                  v-bind:class="{ selected: state.outputs}"
                   v-if="mod.outputs.length &gt; 0"
                   @click="setOutputs(mod)"
                   class="list-group-item resource"
@@ -163,6 +164,7 @@ import StatesCompare from "../components/StatesCompare.vue";
     StateOutputs,
     StatesCompare,
   },
+  emits: ["refresh"],
   data() {
     return {
       locks: {},
@@ -212,6 +214,24 @@ import StatesCompare from "../components/StatesCompare.vue";
         return res;
       }
       return module.resources;
+    },
+    showDetailsPanel() {
+      this.display.details = true;
+      this.display.outputs = false;
+      this.display.compare = false;
+    },
+    showComparePanel() {
+      this.display.details = false;
+      this.display.outputs = false;
+      this.display.compare = true;
+    },
+    showOutputPanel() {
+      this.display.details = true;
+      this.display.outputs = true;
+      this.display.compare = false;
+    },
+    formatDate(date: string): string {
+        return new Date(date).toUTCString();
     },
     fetchLocks(): void {
       const url = `/api/locks`;
@@ -266,24 +286,30 @@ import StatesCompare from "../components/StatesCompare.vue";
       }
       return false;
     },
+    setVersion(versionID: Event): void {
+      router.replace({
+        path: `/lineage/${this.url.lineage}/states`,
+        query: { versionid: (versionID.target as HTMLSelectElement).value },
+      });
+    },
     setSelected(mod: any, res: any): void {
       this.selectedMod = mod;
       this.selectedRes = res;
       this.state.outputs = false;
-      this.display.outputs = false;
+      this.showDetailsPanel();
       var hash = res.type + "." + res.name;
-      router.push({
-        path: `/lineage/${this.url.lineage}`,
+      router.replace({
+        path: `/lineage/${this.url.lineage}/states`,
         query: { versionid: this.url.versionid, ressource: hash },
+
       });
     },
     setOutputs(mod: any): void {
       this.selectedMod = mod;
-      this.selectedRes = null;
       this.state.outputs = true;
-      this.display.outputs = true;
-      router.push({
-        path: `/lineage/${this.url.lineage}`,
+      this.showOutputPanel();
+      router.replace({
+        path: `/lineage/${this.url.lineage}/states`,
         query: {
           versionid: this.url.versionid,
           ressource: mod.path + "." + "outputs",
@@ -326,15 +352,14 @@ import StatesCompare from "../components/StatesCompare.vue";
         this.compareVersion != undefined
       ) {
         router.replace({
-          name: "State",
+          name: "States",
           params: { lineage: this.url.lineage },
           query: {
             versionid: this.url.versionid,
             compare: this.compareVersion.versionId,
           },
         });
-        this.display.details = false;
-        this.display.compare = true;
+        this.showComparePanel();
 
         const url =
           `/api/lineages/` +
@@ -370,14 +395,6 @@ import StatesCompare from "../components/StatesCompare.vue";
           .then(function() {
             // always executed
           });
-      } else {
-        router.replace({
-          name: "State",
-          params: { lineage: this.url.lineage },
-          query: { versionid: this.url.versionid },
-        });
-        this.display.details = true;
-        this.display.compare = false;
       }
     },
   },
@@ -423,14 +440,13 @@ import StatesCompare from "../components/StatesCompare.vue";
         }
       },
     },
-    "$data.selectedVersion": {
+    "$route.query.versionid": {
       handler: function(nv, ov) {
-        router.push({
-          name: "State",
-          params: { lineage: this.url.lineage },
-          query: { versionid: nv },
-        });
+        if (this.url.lineage != this.$route.params.lineage) {
+          this.$emit("refresh");
+        }
         if (nv != ov) {
+          this.url.versionid = nv;
           this.getDetails(nv);
         }
         this.compareVersions();
@@ -476,6 +492,7 @@ export default class State extends Vue {}
 }
 
 #nodeslist .list-group-item .resource:hover,
+#nodeslist .list-group-item.resource:hover,
 #only-in-old .list-group-item:hover,
 #only-in-new .list-group-item:hover {
   background-color: #d9edf7;
@@ -488,7 +505,7 @@ export default class State extends Vue {}
   color: #337ab7;
 }
 
-#nodeslist .list-group-item .resource.selected {
+#nodeslist .list-group-item.selected {
   background-color: #d9edf7;
   color: #337ab7;
 }

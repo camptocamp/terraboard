@@ -23,6 +23,12 @@
             </router-link>
           </li>
           <li class="nav-item mx-2">
+            <router-link to="/plans" class="nav-link"
+              ><span class="fas fa-file-alt" aria-hidden="true"></span>
+              Plans
+            </router-link>
+          </li>
+          <li class="nav-item mx-2">
             <router-link to="/search" class="nav-link"
               ><span class="fas fa-search" aria-hidden="true"></span> Search
             </router-link>
@@ -95,7 +101,7 @@ import router from "../router";
     },
     goToState(value: any) {
       if (value != null) {
-        router.push({name: "State", params: {lineage: value.lineage_value}, query: { versionid: value.version_id } });
+        router.push({name: "States", params: {lineage: value.lineage_value}, query: { versionid: value.version_id } });
       }
     },
     clearSelect() {

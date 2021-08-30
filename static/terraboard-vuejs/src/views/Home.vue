@@ -15,6 +15,7 @@ import StatesList from '@/components/StatesList.vue'; // @ is an alias to /src
     Charts,
     StatesList,
   },
+  emits: ["refresh"],
   created() {
     this.updateTitle();
   },

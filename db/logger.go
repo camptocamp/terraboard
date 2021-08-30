@@ -18,11 +18,6 @@ import (
 
 // GormLogger is a wrapper class that implement Gorm logger interface
 type GormLogger struct {
-	GormLoggerConfig
-}
-
-// GormLoggerConfig handle GormLogger config (log level, slow threshold)
-type GormLoggerConfig struct {
 	LogLevel      logger.LogLevel
 	SlowThreshold time.Duration
 }
@@ -30,10 +25,8 @@ type GormLoggerConfig struct {
 var (
 	// LogrusGormLogger default GormLogger instance for Gorm logging through Logrus
 	LogrusGormLogger = GormLogger{
-		GormLoggerConfig{
-			LogLevel:      logger.Warn,
-			SlowThreshold: 200 * time.Millisecond,
-		},
+		LogLevel:      logger.Warn,
+		SlowThreshold: 200 * time.Millisecond,
 	}
 )
 
@@ -45,52 +38,52 @@ func (l *GormLogger) LogMode(level logger.LogLevel) logger.Interface {
 }
 
 // Info print info
-func (l *GormLogger) Info(_ context.Context, msg string, data ...interface{}) {
+func (l *GormLogger) Info(ctx context.Context, msg string, data ...interface{}) {
 	if l.LogLevel >= logger.Info {
-		logrus.Info(msg, append([]interface{}{utils.FileWithLineNum()}, data...))
+		logrus.WithContext(ctx).Info(msg, append([]interface{}{utils.FileWithLineNum()}, data...))
 	}
 }
 
 // Warn print warn messages
-func (l *GormLogger) Warn(_ context.Context, msg string, data ...interface{}) {
+func (l *GormLogger) Warn(ctx context.Context, msg string, data ...interface{}) {
 	if l.LogLevel >= logger.Warn {
-		logrus.Warn(msg, append([]interface{}{utils.FileWithLineNum()}, data...))
+		logrus.WithContext(ctx).Warn(msg, append([]interface{}{utils.FileWithLineNum()}, data...))
 	}
 }
 
 // Error print error messages
-func (l *GormLogger) Error(_ context.Context, msg string, data ...interface{}) {
+func (l *GormLogger) Error(ctx context.Context, msg string, data ...interface{}) {
 	if l.LogLevel >= logger.Error {
-		logrus.Warn(msg, append([]interface{}{utils.FileWithLineNum()}, data...))
+		logrus.WithContext(ctx).Error(msg, append([]interface{}{utils.FileWithLineNum()}, data...))
 	}
 }
 
 // Trace print sql message
-func (l *GormLogger) Trace(_ context.Context, begin time.Time, fc func() (string, int64), err error) {
+func (l *GormLogger) Trace(ctx context.Context, begin time.Time, fc func() (string, int64), err error) {
 	if l.LogLevel > 0 {
 		elapsed := time.Since(begin)
 		switch {
 		case err != nil && l.LogLevel >= logger.Error:
 			sql, rows := fc()
 			if rows == -1 {
-				logrus.Trace(utils.FileWithLineNum(), err, float64(elapsed.Nanoseconds())/1e6, "-", sql)
+				logrus.WithContext(ctx).Error(utils.FileWithLineNum(), err, float64(elapsed.Nanoseconds())/1e6, "-", sql)
 			} else {
-				logrus.Trace(utils.FileWithLineNum(), err, float64(elapsed.Nanoseconds())/1e6, rows, sql)
+				logrus.WithContext(ctx).Error(utils.FileWithLineNum(), err, float64(elapsed.Nanoseconds())/1e6, rows, sql)
 			}
 		case elapsed > l.SlowThreshold && l.SlowThreshold != 0 && l.LogLevel >= logger.Warn:
 			sql, rows := fc()
 			slowLog := fmt.Sprintf("SLOW SQL >= %v", l.SlowThreshold)
 			if rows == -1 {
-				logrus.Trace(utils.FileWithLineNum(), slowLog, float64(elapsed.Nanoseconds())/1e6, "-", sql)
+				logrus.WithContext(ctx).Warn(utils.FileWithLineNum(), slowLog, float64(elapsed.Nanoseconds())/1e6, "-", sql)
 			} else {
-				logrus.Trace(utils.FileWithLineNum(), slowLog, float64(elapsed.Nanoseconds())/1e6, rows, sql)
+				logrus.WithContext(ctx).Warn(utils.FileWithLineNum(), slowLog, float64(elapsed.Nanoseconds())/1e6, rows, sql)
 			}
 		case l.LogLevel >= logger.Info:
 			sql, rows := fc()
 			if rows == -1 {
-				logrus.Trace(utils.FileWithLineNum(), float64(elapsed.Nanoseconds())/1e6, "-", sql)
+				logrus.WithContext(ctx).Debug(utils.FileWithLineNum(), float64(elapsed.Nanoseconds())/1e6, "-", sql)
 			} else {
-				logrus.Trace(utils.FileWithLineNum(), float64(elapsed.Nanoseconds())/1e6, rows, sql)
+				logrus.WithContext(ctx).Debug(utils.FileWithLineNum(), float64(elapsed.Nanoseconds())/1e6, rows, sql)
 			}
 		}
 	}
