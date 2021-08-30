@@ -11,6 +11,7 @@ import (
  *********************************************/
 
 type planOutputList []PlanOutput
+type planVariableList []PlanModelVariable
 type planStateOutputList []PlanStateOutput
 type planStateResourceAttributeList []PlanStateResourceAttribute
 type rawJSON string
@@ -29,6 +30,25 @@ func (p *planOutputList) UnmarshalJSON(b []byte) error {
 			Change: value,
 		}
 		list = append(list, output)
+	}
+
+	*p = list
+	return nil
+}
+
+func (p *planVariableList) UnmarshalJSON(b []byte) error {
+	var tmp map[string]interface{}
+	err := json.Unmarshal(b, &tmp)
+	if err != nil {
+		return err
+	}
+
+	var list planVariableList
+	for key, value := range tmp {
+		list = append(list, PlanModelVariable{
+			Key:   key,
+			Value: fmt.Sprintf("%v", value),
+		})
 	}
 
 	*p = list
