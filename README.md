@@ -339,7 +339,7 @@ In order to send Terraform plans to Terraboard, you must wrap it in this JSON fo
     "terraform_version": "<Terraform version>",
     "git_remote": "<The URL of the remote that generated this plan>",
     "git_commit": "<Commit hash>",
-    "ci_url": "<The URL of the CI that sended this plan>",
+    "ci_url": "<The URL of the CI that sent this plan>",
     "source": "<Free field for the triggering event>",
     "plan_json": "<Terraform plan JSON export>"
 }
