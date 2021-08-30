@@ -1,4 +1,5 @@
 <template>
+    <h1 v-if="this.lastPath != ''">Workspace: {{this.lastPath}}</h1>
     <label id="navigate" v-if="data.length != 0">
     <span
       class="fas fa-caret-left"
@@ -17,14 +18,12 @@
   <div id="results">
     <table class="table table-border table-striped">
       <thead>
-        <th>Identifier</th>
         <th>Type</th>
         <th>Created At</th>
         <th>Actions</th>
       </thead>
       <tbody>
         <tr v-for="r in this.pager.items" v-bind:key="r">
-          <td>{{ r.name }}</td>
           <td>
             <span v-if="r.type === 'state'" class="badge rounded-pill bg-primary">State</span>
             <span v-else-if="r.type === 'plan'" class="badge rounded-pill bg-secondary">Plan</span>
@@ -64,6 +63,7 @@ class ObjWrapper {
   data() {
     return {
       data: [] as ObjWrapper[],
+      lastPath: '',
       lineage: "",
       pager: {
         items: [],
@@ -81,6 +81,15 @@ class ObjWrapper {
     formatDate(date: Date): string {
       return date.toUTCString();
     },
+    getLastStatePath(): string {
+      for (let i = 0; i < this.data.length; i++) {
+        const obj = this.data[i];
+        if (obj.type == 'state') {
+          return obj.name;
+        }
+      }
+      return "";
+    },
     goToRessource(route: any) {
       router.push(route);
     },
@@ -89,7 +98,6 @@ class ObjWrapper {
       axios.get(url)
         .then((response) => {
           // handle success
-          console.log(response);
           response.data.forEach((obj: any) => {
             let entry = new ObjWrapper(
               obj.path, 
@@ -116,6 +124,7 @@ class ObjWrapper {
                 this.data.push(entry)
               });
               this.data.sort((a: any, b: any) => b.createdAt.getTime() - a.createdAt.getTime())
+              this.lastPath = this.getLastStatePath();
               this.refreshList(1);
             })
             .catch(function (err) {
