@@ -109,7 +109,7 @@ type PlanModel struct {
 	PlanStateValueID sql.NullInt64  `gorm:"index" json:"-"`
 
 	// The variables set in the root module when creating the plan.
-	Variables []PlanModelVariable `json:"variables,omitempty"`
+	Variables planVariableList `json:"variables,omitempty"`
 
 	// The change operations for resources and data sources within this
 	// plan.
@@ -204,7 +204,7 @@ type PlanStateResource struct {
 	// empty.
 	//
 	// This value can be either an integer (int) or a string.
-	Index string `json:"index,omitempty"`
+	Index rawJSON `json:"index,omitempty"`
 
 	// The name of the provider this resource belongs to. This allows
 	// the provider to be interpreted unambiguously in the unusual
@@ -224,7 +224,7 @@ type PlanStateResource struct {
 	PlanStateResourceAttributes planStateResourceAttributeList `json:"values,omitempty"`
 
 	// The addresses of the resources that this resource depends on.
-	DependsOn string `json:"depends_on,omitempty"`
+	DependsOn rawJSON `json:"depends_on,omitempty"`
 
 	// If true, the resource has been marked as tainted and will be
 	// re-created on the next update.
@@ -270,7 +270,7 @@ type PlanResourceChange struct {
 	// empty.
 	//
 	// This value can be either an integer (int) or a string.
-	Index string `json:"index,omitempty"`
+	Index rawJSON `json:"index,omitempty"`
 
 	// The name of the provider this resource belongs to. This allows
 	// the provider to be interpreted unambiguously in the unusual
