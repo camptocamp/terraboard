@@ -83,7 +83,7 @@
                 id="resFilterInput"
                 class="form-control"
                 type="search"
-                v-model="resFilter"
+                v-model="resFilter.value"
                 placeholder="Filter resources..."
               />
             </li>
@@ -97,13 +97,13 @@
                 class="node-name"
                 v-bind:class="{ selected: mod == selectedMod }"
               >
-                <h4>{{mod.path ? mod.path : "root"}}<span class="badge bg-secondary float-end w-5"
-                  >{{(this.resFilter == "" ? "" : this.filteredResLength+"/")+mod.resources.length}}</span
+                <h4>{{mod.path ? mod.path : "root"}}<span :id="'modSpan-'+mod.path" class="badge bg-secondary float-end w-5"
+                  ></span
                 ></h4>
               </div>
               <ul v-show="display.mod == mod" class="list-group">
                 <li
-                  v-for="r in filterModules(mod.resources, resFilter)"
+                  v-for="r in filterResources(mod)"
                   v-bind:key="r"
                   v-bind:class="{ selected: r == selectedRes }"
                   @click="setSelected(mod, r)"
@@ -171,9 +171,10 @@ import StatesCompare from "../components/StatesCompare.vue";
       compareVersion: "",
       selectedRes: {},
       selectedMod: {},
-      resFilter: "",
-      filteredRes: {},
-      filteredResLength: 0,
+      resFilter: {
+        value: "",
+        module: new Map(),
+      },
       compare: {},
       compareDiff: {},
       url: {
@@ -195,20 +196,22 @@ import StatesCompare from "../components/StatesCompare.vue";
     };
   },
   methods: {
-    filterModules(modules: any, filter: string) {
-      if(filter != "") {
+    filterResources(module: any) {
+      if(this.resFilter.value != "") {
         let res: any[] = [];
-        modules.forEach((mod: any) => {
-          if (mod.name.lastIndexOf(filter, 0) === 0) {
-            res.push(mod);
+        module.resources.forEach((resource: any) => {
+          if ((resource.type+"."+resource.name).includes(this.resFilter.value)) {
+            res.push(resource);
           }
         });
           
-        this.filteredRes = res;
-        this.filteredResLength = res.length;
+        this.resFilter.module.set(module.path, {
+          resources: res,
+          length: res.length,
+        });
         return res;
       }
-      return modules;
+      return module.resources;
     },
     fetchLocks(): void {
       const url = `/api/locks`;
@@ -454,6 +457,14 @@ import StatesCompare from "../components/StatesCompare.vue";
   },
   updated() {
     hljs.highlightAll();
+    if(this.state.details.modules != undefined) {
+      this.state.details.modules.forEach((mod: any) => {
+        const span = document.getElementById("modSpan-"+mod.path) as HTMLSpanElement;
+        span.innerHTML = (this.resFilter.value == "" || this.resFilter.module.get(mod.path) === undefined)
+        ? mod.resources.length 
+        : this.resFilter.module.get(mod.path).length+"/"+mod.resources.length;
+      });
+    }
   }
 })
 export default class State extends Vue {}
