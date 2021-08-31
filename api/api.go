@@ -274,6 +274,50 @@ func SubmitPlan(w http.ResponseWriter, r *http.Request, db *db.Database) {
 	}
 }
 
+// GetPlansSummary provides summary of all Plan by lineage (only metadata added by the wrapper).
+// Optional "&limit=X" parameter to limit requested quantity of plans.
+// Optional "&page=X" parameter to add an offset to the query and enable pagination.
+// Sorted by most recent to oldest.
+// /api/plans/summary GET endpoint callback
+// Also return pagination informations (current page ans total items count in database)
+func GetPlansSummary(w http.ResponseWriter, r *http.Request, db *db.Database) {
+	lineage := r.URL.Query().Get("lineage")
+	limit := r.URL.Query().Get("limit")
+	page := r.URL.Query().Get("page")
+	plans, currentPage, total := db.GetPlansSummary(lineage, limit, page)
+
+	response := make(map[string]interface{})
+	response["plans"] = plans
+	response["page"] = currentPage
+	response["total"] = total
+	j, err := json.Marshal(response)
+	if err != nil {
+		log.Errorf("Failed to marshal plans: %v", err)
+		JSONError(w, "Failed to marshal plans", err)
+		return
+	}
+	if _, err := io.WriteString(w, string(j)); err != nil {
+		log.Error(err.Error())
+	}
+}
+
+// GetPlan provides a specific Plan of a lineage using ID.
+// /api/plans GET endpoint callback on request with ?plan_id=X parameter
+func GetPlan(w http.ResponseWriter, r *http.Request, db *db.Database) {
+	id := r.URL.Query().Get("planid")
+	plan := db.GetPlan(id)
+
+	j, err := json.Marshal(plan)
+	if err != nil {
+		log.Errorf("Failed to marshal plan: %v", err)
+		JSONError(w, "Failed to marshal plan", err)
+		return
+	}
+	if _, err := io.WriteString(w, string(j)); err != nil {
+		log.Error(err.Error())
+	}
+}
+
 // GetPlans provides all Plan by lineage.
 // Optional "&limit=X" parameter to limit requested quantity of plans.
 // Optional "&page=X" parameter to add an offset to the query and enable pagination.
@@ -305,7 +349,11 @@ func GetPlans(w http.ResponseWriter, r *http.Request, db *db.Database) {
 // on /api/plans request
 func ManagePlans(w http.ResponseWriter, r *http.Request, db *db.Database) {
 	if r.Method == "GET" {
-		GetPlans(w, r, db)
+		if r.URL.Query().Get("planid") != "" {
+			GetPlan(w, r, db)
+		} else {
+			GetPlans(w, r, db)
+		}
 	} else if r.Method == "POST" {
 		SubmitPlan(w, r, db)
 	} else {

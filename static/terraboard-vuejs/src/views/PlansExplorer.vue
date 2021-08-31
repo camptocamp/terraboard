@@ -161,7 +161,7 @@ import router from "../router";
         .join("&");
 
       router.push({ name: "PlansExplorer", query: params });
-      const url = `/api/plans?` + query;
+      const url = `/api/plans/summary?` + query;
       axios
         .get(url)
         .then((response) => {

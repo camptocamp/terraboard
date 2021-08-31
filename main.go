@@ -189,6 +189,7 @@ func main() {
 	apiRouter.HandleFunc(util.GetFullPath("attribute/keys"), handleWithDB(api.ListAttributeKeys, database))
 	apiRouter.HandleFunc(util.GetFullPath("tf_versions"), handleWithDB(api.ListTfVersions, database))
 	apiRouter.HandleFunc(util.GetFullPath("plans"), handleWithDB(api.ManagePlans, database))
+	apiRouter.HandleFunc(util.GetFullPath("plans/summary"), handleWithDB(api.GetPlansSummary, database))
 
 	// Serve static files (CSS, JS, images) from dir
 	spa := spaHandler{staticPath: "static", indexPath: "index.html"}
