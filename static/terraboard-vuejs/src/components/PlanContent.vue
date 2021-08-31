@@ -88,11 +88,11 @@
                 <td>Changes:</td>
                 <td>
                   <div class="row justify-content-middle align-middle">
-                    <div class="overview-chart col-5 text-center" style="min-width: 150px; max-width: 240px;">
+                    <div v-if="this.plan.parsed_plan.resource_changes != undefined" class="overview-chart col-5 text-center" style="min-width: 150px; max-width: 240px;">
                         <canvas id="chart-pie-resource-changes" class="chart mb-2"></canvas>
                         <p>Resource changes</p>
                     </div>
-                    <div class="overview-chart col-5 text-center" style="min-width: 150px; max-width: 240px;">
+                    <div v-if="this.plan.parsed_plan.output_changes != undefined" class="overview-chart col-5 text-center" style="min-width: 150px; max-width: 240px;">
                         <canvas id="chart-pie-output-changes" class="chart mb-2"></canvas>
                         <p>Output changes</p>
                     </div>
@@ -254,30 +254,35 @@ Chart.register( PieController, ArcElement, Tooltip )
       return new Date(date).toUTCString();
     },
     checkPlannedChanges() {
-      this.plan.parsed_plan.output_changes.forEach((change: any) => {
-        let actions = change.change.actions;
-        if (actions.includes("create")) {
-          this.changes.outputs.added++;
-        } else if (actions.includes("update")) {
-          this.changes.outputs.changed++;
-        } else if (actions.includes("delete")) {
-          this.changes.outputs.deleted++;
-        } else {
-          this.changes.outputs.none++;
-        }
-      });
-      this.plan.parsed_plan.resource_changes.forEach((change: any) => {
-        let actions = change.change.actions;
-        if (actions.includes("create")) {
-          this.changes.resources.added++;
-        } else if (actions.includes("update")) {
-          this.changes.resources.changed++;
-        } else if (actions.includes("delete")) {
-          this.changes.resources.deleted++;
-        } else {
-          this.changes.resources.none++;
-        }
-      });
+      if (this.plan.parsed_plan.output_changes != undefined) {
+        this.plan.parsed_plan.output_changes.forEach((change: any) => {
+          let actions = change.change.actions;
+          if (actions.includes("create")) {
+            this.changes.outputs.added++;
+          } else if (actions.includes("update")) {
+            this.changes.outputs.changed++;
+          } else if (actions.includes("delete")) {
+            this.changes.outputs.deleted++;
+          } else {
+            this.changes.outputs.none++;
+          }
+        });
+      }
+
+      if (this.plan.parsed_plan.resource_changes != undefined) {
+        this.plan.parsed_plan.resource_changes.forEach((change: any) => {
+          let actions = change.change.actions;
+          if (actions.includes("create")) {
+            this.changes.resources.added++;
+          } else if (actions.includes("update")) {
+            this.changes.resources.changed++;
+          } else if (actions.includes("delete")) {
+            this.changes.resources.deleted++;
+          } else {
+            this.changes.resources.none++;
+          }
+        });
+      }
     },
   },
   computed: {
