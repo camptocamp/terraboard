@@ -58,7 +58,7 @@
             <tbody>
               <tr>
                 <td>Lineage:</td>
-                <td>{{ plan.lineage_data.lineage }}</td>
+                <td><router-link :to="`/lineage/${plan.lineage_data.lineage}`">{{ plan.lineage_data.lineage }}</router-link></td>
               </tr>
               <tr>
                 <td>TF Version:</td>
@@ -308,45 +308,49 @@ Chart.register( PieController, ArcElement, Tooltip )
     this.checkPlannedChanges();
   },
   mounted() {
-    const ctxResources = document.getElementById('chart-pie-resource-changes') as ChartItem;
-    const resourceChangesChart = new Chart(ctxResources, {
-        type: 'pie',
-        data: {
-            labels: ["No changes", "Added", "Updated", "Deleted"],
-            datasets: [{
-                label: 'Resource Changes',
-                data: [this.changes.resources.none, this.changes.resources.added, this.changes.resources.changed, this.changes.resources.deleted],
-                backgroundColor: [
-                  '#0d6efd',
-                  '#198754',
-                  '#fd7e14',
-                  '#dc3545',
-                ],
-                hoverOffset: 4
-            }]
-        },
-        options: this.chartOptions
-    });
+    if (this.plan.parsed_plan.resource_changes != undefined) {
+      const ctxResources = document.getElementById('chart-pie-resource-changes') as ChartItem;
+      const resourceChangesChart = new Chart(ctxResources, {
+          type: 'pie',
+          data: {
+              labels: ["No changes", "Added", "Updated", "Deleted"],
+              datasets: [{
+                  label: 'Resource Changes',
+                  data: [this.changes.resources.none, this.changes.resources.added, this.changes.resources.changed, this.changes.resources.deleted],
+                  backgroundColor: [
+                    '#0d6efd',
+                    '#198754',
+                    '#fd7e14',
+                    '#dc3545',
+                  ],
+                  hoverOffset: 4
+              }]
+          },
+          options: this.chartOptions
+      });
+    }
 
-    const ctxOutputs = document.getElementById('chart-pie-output-changes') as ChartItem;
-    const outputChangesChart = new Chart(ctxOutputs, {
-        type: 'pie',
-        data: {
-            labels: ["No changes", "Added", "Updated", "Deleted"],
-            datasets: [{
-                label: 'Output Changes',
-                data: [this.changes.outputs.none, this.changes.outputs.added, this.changes.outputs.changed, this.changes.outputs.deleted],
-                backgroundColor: [
-                  '#0d6efd',
-                  '#198754',
-                  '#fd7e14',
-                  '#dc3545',
-                ],
-                hoverOffset: 4
-            }]
-        },
-        options: this.chartOptions
-    });
+    if (this.plan.parsed_plan.output_changes != undefined) {
+      const ctxOutputs = document.getElementById('chart-pie-output-changes') as ChartItem;
+      const outputChangesChart = new Chart(ctxOutputs, {
+          type: 'pie',
+          data: {
+              labels: ["No changes", "Added", "Updated", "Deleted"],
+              datasets: [{
+                  label: 'Output Changes',
+                  data: [this.changes.outputs.none, this.changes.outputs.added, this.changes.outputs.changed, this.changes.outputs.deleted],
+                  backgroundColor: [
+                    '#0d6efd',
+                    '#198754',
+                    '#fd7e14',
+                    '#dc3545',
+                  ],
+                  hoverOffset: 4
+              }]
+          },
+          options: this.chartOptions
+      });
+    }
   },
 })
 export default class PlanContent extends Vue {}
