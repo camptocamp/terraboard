@@ -109,7 +109,7 @@ class ObjWrapper {
             this.data.push(entry)
           });
 
-          const url = `/api/plans?lineage=`+this.lineage;
+          const url = `/api/plans/summary?lineage=`+this.lineage;
           axios.get(url)
             .then((response) => {
               // handle success

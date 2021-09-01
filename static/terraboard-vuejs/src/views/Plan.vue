@@ -9,7 +9,7 @@
                 <li
                   v-for="plan in plans"
                   v-bind:key="plan"
-                  v-bind:class="{ selected: plan == selectedPlan }"
+                  v-bind:class="{ selected: selectedPlan !== undefined && plan.ID == selectedPlan.ID }"
                   @click="setPlanSelected(plan)"
                   class="list-group-item plan"
                 >
@@ -19,12 +19,15 @@
         </div>
       </div>
     </div>
-    <div id="node" class="col-xl-8 col-xxl-9">
+    <div id="node h-100" :key="selectedPlan" class="col-xl-8 col-xxl-9">
       <PlanContent
-        v-if="selectedPlan.parsed_plan !== undefined"
+        v-if="selectedPlan !== undefined && selectedPlan.parsed_plan !== undefined"
         v-bind:plan="selectedPlan"
         v-bind:key="selectedPlan"
       />
+      <div v-else class="h-100 w-100 text-center">
+        <i class="fas fa-spinner fa-spin fa-5x"></i>
+      </div>
     </div>
   </div>
 </template>
@@ -62,8 +65,8 @@ import PlanContent from "../components/PlanContent.vue";
     formatDate(date: string): string {
         return new Date(date).toUTCString();
     },
-    fetchLatestPlans(limit: number): void {
-      const url = `/api/plans?limit=`+limit+`&lineage=`+this.url.lineage;
+    fetchLatestPlansSummary(limit: number): void {
+      const url = `/api/plans/summary?limit=`+limit+`&lineage=`+this.url.lineage;
       axios
         .get(url)
         .then((response) => {
@@ -79,7 +82,7 @@ import PlanContent from "../components/PlanContent.vue";
               }
             });
             if (planFinded === false) {
-              const url = `/api/plans?lineage=`+this.url.lineage;
+              const url = `/api/plans/summary?lineage=`+this.url.lineage;
               axios
                 .get(url)
                 .then((response) => {
@@ -121,20 +124,38 @@ import PlanContent from "../components/PlanContent.vue";
         });
     },
     setPlanSelected(plan: any): void {
-      this.selectedPlan = plan;
-      router.replace({
-        path: `/lineage/${this.url.lineage}/plans`,
-        query: { 
-          planid: plan.ID,
-        },
-      });
+      this.selectedPlan = undefined;
+      const url = `/api/plans?planid=`+plan.ID;
+      axios
+        .get(url)
+        .then((response) => {
+          this.selectedPlan = response.data;
+          router.replace({
+            path: `/lineage/${this.url.lineage}/plans`,
+            query: { 
+              planid: this.selectedPlan.ID,
+            },
+          });
+        })
+        .catch(function(err) {
+          if (err.response) {
+            console.log("Server Error:", err);
+          } else if (err.request) {
+            console.log("Network Error:", err);
+          } else {
+            console.log("Client Error:", err);
+          }
+        })
+        .then(function() {
+          // always executed
+        });
     },
   },
   created() {
     this.updateTitle();
     this.url.lineage = this.$route.params.lineage;
     this.url.planid = router.currentRoute.value.query.planid;
-    this.fetchLatestPlans(10);
+    this.fetchLatestPlansSummary(10);
   },
   updated() {
     hljs.highlightAll();

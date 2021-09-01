@@ -619,6 +619,83 @@ func (db *Database) InsertPlan(plan []byte) error {
 	return db.Create(&p).Error
 }
 
+// GetPlansSummary retrieves a summary of all Plans of a lineage from the database
+func (db *Database) GetPlansSummary(lineage, limitStr, pageStr string) (plans []types.Plan, page int, total int) {
+	var whereClause []interface{}
+	var whereClauseTotal string
+	if lineage != "" {
+		whereClause = append(whereClause, `"Lineage"."value" = ?`, lineage)
+		whereClauseTotal = ` JOIN lineages on lineages.id=t.lineage_id WHERE lineages.value = ?`
+	}
+
+	row := db.Raw("SELECT count(*) FROM plans AS t"+whereClauseTotal, lineage).Row()
+	if err := row.Scan(&total); err != nil {
+		log.Error(err.Error())
+	}
+
+	var limit int
+	if limitStr == "" {
+		limit = -1
+	} else {
+		var err error
+		limit, err = strconv.Atoi(limitStr)
+		if err != nil {
+			log.Warnf("GetPlans limit ignored: %v", err)
+			limit = -1
+		}
+	}
+
+	var offset int
+	if pageStr == "" {
+		offset = -1
+	} else {
+		var err error
+		page, err = strconv.Atoi(pageStr)
+		if err != nil {
+			log.Warnf("GetPlans offset ignored: %v", err)
+		} else {
+			offset = (page - 1) * pageSize
+		}
+	}
+
+	db.Select(`"plans"."id"`, `"plans"."created_at"`, `"plans"."updated_at"`, `"plans"."tf_version"`,
+		`"plans"."git_remote"`, `"plans"."git_commit"`, `"plans"."ci_url"`, `"plans"."source"`).
+		Joins("Lineage").
+		Order("created_at desc").
+		Limit(limit).
+		Offset(offset).
+		Find(&plans, whereClause...)
+
+	return
+}
+
+// GetPlan retrieves a specific Plan by his ID from the database
+func (db *Database) GetPlan(id string) (plans types.Plan) {
+	db.Joins("Lineage").
+		Preload("ParsedPlan").
+		Preload("ParsedPlan.PlanStateValue").
+		Preload("ParsedPlan.PlanStateValue.PlanStateOutputs").
+		Preload("ParsedPlan.PlanStateValue.PlanStateModule").
+		Preload("ParsedPlan.PlanStateValue.PlanStateModule.PlanStateResources").
+		Preload("ParsedPlan.PlanStateValue.PlanStateModule.PlanStateResources.PlanStateResourceAttributes").
+		Preload("ParsedPlan.PlanStateValue.PlanStateModule.PlanStateModules").
+		Preload("ParsedPlan.Variables").
+		Preload("ParsedPlan.PlanResourceChanges").
+		Preload("ParsedPlan.PlanResourceChanges.Change").
+		Preload("ParsedPlan.PlanOutputs").
+		Preload("ParsedPlan.PlanOutputs.Change").
+		Preload("ParsedPlan.PlanState").
+		Preload("ParsedPlan.PlanState.PlanStateValue").
+		Preload("ParsedPlan.PlanState.PlanStateValue.PlanStateOutputs").
+		Preload("ParsedPlan.PlanState.PlanStateValue.PlanStateModule").
+		Preload("ParsedPlan.PlanState.PlanStateValue.PlanStateModule.PlanStateResources").
+		Preload("ParsedPlan.PlanState.PlanStateValue.PlanStateModule.PlanStateResources.PlanStateResourceAttributes").
+		Preload("ParsedPlan.PlanState.PlanStateValue.PlanStateModule.PlanStateModules").
+		Find(&plans, `"plans"."id" = ?`, id)
+
+	return
+}
+
 // GetPlans retrieves all Plan of a lineage from the database
 func (db *Database) GetPlans(lineage, limitStr, pageStr string) (plans []types.Plan, page int, total int) {
 	var whereClause []interface{}
