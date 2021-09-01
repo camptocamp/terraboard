@@ -2,7 +2,8 @@
   <div id="mainrow" class="row">
     <div id="leftcol" class="col-xl-4 col-xxl-3">
       <div class="mr-4">
-        <div class="card">
+        <router-link class="ms-2" :to="`/lineage/${url.lineage}`"><i class="fas fa-arrow-left"></i> Back to workspace</router-link>
+        <div class="card mt-2">
           <h5 class="card-header">
             General Information
             <span
