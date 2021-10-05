@@ -13,7 +13,7 @@ require (
 	github.com/go-test/deep v1.0.3
 	github.com/google/go-cmp v0.5.6
 	github.com/gorilla/mux v1.8.0
-	github.com/gusaul/go-dynamock v0.0.0-20210107061312-3e989056e1e6 // indirect
+	github.com/gusaul/go-dynamock v0.0.0-20210107061312-3e989056e1e6
 	github.com/hashicorp/errwrap v1.1.0
 	github.com/hashicorp/go-cleanhttp v0.5.1
 	github.com/hashicorp/go-hclog v0.15.0
@@ -37,13 +37,11 @@ require (
 	github.com/pmezard/go-difflib v1.0.0
 	github.com/sirupsen/logrus v1.7.0
 	github.com/spf13/afero v1.2.2
-	github.com/stretchr/testify v1.7.0 // indirect
-	github.com/svanharmelen/jsonapi v0.0.0-20180618144545-0c0828c3f16d // indirect
+	github.com/stretchr/testify v1.7.0
 	github.com/zclconf/go-cty v1.9.0
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
 	golang.org/x/mod v0.4.2
 	golang.org/x/net v0.0.0-20210503060351-7fd8e65b6420
-	golang.org/x/text v0.3.6 // indirect
 	golang.org/x/time v0.0.0-20201208040808-7e3f01d25324 // indirect
 	google.golang.org/api v0.58.0
 	gopkg.in/yaml.v2 v2.4.0
