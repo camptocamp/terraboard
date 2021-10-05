@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 
 	tfversion "github.com/hashicorp/terraform/version"
@@ -60,6 +61,7 @@ type TFEConfig struct {
 
 // GCPConfig stores the Google Cloud configuration
 type GCPConfig struct {
+	HTTPClient *http.Client
 	GCSBuckets []string `long:"gcs-bucket" yaml:"gcs-bucket" description:"Google Cloud bucket to search"`
 	GCPSAKey   string   `long:"gcp-sa-key-path" env:"GCP_SA_KEY_PATH" yaml:"gcp-sa-key-path" description:"The path to the service account to use to connect to Google Cloud Platform"`
 }
@@ -153,7 +155,7 @@ func initDefaultConfig() Config {
 // Parse flags and env variables to given struct using go-flags
 // parser
 func parseStructFlagsAndEnv(obj interface{}) {
-	parser := flags.NewParser(obj, flags.Default)
+	parser := flags.NewParser(obj, flags.IgnoreUnknown)
 	if _, err := parser.Parse(); err != nil {
 		fmt.Printf("Failed to parse flags: %s", err)
 		os.Exit(1)

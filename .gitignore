@@ -2,3 +2,4 @@ hugo/public
 vendor/
 terraboard
 dist/
+coverage.out

@@ -126,7 +126,7 @@ func (db *Database) stateS3toDB(sf *statefile.File, path string, versionID strin
 	err = db.FirstOrCreate(&lineage, types.Lineage{Value: sf.Lineage}).Error
 	if err != nil || lineage.ID == 0 {
 		log.WithField("error", err).
-			Error("Unknown error in stateS3toDB during lineage finding", err)
+			Error("Unknown error in stateS3toDB during lineage finding")
 		return types.State{}, err
 	}
 	db.lock.Unlock()
@@ -394,7 +394,6 @@ func (db *Database) SearchAttribute(query url.Values) (results []types.SearchRes
 		" ORDER BY states.path, states.serial, lineage_value, modules.path, resources.type, resources.name, resources.index, attributes.key" +
 		" LIMIT ?"
 
-	log.Info(sql)
 	params = append(params, pageSize)
 
 	if v := string(query.Get("page")); v != "" {
