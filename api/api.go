@@ -13,7 +13,21 @@ import (
 	"github.com/camptocamp/terraboard/state"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
+	"gorm.io/datatypes"
 )
+
+// Terraform plan payload structure usedfor swagger documentation
+type planPayload struct {
+	Lineage   string         `json:"lineage"`
+	TFVersion string         `json:"terraform_version"`
+	GitRemote string         `json:"git_remote"`
+	GitCommit string         `json:"git_commit"`
+	CiURL     string         `json:"ci_url"`
+	Source    string         `json:"source"`
+	PlanJSON  datatypes.JSON `json:"plan_json" swaggertype:"object"`
+}
+
+var _ *planPayload = nil // Avoid deadcode warning for planPayload
 
 // JSONError is a wrapper function for errors
 // which prints them to the http.ResponseWriter as a JSON response
@@ -55,7 +69,7 @@ func ListTerraformVersionsWithCount(w http.ResponseWriter, r *http.Request, d *d
 // @Description Returns Lineage states stats along with paging information
 // @ID list-state-stats
 // @Produce  json
-// @Param   page      query   integer     false  "Curent page for pagination"
+// @Param   page      query   integer     false  "Current page for pagination"
 // @Success 200 {string} string	"ok"
 // @Router /lineages/stats [get]
 func ListStateStats(w http.ResponseWriter, r *http.Request, d *db.Database) {
@@ -357,7 +371,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 // @Description Submits and inserts a new Terraform plan in the database.
 // @ID submit-plan
 // @Accept  json
-// @Param   plan      body   types.Plan     false  "Wrapped plan"
+// @Param   plan      body   api.planPayload     false  "Wrapped plan"
 // @Router /plans [post]
 func SubmitPlan(w http.ResponseWriter, r *http.Request, db *db.Database) {
 	body, err := ioutil.ReadAll(r.Body)

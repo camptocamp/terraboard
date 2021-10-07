@@ -1,11 +1,6 @@
 basePath: /api
 definitions:
-  types.Lineage:
-    properties:
-      lineage:
-        type: string
-    type: object
-  types.Plan:
+  api.planPayload:
     properties:
       ci_url:
         type: string
@@ -13,8 +8,8 @@ definitions:
         type: string
       git_remote:
         type: string
-      lineage_data:
-        $ref: '#/definitions/types.Lineage'
+      lineage:
+        type: string
       plan_json:
         type: object
       source:
@@ -139,7 +134,7 @@ paths:
       description: Returns Lineage states stats along with paging information
       operationId: list-state-stats
       parameters:
-      - description: Curent page for pagination
+      - description: Current page for pagination
         in: query
         name: page
         type: integer
@@ -217,7 +212,7 @@ paths:
         in: body
         name: plan
         schema:
-          $ref: '#/definitions/types.Plan'
+          $ref: '#/definitions/api.planPayload'
       summary: Submit a new plan
   /plans/summary:
     get:

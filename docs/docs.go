@@ -90,7 +90,7 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Curent page for pagination",
+                        "description": "Current page for pagination",
                         "name": "page",
                         "in": "query"
                     }
@@ -300,7 +300,7 @@ var doc = `{
                         "name": "plan",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/types.Plan"
+                            "$ref": "#/definitions/api.planPayload"
                         }
                     }
                 ]
@@ -498,15 +498,7 @@ var doc = `{
         }
     },
     "definitions": {
-        "types.Lineage": {
-            "type": "object",
-            "properties": {
-                "lineage": {
-                    "type": "string"
-                }
-            }
-        },
-        "types.Plan": {
+        "api.planPayload": {
             "type": "object",
             "properties": {
                 "ci_url": {
@@ -518,8 +510,8 @@ var doc = `{
                 "git_remote": {
                     "type": "string"
                 },
-                "lineage_data": {
-                    "$ref": "#/definitions/types.Lineage"
+                "lineage": {
+                    "type": "string"
                 },
                 "plan_json": {
                     "type": "object"
