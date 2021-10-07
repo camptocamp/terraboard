@@ -34,10 +34,10 @@ type State struct {
 }
 
 type Lineage struct {
-	gorm.Model `swaggerignore:"true"`
-	Value      string  `gorm:"index;unique" json:"lineage"`
-	States     []State `json:"states" swaggerignore:"true"`
-	Plans      []Plan  `json:"plans" swaggerignore:"true"`
+	gorm.Model
+	Value  string  `gorm:"index;unique" json:"lineage"`
+	States []State `json:"states"`
+	Plans  []Plan  `json:"plans"`
 }
 
 // Module is a Terraform module in a State
@@ -79,16 +79,16 @@ type Attribute struct {
 // Plan is a Terraform plan
 type Plan struct {
 	gorm.Model   `swaggerignore:"true"`
-	LineageID    uint           `gorm:"index" json:"-" swaggerignore:"true"`
+	LineageID    uint           `gorm:"index" json:"-"`
 	Lineage      Lineage        `json:"lineage_data"`
 	TFVersion    string         `gorm:"varchar(10)" json:"terraform_version"`
 	GitRemote    string         `json:"git_remote"`
 	GitCommit    string         `gorm:"varchar(50)" json:"git_commit"`
 	CiURL        string         `json:"ci_url"`
 	Source       string         `json:"source"`
-	ParsedPlan   PlanModel      `json:"parsed_plan" swaggerignore:"true"`
-	ParsedPlanID sql.NullInt64  `gorm:"index" json:"-" swaggerignore:"true"`
-	PlanJSON     datatypes.JSON `json:"plan_json" swaggertype:"object"`
+	ParsedPlan   PlanModel      `json:"parsed_plan"`
+	ParsedPlanID sql.NullInt64  `gorm:"index" json:"-"`
+	PlanJSON     datatypes.JSON `json:"plan_json"`
 }
 
 // PlanModel represents the entire contents of an output Terraform plan.
