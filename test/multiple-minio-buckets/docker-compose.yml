@@ -18,6 +18,7 @@ services:
       - ./config.yml:/config/config.yml:ro
     ports:
       - "8080:8080"
+      - "8081:8081"
 
   minio:
     image: minio/minio:latest

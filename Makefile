@@ -56,6 +56,11 @@ publish-coveralls: setup ## Publish coverage results on coveralls
 clean: ## Remove binary if it exists
 	rm -f $(NAME)
 
+.PHONY: update-docs
+update-docs: ## Install swag and regenerate swagger spec
+	@command swag >/dev/null 2>&1 || go install github.com/swaggo/swag/cmd/swag@latest
+	swag init
+
 .PHONY: all
 all: lint test build coverage
 

@@ -1,0 +1,345 @@
+basePath: /api
+definitions:
+  api.planPayload:
+    properties:
+      ci_url:
+        type: string
+      git_commit:
+        type: string
+      git_remote:
+        type: string
+      lineage:
+        type: string
+      plan_json:
+        type: object
+      source:
+        type: string
+      terraform_version:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is the API for Terraboard.
+  license:
+    name: Apache License 2.0
+    url: https://github.com/camptocamp/terraboard/blob/master/LICENSE
+  title: Terraboard API
+  version: "1.0"
+paths:
+  /attribute/keys:
+    get:
+      description: Lists all resource attribute keys, optionally filtered by resource_type
+      operationId: list-attribute-keys
+      parameters:
+      - description: Resource Type
+        in: query
+        name: resource_type
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: Get resource attribute keys
+  /lineages:
+    get:
+      description: List all existing lineages
+      operationId: get-lineages
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: Get lineages
+  /lineages/{lineage}:
+    get:
+      description: Retrieves a State from the database by its lineage and versionID
+      operationId: get-state
+      parameters:
+      - description: Version ID
+        in: query
+        name: versionid
+        type: string
+      - description: Lineage
+        in: path
+        name: lineage
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: Provides information on a State
+  /lineages/{lineage}/activity:
+    get:
+      description: Retrieves the activity (version history) of a Lineage
+      operationId: get-lineage-activity
+      parameters:
+      - description: Lineage
+        in: path
+        name: lineage
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: Get Lineage activity
+  /lineages/{lineage}/compare:
+    get:
+      description: Compares two versions ('from' and 'to') of a State
+      operationId: state-compare
+      parameters:
+      - description: Lineage
+        in: path
+        name: lineage
+        required: true
+        type: string
+      - description: Version from
+        in: query
+        name: from
+        required: true
+        type: string
+      - description: Version to
+        in: query
+        name: to
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: Compares two versions of a State
+  /lineages/stats:
+    get:
+      description: Returns Lineage states stats along with paging information
+      operationId: list-state-stats
+      parameters:
+      - description: Current page for pagination
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: Get Lineage states stats
+  /lineages/tfversion/count:
+    get:
+      description: Get terraform version with their associated counts, sorted by the
+        'orderBy' parameter (version by default)
+      operationId: list-terraform-versions-with-count
+      parameters:
+      - description: Order by constraint
+        in: query
+        name: orderBy
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: Lists Terraform versions with counts
+  /locks:
+    get:
+      description: Returns information on locked States
+      operationId: get-locks
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: Get locked states information
+  /plans:
+    get:
+      description: Provides a specific Plan of a lineage using ID or all plans if
+        no ID is provided
+      operationId: get-plans
+      parameters:
+      - description: Plan's ID
+        in: query
+        name: planid
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: Get plans
+    post:
+      consumes:
+      - application/json
+      description: Submits and inserts a new Terraform plan in the database.
+      operationId: submit-plan
+      parameters:
+      - description: Wrapped plan
+        in: body
+        name: plan
+        schema:
+          $ref: '#/definitions/api.planPayload'
+      summary: Submit a new plan
+  /plans/summary:
+    get:
+      description: Provides summary of all Plan by lineage (only metadata added by
+        the wrapper). Sorted by most recent to oldest. Returns also paging informations
+        (current page ans total items count in database)
+      operationId: get-plans-summary
+      parameters:
+      - description: Lineage
+        in: query
+        name: lineage
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: Get summary of all Plan by lineage
+  /resource/names:
+    get:
+      description: Lists all resource names
+      operationId: list-resource-names
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: Get resource names
+  /resource/types:
+    get:
+      description: Lists all Resource types
+      operationId: list-resource-types
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: Get Resource types
+  /resource/types/count:
+    get:
+      description: Lists all resource types with their associated count
+      operationId: list-resource-types-with-count
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: Get resource types with count
+  /search/attribute:
+    get:
+      description: Performs a search on Resource Attributes by various parameters
+      operationId: search-attribute
+      parameters:
+      - description: Version ID
+        in: query
+        name: versionid
+        type: string
+      - description: Ressource type
+        in: query
+        name: type
+        type: string
+      - description: Resource ID
+        in: query
+        name: name
+        type: string
+      - description: Attribute Key
+        in: query
+        name: key
+        type: string
+      - description: Attribute Value
+        in: query
+        name: value
+        type: string
+      - description: Terraform Version
+        in: query
+        name: tf_version
+        type: string
+      - description: Lineage
+        in: query
+        name: lineage_value
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: Search Resource Attributes
+  /tf_versions:
+    get:
+      description: Lists all terraform versions
+      operationId: list-tf-versions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: Get terraform versions
+  /user:
+    get:
+      description: Returns information about the logged user
+      operationId: get-user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: Get logged user information
+swagger: "2.0"

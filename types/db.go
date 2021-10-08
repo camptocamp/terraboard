@@ -78,7 +78,7 @@ type Attribute struct {
 
 // Plan is a Terraform plan
 type Plan struct {
-	gorm.Model
+	gorm.Model   `swaggerignore:"true"`
 	LineageID    uint           `gorm:"index" json:"-"`
 	Lineage      Lineage        `json:"lineage_data"`
 	TFVersion    string         `gorm:"varchar(10)" json:"terraform_version"`

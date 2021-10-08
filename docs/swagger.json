@@ -1,0 +1,514 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is the API for Terraboard.",
+        "title": "Terraboard API",
+        "contact": {},
+        "license": {
+            "name": "Apache License 2.0",
+            "url": "https://github.com/camptocamp/terraboard/blob/master/LICENSE"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api",
+    "paths": {
+        "/attribute/keys": {
+            "get": {
+                "description": "Lists all resource attribute keys, optionally filtered by resource_type",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get resource attribute keys",
+                "operationId": "list-attribute-keys",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Resource Type",
+                        "name": "resource_type",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/lineages": {
+            "get": {
+                "description": "List all existing lineages",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get lineages",
+                "operationId": "get-lineages",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/lineages/stats": {
+            "get": {
+                "description": "Returns Lineage states stats along with paging information",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get Lineage states stats",
+                "operationId": "list-state-stats",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Current page for pagination",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/lineages/tfversion/count": {
+            "get": {
+                "description": "Get terraform version with their associated counts, sorted by the 'orderBy' parameter (version by default)",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Lists Terraform versions with counts",
+                "operationId": "list-terraform-versions-with-count",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Order by constraint",
+                        "name": "orderBy",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/lineages/{lineage}": {
+            "get": {
+                "description": "Retrieves a State from the database by its lineage and versionID",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Provides information on a State",
+                "operationId": "get-state",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Version ID",
+                        "name": "versionid",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Lineage",
+                        "name": "lineage",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/lineages/{lineage}/activity": {
+            "get": {
+                "description": "Retrieves the activity (version history) of a Lineage",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get Lineage activity",
+                "operationId": "get-lineage-activity",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Lineage",
+                        "name": "lineage",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/lineages/{lineage}/compare": {
+            "get": {
+                "description": "Compares two versions ('from' and 'to') of a State",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Compares two versions of a State",
+                "operationId": "state-compare",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Lineage",
+                        "name": "lineage",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Version from",
+                        "name": "from",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Version to",
+                        "name": "to",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/locks": {
+            "get": {
+                "description": "Returns information on locked States",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get locked states information",
+                "operationId": "get-locks",
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/plans": {
+            "get": {
+                "description": "Provides a specific Plan of a lineage using ID or all plans if no ID is provided",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get plans",
+                "operationId": "get-plans",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Plan's ID",
+                        "name": "planid",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Submits and inserts a new Terraform plan in the database.",
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Submit a new plan",
+                "operationId": "submit-plan",
+                "parameters": [
+                    {
+                        "description": "Wrapped plan",
+                        "name": "plan",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/api.planPayload"
+                        }
+                    }
+                ]
+            }
+        },
+        "/plans/summary": {
+            "get": {
+                "description": "Provides summary of all Plan by lineage (only metadata added by the wrapper). Sorted by most recent to oldest. Returns also paging informations (current page ans total items count in database)",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get summary of all Plan by lineage",
+                "operationId": "get-plans-summary",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Lineage",
+                        "name": "lineage",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/resource/names": {
+            "get": {
+                "description": "Lists all resource names",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get resource names",
+                "operationId": "list-resource-names",
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/resource/types": {
+            "get": {
+                "description": "Lists all Resource types",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get Resource types",
+                "operationId": "list-resource-types",
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/resource/types/count": {
+            "get": {
+                "description": "Lists all resource types with their associated count",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get resource types with count",
+                "operationId": "list-resource-types-with-count",
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/search/attribute": {
+            "get": {
+                "description": "Performs a search on Resource Attributes by various parameters",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Search Resource Attributes",
+                "operationId": "search-attribute",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Version ID",
+                        "name": "versionid",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Ressource type",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Resource ID",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Attribute Key",
+                        "name": "key",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Attribute Value",
+                        "name": "value",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Terraform Version",
+                        "name": "tf_version",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Lineage",
+                        "name": "lineage_value",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/tf_versions": {
+            "get": {
+                "description": "Lists all terraform versions",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get terraform versions",
+                "operationId": "list-tf-versions",
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user": {
+            "get": {
+                "description": "Returns information about the logged user",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get logged user information",
+                "operationId": "get-user",
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "api.planPayload": {
+            "type": "object",
+            "properties": {
+                "ci_url": {
+                    "type": "string"
+                },
+                "git_commit": {
+                    "type": "string"
+                },
+                "git_remote": {
+                    "type": "string"
+                },
+                "lineage": {
+                    "type": "string"
+                },
+                "plan_json": {
+                    "type": "object"
+                },
+                "source": {
+                    "type": "string"
+                },
+                "terraform_version": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

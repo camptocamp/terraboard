@@ -13,7 +13,21 @@ import (
 	"github.com/camptocamp/terraboard/state"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
+	"gorm.io/datatypes"
 )
+
+// Terraform plan payload structure usedfor swagger documentation
+type planPayload struct {
+	Lineage   string         `json:"lineage"`
+	TFVersion string         `json:"terraform_version"`
+	GitRemote string         `json:"git_remote"`
+	GitCommit string         `json:"git_commit"`
+	CiURL     string         `json:"ci_url"`
+	Source    string         `json:"source"`
+	PlanJSON  datatypes.JSON `json:"plan_json" swaggertype:"object"`
+}
+
+var _ *planPayload = nil // Avoid deadcode warning for planPayload
 
 // JSONError is a wrapper function for errors
 // which prints them to the http.ResponseWriter as a JSON response
@@ -29,6 +43,13 @@ func JSONError(w http.ResponseWriter, message string, err error) {
 
 // ListTerraformVersionsWithCount lists Terraform versions with their associated
 // counts, sorted by the 'orderBy' parameter (version by default)
+// @Summary Lists Terraform versions with counts
+// @Description Get terraform version with their associated counts, sorted by the 'orderBy' parameter (version by default)
+// @ID list-terraform-versions-with-count
+// @Produce  json
+// @Param   orderBy      query   string     false  "Order by constraint"
+// @Success 200 {string} string	"ok"
+// @Router /lineages/tfversion/count [get]
 func ListTerraformVersionsWithCount(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	query := r.URL.Query()
 	versions, _ := d.ListTerraformVersionsWithCount(query)
@@ -44,6 +65,13 @@ func ListTerraformVersionsWithCount(w http.ResponseWriter, r *http.Request, d *d
 }
 
 // ListStateStats returns State information for a given path as parameter
+// @Summary Get Lineage states stats
+// @Description Returns Lineage states stats along with paging information
+// @ID list-state-stats
+// @Produce  json
+// @Param   page      query   integer     false  "Current page for pagination"
+// @Success 200 {string} string	"ok"
+// @Router /lineages/stats [get]
 func ListStateStats(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	query := r.URL.Query()
 	states, page, total := d.ListStateStats(query)
@@ -64,6 +92,14 @@ func ListStateStats(w http.ResponseWriter, r *http.Request, d *db.Database) {
 }
 
 // GetState provides information on a State
+// @Summary Provides information on a State
+// @Description Retrieves a State from the database by its lineage and versionID
+// @ID get-state
+// @Produce  json
+// @Param   versionid      query   string     false  "Version ID"
+// @Param   lineage      path   string     true  "Lineage"
+// @Success 200 {string} string	"ok"
+// @Router /lineages/{lineage} [get]
 func GetState(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	params := mux.Vars(r)
 	versionID := r.URL.Query().Get("versionid")
@@ -88,6 +124,13 @@ func GetState(w http.ResponseWriter, r *http.Request, d *db.Database) {
 }
 
 // GetLineageActivity returns the activity (version history) of a Lineage
+// @Summary Get Lineage activity
+// @Description Retrieves the activity (version history) of a Lineage
+// @ID get-lineage-activity
+// @Produce  json
+// @Param   lineage      path   string     true  "Lineage"
+// @Success 200 {string} string	"ok"
+// @Router /lineages/{lineage}/activity [get]
 func GetLineageActivity(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	params := mux.Vars(r)
 	activity := d.GetLineageActivity(params["lineage"])
@@ -103,6 +146,15 @@ func GetLineageActivity(w http.ResponseWriter, r *http.Request, d *db.Database) 
 }
 
 // StateCompare compares two versions ('from' and 'to') of a State
+// @Summary Compares two versions of a State
+// @Description Compares two versions ('from' and 'to') of a State
+// @ID state-compare
+// @Produce  json
+// @Param   lineage      path   string     true  "Lineage"
+// @Param   from      query   string     true  "Version from"
+// @Param   to      query   string     true  "Version to"
+// @Success 200 {string} string	"ok"
+// @Router /lineages/{lineage}/compare [get]
 func StateCompare(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	params := mux.Vars(r)
 	query := r.URL.Query()
@@ -128,6 +180,12 @@ func StateCompare(w http.ResponseWriter, r *http.Request, d *db.Database) {
 }
 
 // GetLocks returns information on locked States
+// @Summary Get locked states information
+// @Description Returns information on locked States
+// @ID get-locks
+// @Produce  json
+// @Success 200 {string} string	"ok"
+// @Router /locks [get]
 func GetLocks(w http.ResponseWriter, _ *http.Request, sps []state.Provider) {
 	allLocks := make(map[string]state.LockInfo)
 	for _, sp := range sps {
@@ -153,6 +211,19 @@ func GetLocks(w http.ResponseWriter, _ *http.Request, sps []state.Provider) {
 
 // SearchAttribute performs a search on Resource Attributes
 // by various parameters
+// @Summary Search Resource Attributes
+// @Description Performs a search on Resource Attributes by various parameters
+// @ID search-attribute
+// @Produce  json
+// @Param   versionid      query   string     false  "Version ID"
+// @Param   type      query   string     false  "Ressource type"
+// @Param   name      query   string     false  "Resource ID"
+// @Param   key      query   string     false  "Attribute Key"
+// @Param   value      query   string     false  "Attribute Value"
+// @Param   tf_version      query   string     false  "Terraform Version"
+// @Param   lineage_value      query   string     false  "Lineage"
+// @Success 200 {string} string	"ok"
+// @Router /search/attribute [get]
 func SearchAttribute(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	query := r.URL.Query()
 	result, page, total := d.SearchAttribute(query)
@@ -174,6 +245,12 @@ func SearchAttribute(w http.ResponseWriter, r *http.Request, d *db.Database) {
 }
 
 // ListResourceTypes lists all Resource types
+// @Summary Get Resource types
+// @Description Lists all Resource types
+// @ID list-resource-types
+// @Produce  json
+// @Success 200 {string} string	"ok"
+// @Router /resource/types [get]
 func ListResourceTypes(w http.ResponseWriter, _ *http.Request, d *db.Database) {
 	result, _ := d.ListResourceTypes()
 	j, err := json.Marshal(result)
@@ -187,6 +264,12 @@ func ListResourceTypes(w http.ResponseWriter, _ *http.Request, d *db.Database) {
 }
 
 // ListResourceTypesWithCount lists all Resource types with their associated count
+// @Summary Get resource types with count
+// @Description Lists all resource types with their associated count
+// @ID list-resource-types-with-count
+// @Produce  json
+// @Success 200 {string} string	"ok"
+// @Router /resource/types/count [get]
 func ListResourceTypesWithCount(w http.ResponseWriter, _ *http.Request, d *db.Database) {
 	result, _ := d.ListResourceTypesWithCount()
 	j, err := json.Marshal(result)
@@ -200,6 +283,12 @@ func ListResourceTypesWithCount(w http.ResponseWriter, _ *http.Request, d *db.Da
 }
 
 // ListResourceNames lists all Resource names
+// @Summary Get resource names
+// @Description Lists all resource names
+// @ID list-resource-names
+// @Produce  json
+// @Success 200 {string} string	"ok"
+// @Router /resource/names [get]
 func ListResourceNames(w http.ResponseWriter, _ *http.Request, d *db.Database) {
 	result, _ := d.ListResourceNames()
 	j, err := json.Marshal(result)
@@ -214,6 +303,13 @@ func ListResourceNames(w http.ResponseWriter, _ *http.Request, d *db.Database) {
 
 // ListAttributeKeys lists all Resource Attribute Keys,
 // optionally filtered by resource_type
+// @Summary Get resource attribute keys
+// @Description Lists all resource attribute keys, optionally filtered by resource_type
+// @ID list-attribute-keys
+// @Produce  json
+// @Param   resource_type      query   string     false  "Resource Type"
+// @Success 200 {string} string	"ok"
+// @Router /attribute/keys [get]
 func ListAttributeKeys(w http.ResponseWriter, r *http.Request, d *db.Database) {
 	resourceType := r.URL.Query().Get("resource_type")
 	result, _ := d.ListAttributeKeys(resourceType)
@@ -228,6 +324,12 @@ func ListAttributeKeys(w http.ResponseWriter, r *http.Request, d *db.Database) {
 }
 
 // ListTfVersions lists all Terraform versions
+// @Summary Get terraform versions
+// @Description Lists all terraform versions
+// @ID list-tf-versions
+// @Produce  json
+// @Success 200 {string} string	"ok"
+// @Router /tf_versions [get]
 func ListTfVersions(w http.ResponseWriter, _ *http.Request, d *db.Database) {
 	result, _ := d.ListTfVersions()
 	j, err := json.Marshal(result)
@@ -241,6 +343,12 @@ func ListTfVersions(w http.ResponseWriter, _ *http.Request, d *db.Database) {
 }
 
 // GetUser returns information about the logged user
+// @Summary Get logged user information
+// @Description Returns information about the logged user
+// @ID get-user
+// @Produce  json
+// @Success 200 {string} string	"ok"
+// @Router /user [get]
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	name := r.Header.Get("X-Forwarded-User")
 	email := r.Header.Get("X-Forwarded-Email")
@@ -259,6 +367,12 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 
 // SubmitPlan inserts a new Terraform plan in the database.
 // /api/plans POST endpoint callback
+// @Summary Submit a new plan
+// @Description Submits and inserts a new Terraform plan in the database.
+// @ID submit-plan
+// @Accept  json
+// @Param   plan      body   api.planPayload     false  "Wrapped plan"
+// @Router /plans [post]
 func SubmitPlan(w http.ResponseWriter, r *http.Request, db *db.Database) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -280,6 +394,15 @@ func SubmitPlan(w http.ResponseWriter, r *http.Request, db *db.Database) {
 // Sorted by most recent to oldest.
 // /api/plans/summary GET endpoint callback
 // Also return pagination informations (current page ans total items count in database)
+// @Summary Get summary of all Plan by lineage
+// @Description Provides summary of all Plan by lineage (only metadata added by the wrapper). Sorted by most recent to oldest. Returns also paging informations (current page ans total items count in database)
+// @ID get-plans-summary
+// @Produce  json
+// @Param   lineage      query   string     false  "Lineage"
+// @Param   page      query   integer     false  "Page"
+// @Param   limit      query   integer     false  "Limit"
+// @Success 200 {string} string	"ok"
+// @Router /plans/summary [get]
 func GetPlansSummary(w http.ResponseWriter, r *http.Request, db *db.Database) {
 	lineage := r.URL.Query().Get("lineage")
 	limit := r.URL.Query().Get("limit")
@@ -303,6 +426,15 @@ func GetPlansSummary(w http.ResponseWriter, r *http.Request, db *db.Database) {
 
 // GetPlan provides a specific Plan of a lineage using ID.
 // /api/plans GET endpoint callback on request with ?plan_id=X parameter
+// @Summary Get plans
+// @Description Provides a specific Plan of a lineage using ID or all plans if no ID is provided
+// @ID get-plans
+// @Produce  json
+// @Param   planid      query   string     false  "Plan's ID"
+// @Param   page      query   integer     false  "Page"
+// @Param   limit      query   integer     false  "Limit"
+// @Success 200 {string} string	"ok"
+// @Router /plans [get]
 func GetPlan(w http.ResponseWriter, r *http.Request, db *db.Database) {
 	id := r.URL.Query().Get("planid")
 	plan := db.GetPlan(id)
@@ -364,6 +496,13 @@ func ManagePlans(w http.ResponseWriter, r *http.Request, db *db.Database) {
 // GetLineages recover all Lineage from db.
 // Optional "&limit=X" parameter to limit requested quantity of them.
 // Sorted by most recent to oldest.
+// @Summary Get lineages
+// @Description List all existing lineages
+// @ID get-lineages
+// @Produce  json
+// @Param   limit      query   integer     false  "Limit"
+// @Success 200 {string} string	"ok"
+// @Router /lineages [get]
 func GetLineages(w http.ResponseWriter, r *http.Request, db *db.Database) {
 	limit := r.URL.Query().Get("limit")
 	lineages := db.GetLineages(limit)
