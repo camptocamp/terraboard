@@ -24,9 +24,7 @@ jobs:
         run: go mod download
 
       - name: Run tests
-        run: |
-          rm -f coverage.out
-          go test -v -race ./... -coverpkg=./... -coverprofile=coverage.out
+        run: make coverage
 
       - name: Install goveralls
         env:
@@ -36,4 +34,4 @@ jobs:
       - name: Send coverage
         env:
           COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: goveralls -coverprofile=coverage.out -service=github
+        run: goveralls -coverprofile=coverage.out -service=github -ignore=internal/**/*

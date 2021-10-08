@@ -92,7 +92,7 @@ It currently supports several remote state backend providers:
 - [Terraform Cloud (remote)](https://www.terraform.io/docs/backends/types/remote.html)
 - [GitLab](https://docs.gitlab.com/ee/user/infrastructure/terraform_state.html)
 
-With the upcoming **v1.2.0** update, Terraboard will be now able to handle multiple buckets/providers configuration! 🥳
+Terraboard is now able to handle multiple buckets/providers configuration! 🥳
 Check *configuration* section for more details. 
 
 ### Overview

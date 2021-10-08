@@ -1,13 +1,97 @@
 package config
 
 import (
+	"os"
 	"reflect"
 	"testing"
 
+	"github.com/davecgh/go-spew/spew"
 	log "github.com/sirupsen/logrus"
 )
 
+func TestSetLogging_debug(t *testing.T) {
+	c := Config{}
+	c.Log.Level = "debug"
+	c.Log.Format = "plain"
+	err := c.SetupLogging()
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+
+	if log.GetLevel() != log.DebugLevel {
+		t.Fatalf("Expected debug level, got %v", log.GetLevel())
+	}
+}
+
+func TestLoadConfig(t *testing.T) {
+	c := LoadConfig("1.0.0")
+	compareConfig := Config{
+		Log: LogConfig{
+			Level:  "info",
+			Format: "plain",
+		},
+		ConfigFilePath: "",
+		DB: DBConfig{
+			Host:         "db",
+			Port:         5432,
+			User:         "gorm",
+			Password:     "",
+			Name:         "gorm",
+			SSLMode:      "require",
+			NoSync:       false,
+			SyncInterval: 1,
+		},
+		AWS: []AWSConfig{
+			{
+				AccessKey:       "",
+				SecretAccessKey: "",
+				DynamoDBTable:   "",
+				S3: []S3BucketConfig{{
+					Bucket:         "",
+					KeyPrefix:      "",
+					FileExtension:  []string{".tfstate"},
+					ForcePathStyle: false,
+				}},
+			},
+		},
+		TFE: []TFEConfig{
+			{
+				Address:      "",
+				Token:        "",
+				Organization: "",
+			},
+		},
+		GCP: []GCPConfig{
+			{
+				GCSBuckets: nil,
+				GCPSAKey:   "",
+			},
+		},
+		Gitlab: []GitlabConfig{
+			{
+				Address: "https://gitlab.com",
+				Token:   "",
+			},
+		},
+		Web: WebConfig{
+			Port:      8080,
+			BaseURL:   "/",
+			LogoutURL: "",
+		},
+	}
+
+	if !reflect.DeepEqual(*c, compareConfig) {
+		t.Errorf(
+			"TestLoadConfig() -> \n\ngot:\n%v,\n\nwant:\n%v",
+			spew.Sdump(*c),
+			spew.Sdump(compareConfig),
+		)
+	}
+}
+
 func TestLoadConfigFromYaml(t *testing.T) {
+	os.Setenv("CONFIG_FILE", "config_test.yml")
+	c := LoadConfig("1.0.0")
 	compareConfig := Config{
 		Log: LogConfig{
 			Level:  "error",
@@ -15,12 +99,14 @@ func TestLoadConfigFromYaml(t *testing.T) {
 		},
 		ConfigFilePath: "config_test.yml",
 		DB: DBConfig{
-			Host:     "postgres",
-			Port:     15432,
-			User:     "terraboard-user",
-			Password: "terraboard-pass",
-			Name:     "terraboard-db",
-			NoSync:   true,
+			Host:         "postgres",
+			Port:         15432,
+			User:         "terraboard-user",
+			Password:     "terraboard-pass",
+			Name:         "terraboard-db",
+			SSLMode:      "require",
+			NoSync:       true,
+			SyncInterval: 1,
 		},
 		AWS: []AWSConfig{
 			{
@@ -60,24 +146,13 @@ func TestLoadConfigFromYaml(t *testing.T) {
 			LogoutURL: "/test-logout",
 		},
 	}
-	c := Config{ConfigFilePath: "config_test.yml"}
-	c.LoadConfigFromYaml()
-	if !reflect.DeepEqual(c, compareConfig) {
-		t.Fatalf("Expected: %v\nGot: %v", compareConfig, c)
-	}
-}
 
-func TestSetLogging_debug(t *testing.T) {
-	c := Config{}
-	c.Log.Level = "debug"
-	c.Log.Format = "plain"
-	err := c.SetupLogging()
-	if err != nil {
-		t.Fatalf("Expected no error, got %v", err)
-	}
-
-	if log.GetLevel() != log.DebugLevel {
-		t.Fatalf("Expected debug level, got %v", log.GetLevel())
+	if !reflect.DeepEqual(*c, compareConfig) {
+		t.Errorf(
+			"TestLoadConfig() -> \n\ngot:\n%v,\n\nwant:\n%v",
+			spew.Sdump(c),
+			spew.Sdump(compareConfig),
+		)
 	}
 }
 

@@ -2,6 +2,9 @@
 
 # Analysis running options
 run:
+  # Timeout for analysis
+  timeout: 5m
+
   # Disable tests to avoid redundancy with test workflow
   tests: false
 

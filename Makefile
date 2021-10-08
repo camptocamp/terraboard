@@ -1,7 +1,9 @@
-NAME          := terraboard
-FILES         := $(wildcard */*.go)
-VERSION       := $(shell git describe --always)
-.DEFAULT_GOAL := help
+NAME          				  := terraboard
+FILES         				  := $(wildcard */*.go)
+TEST_FILES    				  := $(shell go list ./... | grep -v /internal/)
+TEST_FILES_COMMA_SEPARATED    := $(shell go list ./... | grep -v /internal/ | awk '{print}' ORS=',')
+VERSION       				  := $(shell git describe --always)
+.DEFAULT_GOAL 				  := help
 
 export GO111MODULE=on
 
@@ -22,7 +24,7 @@ lint: setup ## Run all lint related tests against the codebase (will use the .go
 
 .PHONY: test
 test: ## Run the tests against the codebase
-	go test -v -race ./...
+	go test -v -race $(TEST_FILES)
 
 .PHONY: build
 build: main.go $(FILES) ## Build the binary
@@ -44,11 +46,11 @@ vendor: # Vendor go modules
 .PHONY: coverage
 coverage: ## Generates coverage report
 	rm -f coverage.out
-	go test -v ./... -coverpkg=./... -coverprofile=coverage.out
+	go test -v $(TEST_FILES) -coverpkg=$(TEST_FILES_COMMA_SEPARATED) -coverprofile=coverage.out
 
 .PHONY: publish-coveralls
 publish-coveralls: setup ## Publish coverage results on coveralls
-	goveralls -service=travis-ci -coverprofile=coverage.out
+	goveralls -service=github -coverprofile=coverage.out -ignore=internal/**/*
 
 .PHONY: clean
 clean: ## Remove binary if it exists

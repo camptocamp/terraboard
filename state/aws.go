@@ -13,7 +13,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 	"github.com/camptocamp/terraboard/config"
 	"github.com/camptocamp/terraboard/internal/terraform/states/statefile"
 	log "github.com/sirupsen/logrus"
@@ -21,8 +23,8 @@ import (
 
 // AWS is a state provider type, leveraging S3 and DynamoDB
 type AWS struct {
-	svc           *s3.S3
-	dynamoSvc     *dynamodb.DynamoDB
+	svc           s3iface.S3API
+	dynamoSvc     dynamodbiface.DynamoDBAPI
 	bucket        string
 	dynamoTable   string
 	keyPrefix     string
@@ -68,7 +70,7 @@ func NewAWS(aws config.AWSConfig, bucket config.S3BucketConfig, noLocks, noVersi
 		bucket:        bucket.Bucket,
 		keyPrefix:     bucket.KeyPrefix,
 		fileExtension: bucket.FileExtension,
-		dynamoSvc:     dynamodb.New(sess, awsConfig),
+		dynamoSvc:     dynamodbiface.DynamoDBAPI(dynamodb.New(sess, awsConfig)),
 		dynamoTable:   aws.DynamoDBTable,
 		noLocks:       noLocks,
 		noVersioning:  noVersioning,
@@ -191,9 +193,8 @@ func (a *AWS) GetState(st, versionID string) (sf *statefile.File, err error) {
 	defer result.Body.Close()
 
 	sf, err = statefile.Read(result.Body)
-
-	if sf == nil {
-		return sf, fmt.Errorf("Failed to find state")
+	if sf == nil || err != nil {
+		return sf, fmt.Errorf("Failed to find state: %v", err)
 	}
 
 	return
