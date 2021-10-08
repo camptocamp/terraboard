@@ -4,44 +4,46 @@
             v-on:click="fetchStats(prevPage)"></span> {{startItems}}-{{itemsInPage}}/{{results.total}}
         <span class="fas fa-caret-right" role="button" v-if="nextPage" v-on:click="fetchStats(nextPage)"></span>
     </label>
-    <table class="table table-border table-striped">
-        <thead>
-            <th></th> <!-- lock -->
-            <th>
-                Path
-            </th>
-            <th>
-                TF Version
-            </th>
-            <th>
-                Serial
-            </th>
-            <th>
-                Time
-            </th>
-            <th>
-                Resources
-            </th>
-            <th>
-                Activity
-            </th>
-        </thead>
-        <tbody>
-            <tr v-for="(r, index) in results.states" v-bind:key="r">
-                <td class="align-middle"><span v-if="isLocked(r.path)" class="fa fas-lock" title="Locked by {{locks[r.path].Who}} on {{locks[r.path].Created | date:'medium'}} ({{locks[r.path].Operation}})"></span></td>
-                <td class="align-middle"><router-link :to="`/lineage/${r.lineage_value}`">{{r.path}}</router-link></td>
-                <td class="align-middle">{{r.terraform_version}}</td>
-                <td class="align-middle">{{r.serial}}</td>
-                <td class="align-middle">{{formatDate(r.last_modified)}}</td>
-                <td class="align-middle">{{r.resource_count}}</td>
-                <td class="text-center align-middle p-0">
-                    <canvas v-bind:id="'spark-'+index" width="200" height="70" style="max-width: 200px; max-height: 70px;">
-                      {{getActivity(index, r.lineage_value, 'spark-'+index)}}
-                    </canvas>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="table table-border table-striped">
+          <thead>
+              <th></th> <!-- lock -->
+              <th>
+                  Path
+              </th>
+              <th>
+                  TF Version
+              </th>
+              <th>
+                  Serial
+              </th>
+              <th>
+                  Time
+              </th>
+              <th>
+                  Resources
+              </th>
+              <th>
+                  Activity
+              </th>
+          </thead>
+          <tbody>
+              <tr v-for="(r, index) in results.states" v-bind:key="r">
+                  <td class="align-middle"><span v-if="isLocked(r.path)" class="fa fas-lock" title="Locked by {{locks[r.path].Who}} on {{locks[r.path].Created | date:'medium'}} ({{locks[r.path].Operation}})"></span></td>
+                  <td class="align-middle"><router-link :to="`/lineage/${r.lineage_value}`">{{r.path}}</router-link></td>
+                  <td class="align-middle">{{r.terraform_version}}</td>
+                  <td class="align-middle">{{r.serial}}</td>
+                  <td class="align-middle">{{formatDate(r.last_modified)}}</td>
+                  <td class="align-middle">{{r.resource_count}}</td>
+                  <td class="text-center align-middle p-0">
+                      <canvas v-bind:id="'spark-'+index" width="200" height="70" style="max-width: 200px; max-height: 70px;">
+                        {{getActivity(index, r.lineage_value, 'spark-'+index)}}
+                      </canvas>
+                  </td>
+              </tr>
+          </tbody>
+      </table>
+    </div>
 </div>
 </template>
 

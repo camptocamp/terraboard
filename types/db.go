@@ -86,6 +86,7 @@ type Plan struct {
 	GitCommit    string         `gorm:"varchar(50)" json:"git_commit"`
 	CiURL        string         `json:"ci_url"`
 	Source       string         `json:"source"`
+	ExitCode     int            `json:"exit_code"`
 	ParsedPlan   PlanModel      `json:"parsed_plan"`
 	ParsedPlanID sql.NullInt64  `gorm:"index" json:"-"`
 	PlanJSON     datatypes.JSON `json:"plan_json"`
