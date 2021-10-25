@@ -1,5 +1,37 @@
 # Changelog
 
+## [2.0.0](https://www.github.com/camptocamp/terraboard/compare/v2.0.0...v2.0.0) (2021-10-25)
+
+
+### Features
+
+* **frontend:** add loading spinner during plan fetching ([4e6d2b6](https://www.github.com/camptocamp/terraboard/commit/4e6d2b6e73c704977bc7c217a383638f6120c044))
+* **frontend:** highlightjs theme ([#202](https://www.github.com/camptocamp/terraboard/issues/202)) ([e18dd8f](https://www.github.com/camptocamp/terraboard/commit/e18dd8fd714d36f98e7dc38d246ba36e209534a8))
+* **frontend:** now trigger refresh on input for search's text fields ([#205](https://www.github.com/camptocamp/terraboard/issues/205)) ([cd42ac1](https://www.github.com/camptocamp/terraboard/commit/cd42ac1a3396cb05821ca9c769a8a4eb010628a2))
+* **frontend:** resource filter now match any substring in res path or name ([cc707ea](https://www.github.com/camptocamp/terraboard/commit/cc707ea5d135a92f28715122299d3d889b422988))
+* **frontend:** set role=button on list carets ([#200](https://www.github.com/camptocamp/terraboard/issues/200)) ([02c0022](https://www.github.com/camptocamp/terraboard/commit/02c0022a02c7d7ee7e591e5af3dbe76056a0e8eb))
+* **frontend:** use pointer cursor on list group items ([#201](https://www.github.com/camptocamp/terraboard/issues/201)) ([0b87348](https://www.github.com/camptocamp/terraboard/commit/0b873487dd052223bf3fa607855272e9169e1d06))
+* **frontend:** use UTC strings for dates ([#198](https://www.github.com/camptocamp/terraboard/issues/198)) ([c77d66f](https://www.github.com/camptocamp/terraboard/commit/c77d66f31f7c83e082097ccb1200e028e2c4ca95))
+* **plan:** process plan's status from ci exit-code ([#215](https://www.github.com/camptocamp/terraboard/issues/215)) ([5b32184](https://www.github.com/camptocamp/terraboard/commit/5b32184086d3a9be864d418301e086cd04a30c9b))
+* **plans:** add plans explorer and viewer  ([#193](https://www.github.com/camptocamp/terraboard/issues/193)) ([35d73c0](https://www.github.com/camptocamp/terraboard/commit/35d73c016b873d8162d445bd56c478632d497703))
+
+
+### Bug Fixes
+
+* **frontend:** avatar not displaying due to css issue ([#206](https://www.github.com/camptocamp/terraboard/issues/206)) ([78f8922](https://www.github.com/camptocamp/terraboard/commit/78f8922f86a36e4b9465070d56d8cf0bb7615e59))
+* **frontend:** missing user's information & avatar ([#204](https://www.github.com/camptocamp/terraboard/issues/204)) ([0aec334](https://www.github.com/camptocamp/terraboard/commit/0aec3342a5041abce1cd9f56334694012dafa454))
+* **frontend:** performance issue with resource filter with multiples modules ([#208](https://www.github.com/camptocamp/terraboard/issues/208)) ([cc707ea](https://www.github.com/camptocamp/terraboard/commit/cc707ea5d135a92f28715122299d3d889b422988))
+* **frontend:** performence issue on plans fetching ([#212](https://www.github.com/camptocamp/terraboard/issues/212)) ([4e6d2b6](https://www.github.com/camptocamp/terraboard/commit/4e6d2b6e73c704977bc7c217a383638f6120c044))
+* **frontend:** resource filter on state view now works ([#203](https://www.github.com/camptocamp/terraboard/issues/203)) ([156e544](https://www.github.com/camptocamp/terraboard/commit/156e544b3f351bf2bc6008ebc26be8d45193f933))
+* **frontend:** undefined error on plan view without outputs changes ([#211](https://www.github.com/camptocamp/terraboard/issues/211)) ([a5d6050](https://www.github.com/camptocamp/terraboard/commit/a5d6050fd9c878d9773f6e1669eabea2a00069c3))
+* **json:** plan's variables parsing error ([#210](https://www.github.com/camptocamp/terraboard/issues/210)) ([91b3dab](https://www.github.com/camptocamp/terraboard/commit/91b3dab01633729d0143e99629363968f9f84c0b))
+* remove localhost from URLs ([#196](https://www.github.com/camptocamp/terraboard/issues/196)) ([7dd34ed](https://www.github.com/camptocamp/terraboard/commit/7dd34ed6fdd1781a6c76a6753e406fb7dc25d33f))
+
+
+### Miscellaneous Chores
+
+* release as 2.0.0 ([a2dd9b6](https://www.github.com/camptocamp/terraboard/commit/a2dd9b66b2ea5eae1a3102414261af414cce9202))
+
 ## [2.0.0-alpha.2](https://www.github.com/camptocamp/terraboard/compare/v2.0.0...v2.0.0-alpha.2) (2021-08-19)
 
 
