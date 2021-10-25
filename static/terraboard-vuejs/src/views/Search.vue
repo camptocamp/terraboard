@@ -84,7 +84,7 @@
       v-if="pager.nextPage"
     ></span>
   </label>
-  <div id="results">
+  <div id="results" class="table-responsive">
     <table class="table table-border table-striped">
       <thead>
         <th></th>

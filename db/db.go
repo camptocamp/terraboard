@@ -658,7 +658,7 @@ func (db *Database) GetPlansSummary(lineage, limitStr, pageStr string) (plans []
 	}
 
 	db.Select(`"plans"."id"`, `"plans"."created_at"`, `"plans"."updated_at"`, `"plans"."tf_version"`,
-		`"plans"."git_remote"`, `"plans"."git_commit"`, `"plans"."ci_url"`, `"plans"."source"`).
+		`"plans"."git_remote"`, `"plans"."git_commit"`, `"plans"."ci_url"`, `"plans"."source"`, `"plans"."exit_code"`).
 		Joins("Lineage").
 		Order("created_at desc").
 		Limit(limit).

@@ -36,10 +36,11 @@
       v-if="pager.nextPage"
     ></span>
   </label>
-  <div id="results">
+  <div id="results" class="table-responsive">
     <table class="table table-border table-striped">
       <thead>
         <th></th>
+        <th>Status</th>
         <th>Lineage</th>
         <th>TF Version</th>
         <th>Git Remote</th>
@@ -58,6 +59,11 @@
             >
               <span class="fas fa-link" aria-hidden="true"></span>
             </router-link>
+          </td>
+          <td>
+            <div v-if="r.exit_code == 0"><i class="fas fa-check-circle text-success me-1"></i></div>
+            <div v-else-if="r.exit_code == 1"><i class="fas fa-times-circle text-danger me-1"></i></div>
+            <div v-else-if="r.exit_code == 2"><i class="fas fa-exclamation-circle text-warning me-1"></i></div>
           </td>
           <td>{{ r.lineage_data.lineage }}</td>
           <td>{{ r.terraform_version }}</td>

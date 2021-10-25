@@ -102,8 +102,9 @@
               <tr>
                 <td class="align-middle">Status:</td>
                 <td class="align-middle">
-                  <div v-if="isStatusValid"><i class="fas fa-check-circle fa-2x text-success me-1"></i><div> Convergent</div></div>
-                  <div v-if="!isStatusValid"><i class="fas fa-exclamation-circle fa-2x text-warning me-1"></i><div> Divergent</div></div>
+                  <div v-if="plan.exit_code == 0"><i class="fas fa-check-circle fa-2x text-success me-1"></i><div> Convergent</div></div>
+                  <div v-if="plan.exit_code == 1"><i class="fas fa-times-circle fa-2x text-danger me-1"></i><div> Failed</div></div>
+                  <div v-if="plan.exit_code == 2"><i class="fas fa-exclamation-circle fa-2x text-warning me-1"></i><div> Divergent</div></div>
                 </td>
               </tr>
             </tbody>
@@ -286,16 +287,6 @@ Chart.register( PieController, ArcElement, Tooltip )
     },
   },
   computed: {
-    isStatusValid: function(): boolean {
-      return (
-        this.changes.resources.added +
-        this.changes.resources.changed +
-        this.changes.resources.deleted +
-        this.changes.outputs.added +
-        this.changes.outputs.changed +
-        this.changes.outputs.deleted
-      ) == 0;
-    },
     sortedAttributes() {
       if (this.resource.attributes !== undefined) {
         return this.resource.attributes.sort((a: any, b: any) => {
