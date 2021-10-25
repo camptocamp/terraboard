@@ -29,7 +29,7 @@ require (
 	github.com/hashicorp/terraform v1.0.2
 	github.com/hashicorp/terraform-svchost v0.0.0-20200729002733-f050f53b9734
 	github.com/jackc/pgproto3/v2 v2.0.7 // indirect
-	github.com/jessevdk/go-flags v1.4.0
+	github.com/jessevdk/go-flags v1.5.0
 	github.com/lib/pq v1.9.0 // indirect
 	github.com/machinebox/graphql v0.2.2
 	github.com/mailru/easyjson v0.7.7 // indirect

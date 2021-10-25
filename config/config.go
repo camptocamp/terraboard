@@ -9,9 +9,34 @@ import (
 
 	tfversion "github.com/hashicorp/terraform/version"
 	"github.com/jessevdk/go-flags"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )
+
+type configFlags struct {
+	Version bool `short:"V" long:"version" description:"Display version."`
+
+	ConfigFilePath string `short:"c" long:"config-file" env:"CONFIG_FILE" description:"Config File path"`
+
+	Provider ProviderConfig `group:"General Provider Options" yaml:"provider"`
+
+	Log LogConfig `group:"Logging Options" yaml:"log"`
+
+	DB DBConfig `group:"Database Options" yaml:"database"`
+
+	AWS AWSConfig `group:"AWS Options" yaml:"aws"`
+
+	S3 S3BucketConfig `group:"S3 Options" yaml:"s3"`
+
+	TFE TFEConfig `group:"Terraform Enterprise Options" yaml:"tfe"`
+
+	GCP GCPConfig `group:"Google Cloud Platform Options" yaml:"gcp"`
+
+	Gitlab GitlabConfig `group:"GitLab Options" yaml:"gitlab"`
+
+	Web WebConfig `group:"Web" yaml:"web"`
+}
 
 // LogConfig stores the log configuration
 type LogConfig struct {
@@ -109,9 +134,9 @@ type Config struct {
 }
 
 // LoadConfigFromYaml loads the config from config file
-func (c *Config) LoadConfigFromYaml() *Config {
-	fmt.Printf("Loading config from %s\n", c.ConfigFilePath)
-	yamlFile, err := ioutil.ReadFile(c.ConfigFilePath)
+func (c *Config) LoadConfigFromYaml(filename string) *Config {
+	fmt.Printf("Loading config from %s\n", filename)
+	yamlFile, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Printf("yamlFile.Get err #%v ", err)
 	}
@@ -121,64 +146,57 @@ func (c *Config) LoadConfigFromYaml() *Config {
 		log.Fatalf("Unmarshal err: %v", err)
 	}
 
-	return c
-}
-
-// Initialize Config with one obj per providers arrays
-// to allow usage of flags / env variables on single provider configuration
-func initDefaultConfig() Config {
-	var c Config
-	var awsInitialConfig AWSConfig
-	var s3InitialConfig S3BucketConfig
-	var tfeInitialConfig TFEConfig
-	var gcpInitialConfig GCPConfig
-	var gitlabInitialConfig GitlabConfig
-
-	parseStructFlagsAndEnv(&awsInitialConfig)
-	c.AWS = append(c.AWS, awsInitialConfig)
-
-	parseStructFlagsAndEnv(&s3InitialConfig)
-	c.AWS[0].S3 = append(c.AWS[0].S3, s3InitialConfig)
-
-	parseStructFlagsAndEnv(&tfeInitialConfig)
-	c.TFE = append(c.TFE, tfeInitialConfig)
-
-	parseStructFlagsAndEnv(&gcpInitialConfig)
-	c.GCP = append(c.GCP, gcpInitialConfig)
-
-	parseStructFlagsAndEnv(&gitlabInitialConfig)
-	c.Gitlab = append(c.Gitlab, gitlabInitialConfig)
-
+	c.ConfigFilePath = filename
 	return c
 }
 
 // Parse flags and env variables to given struct using go-flags
 // parser
-func parseStructFlagsAndEnv(obj interface{}) {
-	parser := flags.NewParser(obj, flags.IgnoreUnknown)
+func parseStructFlagsAndEnv(obj interface{}) configFlags {
+	var tmpConfig configFlags
+	parser := flags.NewParser(&tmpConfig, flags.Default)
 	if _, err := parser.Parse(); err != nil {
-		fmt.Printf("Failed to parse flags: %s", err)
-		os.Exit(1)
+		if flagsErr, ok := err.(*flags.Error); ok && flagsErr.Type == flags.ErrHelp {
+			os.Exit(0)
+		} else {
+			logrus.Fatalf("Failed to parse flags: %s", err)
+		}
 	}
+
+	return tmpConfig
 }
 
 // LoadConfig loads the config from flags & environment
 func LoadConfig(version string) *Config {
-	c := initDefaultConfig()
-	parseStructFlagsAndEnv(&c)
+	var c Config
+	parsedConfig := parseStructFlagsAndEnv(&c)
 
-	if c.ConfigFilePath != "" {
-		if _, err := os.Stat(c.ConfigFilePath); err == nil {
-			c.LoadConfigFromYaml()
+	if parsedConfig.Version {
+		fmt.Printf("Terraboard v%v (built for Terraform v%v)\n", version, tfversion.Version)
+		os.Exit(0)
+	}
+
+	c = Config{
+		Version:        parsedConfig.Version,
+		ConfigFilePath: parsedConfig.ConfigFilePath,
+		Provider:       parsedConfig.Provider,
+		Log:            parsedConfig.Log,
+		DB:             parsedConfig.DB,
+		AWS:            []AWSConfig{parsedConfig.AWS},
+		TFE:            []TFEConfig{parsedConfig.TFE},
+		GCP:            []GCPConfig{parsedConfig.GCP},
+		Gitlab:         []GitlabConfig{parsedConfig.Gitlab},
+		Web:            parsedConfig.Web,
+	}
+	c.AWS[0].S3 = append(c.AWS[0].S3, parsedConfig.S3)
+
+	if parsedConfig.ConfigFilePath != "" {
+		if _, err := os.Stat(parsedConfig.ConfigFilePath); err == nil {
+			c.LoadConfigFromYaml(parsedConfig.ConfigFilePath)
 		} else {
 			fmt.Printf("File %s doesn't exists!\n", c.ConfigFilePath)
 			os.Exit(1)
 		}
-	}
-
-	if c.Version {
-		fmt.Printf("Terraboard v%v (built for Terraform v%v)\n", version, tfversion.Version)
-		os.Exit(0)
 	}
 
 	return &c
