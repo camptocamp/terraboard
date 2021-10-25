@@ -105,9 +105,9 @@ func TestLoadConfigFromYaml(t *testing.T) {
 			User:         "terraboard-user",
 			Password:     "terraboard-pass",
 			Name:         "terraboard-db",
-			SSLMode:      "require",
+			SSLMode:      "",
 			NoSync:       true,
-			SyncInterval: 1,
+			SyncInterval: 0,
 		},
 		AWS: []AWSConfig{
 			{

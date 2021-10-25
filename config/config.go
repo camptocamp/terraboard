@@ -9,7 +9,6 @@ import (
 
 	tfversion "github.com/hashicorp/terraform/version"
 	"github.com/jessevdk/go-flags"
-	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )
@@ -152,15 +151,14 @@ func (c *Config) LoadConfigFromYaml(filename string) *Config {
 
 // Parse flags and env variables to given struct using go-flags
 // parser
-func parseStructFlagsAndEnv(obj interface{}) configFlags {
+func parseStructFlagsAndEnv() configFlags {
 	var tmpConfig configFlags
 	parser := flags.NewParser(&tmpConfig, flags.Default)
 	if _, err := parser.Parse(); err != nil {
 		if flagsErr, ok := err.(*flags.Error); ok && flagsErr.Type == flags.ErrHelp {
 			os.Exit(0)
-		} else {
-			logrus.Fatalf("Failed to parse flags: %s", err)
 		}
+		log.Fatalf("Failed to parse flags: %s", err)
 	}
 
 	return tmpConfig
@@ -169,7 +167,7 @@ func parseStructFlagsAndEnv(obj interface{}) configFlags {
 // LoadConfig loads the config from flags & environment
 func LoadConfig(version string) *Config {
 	var c Config
-	parsedConfig := parseStructFlagsAndEnv(&c)
+	parsedConfig := parseStructFlagsAndEnv()
 
 	if parsedConfig.Version {
 		fmt.Printf("Terraboard v%v (built for Terraform v%v)\n", version, tfversion.Version)
