@@ -13,5 +13,4 @@
          with:
            token: ${{ secrets.GITHUB_TOKEN }}
            release-type: go
-           package-name: release-please-action
            changelog-path: CHANGELOG.md
