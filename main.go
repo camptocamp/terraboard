@@ -206,10 +206,10 @@ func main() {
 
 	// Handle swagger files
 	swaggerRouter := mux.NewRouter()
-	swaggerRouter.HandleFunc("/swagger/", func(w http.ResponseWriter, r *http.Request) {
+	swaggerRouter.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/swagger/index.html", http.StatusMovedPermanently)
 	})
-	swaggerRouter.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
+	swaggerRouter.PathPrefix("/").Handler(httpSwagger.Handler(
 		httpSwagger.URL("/swagger/doc.json"),
 	))
 	swaggerRouter.Use(corsMiddleware)
