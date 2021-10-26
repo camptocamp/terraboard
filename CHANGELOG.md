@@ -1,5 +1,12 @@
 # Changelog
 
+### [2.0.1](https://www.github.com/camptocamp/terraboard/compare/v2.0.0...v2.0.1) (2021-10-26)
+
+
+### Bug Fixes
+
+* **swagger:** move swagger redirection on / instead on /swagger/ ([#221](https://www.github.com/camptocamp/terraboard/issues/221)) ([6d50bf5](https://www.github.com/camptocamp/terraboard/commit/6d50bf58c3603cf56b27ec7eebaafd172ad91023))
+
 ## [2.0.0](https://www.github.com/camptocamp/terraboard/compare/v2.0.0...v2.0.0) (2021-10-25)
 
 
