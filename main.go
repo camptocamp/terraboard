@@ -213,7 +213,7 @@ func main() {
 		httpSwagger.URL("/swagger/doc.json"),
 	))
 	swaggerRouter.Use(corsMiddleware)
-	go serveSwagger(8081, swaggerRouter)
+	go serveSwagger(int(c.Web.SwaggerPort), swaggerRouter)
 
 	// Serve static files (CSS, JS, images) from dir
 	spa := spaHandler{staticPath: "static", indexPath: "index.html"}
