@@ -24,6 +24,7 @@ type planPayload struct {
 	GitCommit string         `json:"git_commit"`
 	CiURL     string         `json:"ci_url"`
 	Source    string         `json:"source"`
+	ExitCode  int            `json:"exit_code"`
 	PlanJSON  datatypes.JSON `json:"plan_json" swaggertype:"object"`
 }
 

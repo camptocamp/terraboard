@@ -75,9 +75,10 @@ func TestLoadConfig(t *testing.T) {
 			},
 		},
 		Web: WebConfig{
-			Port:      8080,
-			BaseURL:   "/",
-			LogoutURL: "",
+			Port:        8080,
+			SwaggerPort: 8081,
+			BaseURL:     "/",
+			LogoutURL:   "",
 		},
 	}
 
@@ -142,9 +143,10 @@ func TestLoadConfigFromYaml(t *testing.T) {
 			},
 		},
 		Web: WebConfig{
-			Port:      39090,
-			BaseURL:   "/test/",
-			LogoutURL: "/test-logout",
+			Port:        39090,
+			SwaggerPort: 8081,
+			BaseURL:     "/test/",
+			LogoutURL:   "/test-logout",
 		},
 	}
 

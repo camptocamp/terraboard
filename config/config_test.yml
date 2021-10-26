@@ -37,5 +37,6 @@ gitlab:
 
 web:
   port: 39090
+  swagger-port: 8081
   base-url: /test/
   logout-url: /test-logout

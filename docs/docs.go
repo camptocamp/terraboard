@@ -504,6 +504,9 @@ var doc = `{
                 "ci_url": {
                     "type": "string"
                 },
+                "exit_code": {
+                    "type": "integer"
+                },
                 "git_commit": {
                     "type": "string"
                 },
