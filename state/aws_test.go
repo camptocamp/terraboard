@@ -279,6 +279,9 @@ type s3Mock struct {
 func (s *s3Mock) ListObjects(_ *s3.ListObjectsInput) (*s3.ListObjectsOutput, error) {
 	return &s3.ListObjectsOutput{Contents: []*s3.Object{{Key: aws.String("test.tfstate")}}}, nil
 }
+func (s *s3Mock) ListObjectsV2Input(_ *s3.ListObjectsInput) (*s3.ListObjectsV2Output, error) {
+	return &s3.ListObjectsV2Output{Contents: []*s3.Object{{Key: aws.String("test.tfstate")}}}, nil
+}
 func (s *s3Mock) ListObjectVersions(_ *s3.ListObjectVersionsInput) (*s3.ListObjectVersionsOutput, error) {
 	return &s3.ListObjectVersionsOutput{
 		Versions: []*s3.ObjectVersion{
