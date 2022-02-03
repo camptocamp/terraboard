@@ -161,7 +161,6 @@ func (a *AWS) GetStates() (states []string, err error) {
 		}
 		params.ContinuationToken = result.NextContinuationToken
 		truncatedListing = *result.IsTruncated
-
 	}
 	states = keys
 	log.WithFields(log.Fields{
