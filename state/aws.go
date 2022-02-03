@@ -135,25 +135,32 @@ func (a *AWS) GetLocks() (locks map[string]LockInfo, err error) {
 
 // GetStates returns a slice of State files in the S3 bucket
 func (a *AWS) GetStates() (states []string, err error) {
+	truncatedListing := true
+	var keys []string
 	log.WithFields(log.Fields{
 		"bucket": a.bucket,
 		"prefix": a.keyPrefix,
 	}).Debug("Listing states from S3")
-	result, err := a.svc.ListObjects(&s3.ListObjectsInput{
+
+	params := s3.ListObjectsV2Input{
 		Bucket: aws_sdk.String(a.bucket),
 		Prefix: &a.keyPrefix,
-	})
-	if err != nil {
-		return states, err
 	}
+	for truncatedListing {
+		result, err := a.svc.ListObjectsV2(&params)
+		if err != nil {
+			return states, err
+		}
 
-	var keys []string
-	for _, obj := range result.Contents {
-		for _, ext := range a.fileExtension {
-			if strings.HasSuffix(*obj.Key, ext) {
-				keys = append(keys, *obj.Key)
+		for _, obj := range result.Contents {
+			for _, ext := range a.fileExtension {
+				if strings.HasSuffix(*obj.Key, ext) {
+					keys = append(keys, *obj.Key)
+				}
 			}
 		}
+		params.ContinuationToken = result.NextContinuationToken
+		truncatedListing = *result.IsTruncated
 	}
 	states = keys
 	log.WithFields(log.Fields{

@@ -276,8 +276,12 @@ type s3Mock struct {
 	s3iface.S3API
 }
 
-func (s *s3Mock) ListObjects(_ *s3.ListObjectsInput) (*s3.ListObjectsOutput, error) {
-	return &s3.ListObjectsOutput{Contents: []*s3.Object{{Key: aws.String("test.tfstate")}}}, nil
+func (s *s3Mock) ListObjectsV2(_ *s3.ListObjectsV2Input) (*s3.ListObjectsV2Output, error) {
+	return &s3.ListObjectsV2Output{Contents: []*s3.Object{
+		{Key: aws.String("test.tfstate")}, {Key: aws.String("test2.tfstate")}, {Key: aws.String("test3.tfstate")}},
+		IsTruncated: func() *bool { b := false; return &b }(),
+		KeyCount:    func() *int64 { b := int64(3); return &b }(),
+		MaxKeys:     func() *int64 { b := int64(1000); return &b }()}, nil
 }
 func (s *s3Mock) ListObjectVersions(_ *s3.ListObjectVersionsInput) (*s3.ListObjectVersionsOutput, error) {
 	return &s3.ListObjectVersionsOutput{
@@ -316,8 +320,8 @@ func TestGetStates(t *testing.T) {
 	states, err := awsInstance.GetStates()
 	if err != nil {
 		t.Error(err)
-	} else if len(states) != 1 {
-		t.Error("Expected one state")
+	} else if len(states) != 3 {
+		t.Error("Expected three states")
 	}
 }
 
