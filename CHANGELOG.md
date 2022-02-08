@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.1.0](https://www.github.com/camptocamp/terraboard/compare/v2.0.0...v2.1.0) (2022-02-08)
+
+
+### Features
+
+* allow more than 1000 state files ([#223](https://www.github.com/camptocamp/terraboard/issues/223)) ([056ca94](https://www.github.com/camptocamp/terraboard/commit/056ca947f4cdff34d903108e59b4d089e7367f1e))
+
+
+### Bug Fixes
+
+* **docker-compose:** wrong username used in pg healthcheck ([b219b9e](https://www.github.com/camptocamp/terraboard/commit/b219b9e1c25844b7ffbf3a18e91321902ec253b3))
+* **swagger:** move swagger redirection on / instead on /swagger/ ([#221](https://www.github.com/camptocamp/terraboard/issues/221)) ([6d50bf5](https://www.github.com/camptocamp/terraboard/commit/6d50bf58c3603cf56b27ec7eebaafd172ad91023))
+
 ## [2.0.0](https://www.github.com/camptocamp/terraboard/compare/v2.0.0...v2.0.0) (2021-10-25)
 
 
