@@ -397,7 +397,7 @@ docker run -p 8080:8080 \
   -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" \
   -e AWS_REGION="${AWS_DEFAULT_REGION}" \
   -e AWS_BUCKET="${AWS_BUCKET}" \
-  -e WS_DYNAMODB_TABLE="${AWS_DYNAMODB_TABLE}" \
+  -e AWS_DYNAMODB_TABLE="${AWS_DYNAMODB_TABLE}" \
   -e DB_PASSWORD="<mypassword>" \
   -e DB_SSLMODE="disable" \
   --net terraboard \
