@@ -1,5 +1,12 @@
 # Changelog
 
+### [2.1.1](https://www.github.com/camptocamp/terraboard/compare/v2.1.0...v2.1.1) (2022-03-05)
+
+
+### Bug Fixes
+
+* **build:** invalid version number displayed ([#229](https://www.github.com/camptocamp/terraboard/issues/229)) ([#231](https://www.github.com/camptocamp/terraboard/issues/231)) ([1fc682a](https://www.github.com/camptocamp/terraboard/commit/1fc682a1ffa87ae0e5fe93a7b2c1500af5cebe18))
+
 ## [2.1.0](https://www.github.com/camptocamp/terraboard/compare/v2.0.0...v2.1.0) (2022-02-08)
 
 
