@@ -2,7 +2,7 @@ NAME          				  := terraboard
 FILES         				  := $(wildcard */*.go)
 TEST_FILES    				  := $(shell go list ./... | grep -v /internal/)
 TEST_FILES_COMMA_SEPARATED    := $(shell go list ./... | grep -v /internal/ | awk '{print}' ORS=',')
-VERSION       				  := $(shell git describe --always)
+VERSION       				  := $(shell git describe --always --tags)
 .DEFAULT_GOAL 				  := help
 
 export GO111MODULE=on
