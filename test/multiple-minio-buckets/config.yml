@@ -10,8 +10,8 @@ provider:
   no-versioning: true
 
 aws:
-  - access-key: root
-    secret-access-key: mypassword
+  - access-key: ${AWS_ACCESS_KEY_ID}
+    secret-access-key: ${AWS_SECRET_ACCESS_KEY}
     endpoint: http://minio:9000/
     region: eu-west-1
     s3:

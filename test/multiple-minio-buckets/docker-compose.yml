@@ -9,6 +9,8 @@ services:
       DB_SSLMODE: disable
       CONFIG_FILE: config/config.yml
       GODEBUG: netdns=go
+      AWS_ACCESS_KEY_ID: root
+      AWS_SECRET_ACCESS_KEY: mypassword
     depends_on:
       db:
         condition: service_healthy
