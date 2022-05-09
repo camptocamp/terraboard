@@ -141,6 +141,7 @@ func (c *Config) LoadConfigFromYaml(filename string) *Config {
 		log.Printf("yamlFile.Get err #%v ", err)
 	}
 
+	yamlFile = []byte(os.ExpandEnv(string(yamlFile)))
 	err = yaml.Unmarshal(yamlFile, c)
 	if err != nil {
 		log.Fatalf("Unmarshal err: %v", err)
