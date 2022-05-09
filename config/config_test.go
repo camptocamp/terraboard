@@ -1,6 +1,7 @@
 package config
 
 import (
+	"os"
 	"reflect"
 	"testing"
 
@@ -93,6 +94,8 @@ func TestLoadConfig(t *testing.T) {
 
 func TestLoadConfigFromYaml(t *testing.T) {
 	var config Config
+	os.Setenv("AWS_DEFAULT_REGION", "test-region")
+	defer os.Unsetenv("AWS_DEFAULT_REGION")
 	config.LoadConfigFromYaml("config_test.yml")
 	compareConfig := Config{
 		Log: LogConfig{
@@ -115,6 +118,7 @@ func TestLoadConfigFromYaml(t *testing.T) {
 				AccessKey:       "root",
 				SecretAccessKey: "mypassword",
 				DynamoDBTable:   "terraboard-dynamodb",
+				Region:          "test-region",
 				S3: []S3BucketConfig{{
 					Bucket:         "terraboard-bucket",
 					KeyPrefix:      "test/",
