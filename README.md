@@ -152,7 +152,7 @@ Terraboard currently supports configuration in three different ways:
 2. CLI parameters **(only usable for single provider configuration)**
 3. Configuration file (YAML). A configuration file example can be found in the root directory of this repository and in the `test/` subdirectory.
 
-**Important: all flags/environment variables related to the providers settings aren't compatible with multi-provider configuration! Instead, you must use the YAML config file to be able to configure multiples buckets/providers.**
+**Important: all flags/environment variables related to the providers settings aren't compatible with multi-provider configuration! Instead, you must use the YAML config file to be able to configure multiples buckets/providers. YAML config is able to load values from environments variables.**
 
 The precedence of configurations is as described below.
 
@@ -171,7 +171,7 @@ provider:
 
 aws:
   - endpoint: http://minio:9000/
-    region: eu-west-1
+    region: ${AWS_DEFAULT_REGION}
     s3:
       - bucket: test-bucket
         force-path-style: true

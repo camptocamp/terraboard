@@ -14,6 +14,7 @@ aws:
   - access-key: root
     secret-access-key: mypassword
     dynamodb-table: terraboard-dynamodb
+    region: ${AWS_DEFAULT_REGION}
     s3:
       - bucket: terraboard-bucket
         key-prefix: test/
