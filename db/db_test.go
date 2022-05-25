@@ -572,7 +572,7 @@ func TestSearchAttribute(t *testing.T) {
 	mock.ExpectQuery("^SELECT count(.+)").
 		WillReturnRows(sqlmock.NewRows([]string{"total"}).AddRow(1))
 	mock.ExpectQuery("^SELECT (.+)").
-		WithArgs("%test_thing%", "%baz%", "%woozles%", `%"confuzles"%`, 20).
+		WithArgs("%test_thing%", "%baz%", "%woozles%", `%"confuzles"%`, `%1.0.0%`, 20).
 		WillReturnRows(sqlmock.NewRows([]string{"path", "version_id", "tf_version"}).AddRow("path", "foo", "1.0.0"))
 
 	db := &Database{
