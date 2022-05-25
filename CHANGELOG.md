@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.2.0](https://www.github.com/camptocamp/terraboard/compare/v2.1.1...v2.2.0) (2022-05-25)
+
+
+### Features
+
+* add ability to resolve environment variables in yaml config ([#240](https://www.github.com/camptocamp/terraboard/issues/240)) ([a857bcd](https://www.github.com/camptocamp/terraboard/commit/a857bcd796ef50c1bee218ff94805579ce2a6efa))
+
+
+### Bug Fixes
+
+* **db:** possible sql injection on /search endpoint ([#247](https://www.github.com/camptocamp/terraboard/issues/247)) ([56dbee8](https://www.github.com/camptocamp/terraboard/commit/56dbee8d8e11da7f33ff0901983a88a358932a93))
+
 ### [2.1.1](https://www.github.com/camptocamp/terraboard/compare/v2.1.0...v2.1.1) (2022-03-05)
 
 
