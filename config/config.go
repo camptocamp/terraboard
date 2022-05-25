@@ -172,7 +172,7 @@ func LoadConfig(version string) *Config {
 	parsedConfig := parseStructFlagsAndEnv()
 
 	if parsedConfig.Version {
-		fmt.Printf("Terraboard v%v (built for Terraform v%v)\n", version, tfversion.Version)
+		fmt.Printf("Terraboard %v (built for Terraform v%v)\n", version, tfversion.Version)
 		os.Exit(0)
 	}
 

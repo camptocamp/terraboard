@@ -152,7 +152,7 @@ func main() {
 
 	util.SetBasePath(c.Web.BaseURL)
 
-	log.Infof("Terraboard v%s (built for Terraform v%s) is starting...", version, tfversion.Version)
+	log.Infof("Terraboard %s (built for Terraform v%s) is starting...", version, tfversion.Version)
 
 	err := c.SetupLogging()
 	if err != nil {

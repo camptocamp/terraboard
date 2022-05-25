@@ -2,7 +2,7 @@
 <div class="navbar mt-auto">
     <div class="container-fluid mx-1">
         <ul class="nav navbar-nav" id="navbar-collapse-menu">
-            <li><a href="https://github.com/camptocamp/terraboard/releases" target="_blank">Terraboard v{{ version }}</a></li>
+            <li><a href="https://github.com/camptocamp/terraboard/releases" target="_blank">Terraboard {{ version }}</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right" id="navbar-collapse-menu">
             <li><a href="https://www.camptocamp.com/" target="_blank">{{ copyright }}</a></li>
