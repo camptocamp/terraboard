@@ -1,5 +1,13 @@
 # Changelog
 
+### [2.2.1](https://www.github.com/camptocamp/terraboard/compare/v2.2.0...v2.2.1) (2022-05-25)
+
+
+### Bug Fixes
+
+* **config:** missing default values with yaml ([3f31b1f](https://www.github.com/camptocamp/terraboard/commit/3f31b1f0e0b8f6f8b17867872d7f4ea0b5fbd128))
+* remove duplicated 'v' on terraboard version (frontend/logs) ([a2f6589](https://www.github.com/camptocamp/terraboard/commit/a2f65899a7f5e41c3f8ef4d8d06e53bd58d6d9d5))
+
 ## [2.2.0](https://www.github.com/camptocamp/terraboard/compare/v2.1.1...v2.2.0) (2022-05-25)
 
 
