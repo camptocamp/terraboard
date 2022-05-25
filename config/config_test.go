@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
+	"github.com/jessevdk/go-flags"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -24,17 +25,22 @@ func TestSetLogging_debug(t *testing.T) {
 }
 
 func TestLoadConfig(t *testing.T) {
-	t.Skip("Skipping this test since go-flags can't parse properlly flags with go test command")
-
-	c := LoadConfig("1.0.0")
-	compareConfig := Config{
+	var tmpConfig configFlags
+	parser := flags.NewParser(&tmpConfig, flags.Default)
+	if _, err := parser.ParseArgs([]string{"--db-host=test", "--port=1234"}); err != nil {
+		if flagsErr, ok := err.(*flags.Error); ok && flagsErr.Type == flags.ErrHelp {
+			os.Exit(0)
+		}
+		log.Fatalf("Failed to parse flags: %s", err)
+	}
+	compareConfig := configFlags{
 		Log: LogConfig{
 			Level:  "info",
 			Format: "plain",
 		},
 		ConfigFilePath: "",
 		DB: DBConfig{
-			Host:         "db",
+			Host:         "test",
 			Port:         5432,
 			User:         "gorm",
 			Password:     "",
@@ -43,50 +49,42 @@ func TestLoadConfig(t *testing.T) {
 			NoSync:       false,
 			SyncInterval: 1,
 		},
-		AWS: []AWSConfig{
-			{
-				AccessKey:       "",
-				SecretAccessKey: "",
-				DynamoDBTable:   "",
-				S3: []S3BucketConfig{{
-					Bucket:         "",
-					KeyPrefix:      "",
-					FileExtension:  []string{".tfstate"},
-					ForcePathStyle: false,
-				}},
-			},
+		AWS: AWSConfig{
+			AccessKey:       "",
+			SecretAccessKey: "",
+			DynamoDBTable:   "",
 		},
-		TFE: []TFEConfig{
-			{
-				Address:      "",
-				Token:        "",
-				Organization: "",
-			},
+		S3: S3BucketConfig{
+			Bucket:         "",
+			KeyPrefix:      "",
+			FileExtension:  []string{".tfstate"},
+			ForcePathStyle: false,
 		},
-		GCP: []GCPConfig{
-			{
-				GCSBuckets: nil,
-				GCPSAKey:   "",
-			},
+		TFE: TFEConfig{
+			Address:      "",
+			Token:        "",
+			Organization: "",
 		},
-		Gitlab: []GitlabConfig{
-			{
-				Address: "https://gitlab.com",
-				Token:   "",
-			},
+		GCP: GCPConfig{
+			GCSBuckets: nil,
+			GCPSAKey:   "",
+		},
+		Gitlab: GitlabConfig{
+			Address: "https://gitlab.com",
+			Token:   "",
 		},
 		Web: WebConfig{
-			Port:        8080,
+			Port:        1234,
 			SwaggerPort: 8081,
 			BaseURL:     "/",
 			LogoutURL:   "",
 		},
 	}
 
-	if !reflect.DeepEqual(*c, compareConfig) {
+	if !reflect.DeepEqual(tmpConfig, compareConfig) {
 		t.Errorf(
 			"TestLoadConfig() -> \n\ngot:\n%v,\n\nwant:\n%v",
-			spew.Sdump(*c),
+			spew.Sdump(tmpConfig),
 			spew.Sdump(compareConfig),
 		)
 	}
@@ -109,9 +107,9 @@ func TestLoadConfigFromYaml(t *testing.T) {
 			User:         "terraboard-user",
 			Password:     "terraboard-pass",
 			Name:         "terraboard-db",
-			SSLMode:      "",
+			SSLMode:      "require",
 			NoSync:       true,
-			SyncInterval: 0,
+			SyncInterval: 1,
 		},
 		AWS: []AWSConfig{
 			{
