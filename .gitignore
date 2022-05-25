@@ -3,3 +3,4 @@ vendor/
 terraboard
 dist/
 coverage.out
+.vscode/
