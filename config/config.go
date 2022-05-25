@@ -98,8 +98,8 @@ type GitlabConfig struct {
 
 // WebConfig stores the UI interface parameters
 type WebConfig struct {
-	Port        uint16 `short:"p" long:"port" env:"TERRABOARD_PORT" yaml:"port" description:"Port to listen on." default:"8080"`
-	SwaggerPort uint16 `long:"swagger-port" env:"TERRABOARD_SWAGGER_PORT" yaml:"swagger-port" description:"Port for swagger to listen on." default:"8081"`
+	Port        uint16 `short:"p" long:"port" env:"TERRABOARD_WEB_PORT" yaml:"port" description:"Port to listen on." default:"8080"`
+	SwaggerPort uint16 `long:"swagger-port" env:"TERRABOARD_WEB_SWAGGER_PORT" yaml:"swagger-port" description:"Port for swagger to listen on." default:"8081"`
 	BaseURL     string `long:"base-url" env:"TERRABOARD_BASE_URL" yaml:"base-url" description:"Base URL." default:"/"`
 	LogoutURL   string `long:"logout-url" env:"TERRABOARD_LOGOUT_URL" yaml:"logout-url" description:"Logout URL."`
 }

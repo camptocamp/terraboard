@@ -317,8 +317,11 @@ You can find a ready-to-use Docker example with two *MinIO* buckets in the `test
 #### Web
 
 - `-p`, `--port` <default: *"8080"*> Port to listen on.
-  - Env: *TERRABOARD_PORT*
+  - Env: *TERRABOARD_WEB_PORT*
   - Yaml: *web.port*
+- `--swagger-port` <default: *"8081"*> Port to listen on for swagger documentation.
+  - Env: *TERRABOARD_WEB_SWAGGER_PORT*
+  - Yaml: *web.swagger-port*
 - `--base-url` <default: *"/"*> Base URL.
   - Env: *TERRABOARD_BASE_URL*
   - Yaml: *web.base-url*
