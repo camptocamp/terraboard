@@ -436,7 +436,7 @@ passing it as the `BASE_URL` environment variable.
 When using an authentication proxy, Terraboard will retrieve the logged in
 user and email from the headers passed by the proxy.
 Terraboard expects you to setup the HTTP Headers `X-Forwarded-User` and
-`X-Forwarded-Email` when passing the llogged in user and email. A Nginx
+`X-Forwarded-Email` when passing the logged in user and email. A Nginx
 example can be found below:
 
 ```nginx
@@ -447,7 +447,7 @@ location / {
   proxy_set_header X-Forwarded-User  $user;
   proxy_set_header X-Forwarded-Email $email;
   ...
-  proxy_pass http://terrabord/;
+  proxy_pass http://terraboard/;
 }
 ```
 
