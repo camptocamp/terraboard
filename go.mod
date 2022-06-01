@@ -38,8 +38,8 @@ require (
 	github.com/sirupsen/logrus v1.7.0
 	github.com/spf13/afero v1.2.2
 	github.com/stretchr/testify v1.7.0
-	github.com/swaggo/http-swagger v1.1.1
-	github.com/swaggo/swag v1.7.3
+	github.com/swaggo/http-swagger v1.2.6
+	github.com/swaggo/swag v1.7.9
 	github.com/zclconf/go-cty v1.9.0
 	github.com/zclconf/go-cty-yaml v1.0.2
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
@@ -65,7 +65,7 @@ require (
 	github.com/fatih/color v1.7.0 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.19.6 // indirect
-	github.com/go-openapi/spec v0.20.3 // indirect
+	github.com/go-openapi/spec v0.20.4 // indirect
 	github.com/go-openapi/swag v0.19.15 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.4.3 // indirect
