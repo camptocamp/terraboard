@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/camptocamp/terraboard/internal/terraform/addrs"
+	"github.com/zclconf/go-cty/cty"
 )
 
 // TestNewModule_provider_fqns exercises module.gatherProviderLocalNames()
@@ -14,7 +15,7 @@ func TestNewModule_provider_local_name(t *testing.T) {
 		t.Fatal(diags.Error())
 	}
 
-	p := addrs.NewProvider(addrs.DefaultRegistryHost, "foo", "test")
+	p := addrs.NewProvider(addrs.DefaultProviderRegistryHost, "foo", "test")
 	if name, exists := mod.ProviderLocalNames[p]; !exists {
 		t.Fatal("provider FQN foo/test not found")
 	} else {
@@ -38,7 +39,7 @@ func TestNewModule_provider_local_name(t *testing.T) {
 	// can also look up the "terraform" provider and see that it sources is
 	// allowed to be overridden, even though there is a builtin provider
 	// called "terraform".
-	p = addrs.NewProvider(addrs.DefaultRegistryHost, "not-builtin", "not-terraform")
+	p = addrs.NewProvider(addrs.DefaultProviderRegistryHost, "not-builtin", "not-terraform")
 	if name, exists := mod.ProviderLocalNames[p]; !exists {
 		t.Fatal("provider FQN not-builtin/not-terraform not found")
 	} else {
@@ -59,8 +60,8 @@ func TestNewModule_resource_providers(t *testing.T) {
 	// the default implied provider and one explicitly using a provider set in
 	// required_providers
 	wantImplicit := addrs.NewDefaultProvider("test")
-	wantFoo := addrs.NewProvider(addrs.DefaultRegistryHost, "foo", "test")
-	wantBar := addrs.NewProvider(addrs.DefaultRegistryHost, "bar", "test")
+	wantFoo := addrs.NewProvider(addrs.DefaultProviderRegistryHost, "foo", "test")
+	wantBar := addrs.NewProvider(addrs.DefaultProviderRegistryHost, "bar", "test")
 
 	// root module
 	if !cfg.Module.ManagedResources["test_instance.explicit"].Provider.Equals(wantFoo) {
@@ -107,7 +108,7 @@ func TestProviderForLocalConfig(t *testing.T) {
 	}
 	lc := addrs.LocalProviderConfig{LocalName: "foo-test"}
 	got := mod.ProviderForLocalConfig(lc)
-	want := addrs.NewProvider(addrs.DefaultRegistryHost, "foo", "test")
+	want := addrs.NewProvider(addrs.DefaultProviderRegistryHost, "foo", "test")
 	if !got.Equals(want) {
 		t.Fatalf("wrong result! got %#v, want %#v\n", got, want)
 	}
@@ -135,7 +136,7 @@ func TestModule_required_providers_after_resource(t *testing.T) {
 		t.Fatal(diags.Error())
 	}
 
-	want := addrs.NewProvider(addrs.DefaultRegistryHost, "foo", "test")
+	want := addrs.NewProvider(addrs.DefaultProviderRegistryHost, "foo", "test")
 
 	req, exists := mod.ProviderRequirements.RequiredProviders["test"]
 	if !exists {
@@ -165,7 +166,7 @@ func TestModule_required_provider_overrides(t *testing.T) {
 	}
 
 	// The foo provider and resource should be unaffected
-	want := addrs.NewProvider(addrs.DefaultRegistryHost, "acme", "foo")
+	want := addrs.NewProvider(addrs.DefaultProviderRegistryHost, "acme", "foo")
 	req, exists := mod.ProviderRequirements.RequiredProviders["foo"]
 	if !exists {
 		t.Fatal("no provider requirements found for \"foo\"")
@@ -182,7 +183,7 @@ func TestModule_required_provider_overrides(t *testing.T) {
 	}
 
 	// The bar provider and resource should be using the override config
-	want = addrs.NewProvider(addrs.DefaultRegistryHost, "blorp", "bar")
+	want = addrs.NewProvider(addrs.DefaultProviderRegistryHost, "blorp", "bar")
 	req, exists = mod.ProviderRequirements.RequiredProviders["bar"]
 	if !exists {
 		t.Fatal("no provider requirements found for \"bar\"")
@@ -223,7 +224,7 @@ func TestModule_implied_provider(t *testing.T) {
 
 	// The three providers used in the config resources
 	foo := addrs.NewProvider("registry.acme.corp", "acme", "foo")
-	whatever := addrs.NewProvider(addrs.DefaultRegistryHost, "acme", "something")
+	whatever := addrs.NewProvider(addrs.DefaultProviderRegistryHost, "acme", "something")
 	bar := addrs.NewDefaultProvider("bar")
 
 	// Verify that the registry.acme.corp/acme/foo provider is defined in the
@@ -289,7 +290,7 @@ func TestImpliedProviderForUnqualifiedType(t *testing.T) {
 	}
 
 	foo := addrs.NewProvider("registry.acme.corp", "acme", "foo")
-	whatever := addrs.NewProvider(addrs.DefaultRegistryHost, "acme", "something")
+	whatever := addrs.NewProvider(addrs.DefaultProviderRegistryHost, "acme", "something")
 	bar := addrs.NewDefaultProvider("bar")
 	tf := addrs.NewBuiltInProvider("terraform")
 
@@ -307,5 +308,107 @@ func TestImpliedProviderForUnqualifiedType(t *testing.T) {
 		if !got.Equals(test.Provider) {
 			t.Errorf("wrong result for %q: got %#v, want %#v\n", test.Type, got, test.Provider)
 		}
+	}
+}
+
+func TestModule_backend_override(t *testing.T) {
+	mod, diags := testModuleFromDir("testdata/valid-modules/override-backend")
+	if diags.HasErrors() {
+		t.Fatal(diags.Error())
+	}
+
+	gotType := mod.Backend.Type
+	wantType := "bar"
+
+	if gotType != wantType {
+		t.Errorf("wrong result for backend type: got %#v, want %#v\n", gotType, wantType)
+	}
+
+	attrs, _ := mod.Backend.Config.JustAttributes()
+
+	gotAttr, diags := attrs["path"].Expr.Value(nil)
+	if diags.HasErrors() {
+		t.Fatal(diags.Error())
+	}
+
+	wantAttr := cty.StringVal("CHANGED/relative/path/to/terraform.tfstate")
+
+	if !gotAttr.RawEquals(wantAttr) {
+		t.Errorf("wrong result for backend 'path': got %#v, want %#v\n", gotAttr, wantAttr)
+	}
+}
+
+// Unlike most other overrides, backend blocks do not require a base configuration in a primary
+// configuration file, as an omitted backend there implies the local backend.
+func TestModule_backend_override_no_base(t *testing.T) {
+	mod, diags := testModuleFromDir("testdata/valid-modules/override-backend-no-base")
+	if diags.HasErrors() {
+		t.Fatal(diags.Error())
+	}
+
+	if mod.Backend == nil {
+		t.Errorf("expected module Backend not to be nil")
+	}
+}
+
+func TestModule_cloud_override_backend(t *testing.T) {
+	mod, diags := testModuleFromDir("testdata/valid-modules/override-backend-with-cloud")
+	if diags.HasErrors() {
+		t.Fatal(diags.Error())
+	}
+
+	if mod.Backend != nil {
+		t.Errorf("expected module Backend to be nil")
+	}
+
+	if mod.CloudConfig == nil {
+		t.Errorf("expected module CloudConfig not to be nil")
+	}
+}
+
+// Unlike most other overrides, cloud blocks do not require a base configuration in a primary
+// configuration file, as an omitted backend there implies the local backend and cloud blocks
+// override backends.
+func TestModule_cloud_override_no_base(t *testing.T) {
+	mod, diags := testModuleFromDir("testdata/valid-modules/override-cloud-no-base")
+	if diags.HasErrors() {
+		t.Fatal(diags.Error())
+	}
+
+	if mod.CloudConfig == nil {
+		t.Errorf("expected module CloudConfig not to be nil")
+	}
+}
+
+func TestModule_cloud_override(t *testing.T) {
+	mod, diags := testModuleFromDir("testdata/valid-modules/override-cloud")
+	if diags.HasErrors() {
+		t.Fatal(diags.Error())
+	}
+
+	attrs, _ := mod.CloudConfig.Config.JustAttributes()
+
+	gotAttr, diags := attrs["organization"].Expr.Value(nil)
+	if diags.HasErrors() {
+		t.Fatal(diags.Error())
+	}
+
+	wantAttr := cty.StringVal("CHANGED")
+
+	if !gotAttr.RawEquals(wantAttr) {
+		t.Errorf("wrong result for Cloud 'organization': got %#v, want %#v\n", gotAttr, wantAttr)
+	}
+
+	// The override should have completely replaced the cloud block in the primary file, no merging
+	if attrs["should_not_be_present_with_override"] != nil {
+		t.Errorf("expected 'should_not_be_present_with_override' attribute to be nil")
+	}
+}
+
+func TestModule_cloud_duplicate_overrides(t *testing.T) {
+	_, diags := testModuleFromDir("testdata/invalid-modules/override-cloud-duplicates")
+	want := `Duplicate Terraform Cloud configurations`
+	if got := diags.Error(); !strings.Contains(got, want) {
+		t.Fatalf("expected module error to contain %q\nerror was:\n%s", want, got)
 	}
 }

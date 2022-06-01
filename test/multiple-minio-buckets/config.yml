@@ -4,6 +4,7 @@ log:
 
 database:
   password: mypassword
+  sslmode: disable
 
 provider:
   no-locks: true

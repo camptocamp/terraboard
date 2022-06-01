@@ -23,11 +23,15 @@ func BuildConfig(root *Module, walker ModuleWalker) (*Config, hcl.Diagnostics) {
 	cfg.Root = cfg // Root module is self-referential.
 	cfg.Children, diags = buildChildModules(cfg, walker)
 
-	// Now that the config is built, we can connect the provider names to all
-	// the known types for validation.
-	cfg.resolveProviderTypes()
+	// Skip provider resolution if there are any errors, since the provider
+	// configurations themselves may not be valid.
+	if !diags.HasErrors() {
+		// Now that the config is built, we can connect the provider names to all
+		// the known types for validation.
+		cfg.resolveProviderTypes()
+	}
 
-	diags = append(diags, validateProviderConfigs(nil, cfg, false)...)
+	diags = append(diags, validateProviderConfigs(nil, cfg, nil)...)
 
 	return cfg, diags
 }
@@ -145,7 +149,7 @@ type ModuleRequest struct {
 
 	// SourceAddr is the source address string provided by the user in
 	// configuration.
-	SourceAddr string
+	SourceAddr addrs.ModuleSource
 
 	// SourceAddrRange is the source range for the SourceAddr value as it
 	// was provided in configuration. This can and should be used to generate

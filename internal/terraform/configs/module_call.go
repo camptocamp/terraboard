@@ -3,6 +3,8 @@ package configs
 import (
 	"fmt"
 
+	"github.com/camptocamp/terraboard/internal/terraform/addrs"
+	"github.com/camptocamp/terraboard/internal/terraform/getmodules"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
@@ -12,7 +14,8 @@ import (
 type ModuleCall struct {
 	Name string
 
-	SourceAddr      string
+	SourceAddr      addrs.ModuleSource
+	SourceAddrRaw   string
 	SourceAddrRange hcl.Range
 	SourceSet       bool
 
@@ -56,17 +59,75 @@ func decodeModuleBlock(block *hcl.Block, override bool) (*ModuleCall, hcl.Diagno
 		})
 	}
 
-	if attr, exists := content.Attributes["source"]; exists {
-		valDiags := gohcl.DecodeExpression(attr.Expr, nil, &mc.SourceAddr)
-		diags = append(diags, valDiags...)
-		mc.SourceAddrRange = attr.Expr.Range()
-		mc.SourceSet = true
-	}
-
+	haveVersionArg := false
 	if attr, exists := content.Attributes["version"]; exists {
 		var versionDiags hcl.Diagnostics
 		mc.Version, versionDiags = decodeVersionConstraint(attr)
 		diags = append(diags, versionDiags...)
+		haveVersionArg = true
+	}
+
+	if attr, exists := content.Attributes["source"]; exists {
+		mc.SourceSet = true
+		mc.SourceAddrRange = attr.Expr.Range()
+		valDiags := gohcl.DecodeExpression(attr.Expr, nil, &mc.SourceAddrRaw)
+		diags = append(diags, valDiags...)
+		if !valDiags.HasErrors() {
+			var addr addrs.ModuleSource
+			var err error
+			if haveVersionArg {
+				addr, err = addrs.ParseModuleSourceRegistry(mc.SourceAddrRaw)
+			} else {
+				addr, err = addrs.ParseModuleSource(mc.SourceAddrRaw)
+			}
+			mc.SourceAddr = addr
+			if err != nil {
+				// NOTE: We leave mc.SourceAddr as nil for any situation where the
+				// source attribute is invalid, so any code which tries to carefully
+				// use the partial result of a failed config decode must be
+				// resilient to that.
+				mc.SourceAddr = nil
+
+				// NOTE: In practice it's actually very unlikely to end up here,
+				// because our source address parser can turn just about any string
+				// into some sort of remote package address, and so for most errors
+				// we'll detect them only during module installation. There are
+				// still a _few_ purely-syntax errors we can catch at parsing time,
+				// though, mostly related to remote package sub-paths and local
+				// paths.
+				switch err := err.(type) {
+				case *getmodules.MaybeRelativePathErr:
+					diags = append(diags, &hcl.Diagnostic{
+						Severity: hcl.DiagError,
+						Summary:  "Invalid module source address",
+						Detail: fmt.Sprintf(
+							"Terraform failed to determine your intended installation method for remote module package %q.\n\nIf you intended this as a path relative to the current module, use \"./%s\" instead. The \"./\" prefix indicates that the address is a relative filesystem path.",
+							err.Addr, err.Addr,
+						),
+						Subject: mc.SourceAddrRange.Ptr(),
+					})
+				default:
+					if haveVersionArg {
+						// In this case we'll include some extra context that
+						// we assumed a registry source address due to the
+						// version argument.
+						diags = append(diags, &hcl.Diagnostic{
+							Severity: hcl.DiagError,
+							Summary:  "Invalid registry module source address",
+							Detail:   fmt.Sprintf("Failed to parse module registry address: %s.\n\nTerraform assumed that you intended a module registry source address because you also set the argument \"version\", which applies only to registry modules.", err),
+							Subject:  mc.SourceAddrRange.Ptr(),
+						})
+					} else {
+						diags = append(diags, &hcl.Diagnostic{
+							Severity: hcl.DiagError,
+							Summary:  "Invalid module source address",
+							Detail:   fmt.Sprintf("Failed to parse module source address: %s.", err),
+							Subject:  mc.SourceAddrRange.Ptr(),
+						})
+					}
+				}
+			}
+		}
 	}
 
 	if attr, exists := content.Attributes["count"]; exists {
@@ -162,6 +223,19 @@ func decodeModuleBlock(block *hcl.Block, override bool) (*ModuleCall, hcl.Diagno
 	return mc, diags
 }
 
+// EntersNewPackage returns true if this call is to an external module, either
+// directly via a remote source address or indirectly via a registry source
+// address.
+//
+// Other behaviors in Terraform may treat package crossings as a special
+// situation, because that indicates that the caller and callee can change
+// independently of one another and thus we should disallow using any features
+// where the caller assumes anything about the callee other than its input
+// variables, required provider configurations, and output values.
+func (mc *ModuleCall) EntersNewPackage() bool {
+	return moduleSourceAddrEntersNewPackage(mc.SourceAddr)
+}
+
 // PassedProviderConfig represents a provider config explicitly passed down to
 // a child module, possibly giving it a new local address in the process.
 type PassedProviderConfig struct {
@@ -199,4 +273,28 @@ var moduleBlockSchema = &hcl.BodySchema{
 		{Type: "locals"},
 		{Type: "provider", LabelNames: []string{"type"}},
 	},
+}
+
+func moduleSourceAddrEntersNewPackage(addr addrs.ModuleSource) bool {
+	switch addr.(type) {
+	case nil:
+		// There are only two situations where we should get here:
+		// - We've been asked about the source address of the root module,
+		//   which is always nil.
+		// - We've been asked about a ModuleCall that is part of the partial
+		//   result of a failed decode.
+		// The root module exists outside of all module packages, so we'll
+		// just return false for that case. For the error case it doesn't
+		// really matter what we return as long as we don't panic, because
+		// we only make a best-effort to allow careful inspection of objects
+		// representing invalid configuration.
+		return false
+	case addrs.ModuleSourceLocal:
+		// Local source addresses are the only address type that remains within
+		// the same package.
+		return false
+	default:
+		// All other address types enter a new package.
+		return true
+	}
 }

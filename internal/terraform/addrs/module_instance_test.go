@@ -77,3 +77,94 @@ func TestModuleInstanceEqual_false(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkStringShort(b *testing.B) {
+	addr, _ := ParseModuleInstanceStr(`module.foo`)
+	for n := 0; n < b.N; n++ {
+		addr.String()
+	}
+}
+
+func BenchmarkStringLong(b *testing.B) {
+	addr, _ := ParseModuleInstanceStr(`module.southamerica-brazil-region.module.user-regional-desktops.module.user-name`)
+	for n := 0; n < b.N; n++ {
+		addr.String()
+	}
+}
+
+func TestModuleInstance_IsDeclaredByCall(t *testing.T) {
+	tests := []struct {
+		instance ModuleInstance
+		call     AbsModuleCall
+		want     bool
+	}{
+		{
+			ModuleInstance{},
+			AbsModuleCall{},
+			false,
+		},
+		{
+			mustParseModuleInstanceStr("module.child"),
+			AbsModuleCall{},
+			false,
+		},
+		{
+			ModuleInstance{},
+			AbsModuleCall{
+				RootModuleInstance,
+				ModuleCall{Name: "child"},
+			},
+			false,
+		},
+		{
+			mustParseModuleInstanceStr("module.child"),
+			AbsModuleCall{ // module.child
+				RootModuleInstance,
+				ModuleCall{Name: "child"},
+			},
+			true,
+		},
+		{
+			mustParseModuleInstanceStr(`module.child`),
+			AbsModuleCall{ // module.kinder.module.child
+				mustParseModuleInstanceStr("module.kinder"),
+				ModuleCall{Name: "child"},
+			},
+			false,
+		},
+		{
+			mustParseModuleInstanceStr("module.kinder"),
+			// module.kinder.module.child contains module.kinder, but is not itself an instance of module.kinder
+			AbsModuleCall{
+				mustParseModuleInstanceStr("module.kinder"),
+				ModuleCall{Name: "child"},
+			},
+			false,
+		},
+		{
+			mustParseModuleInstanceStr("module.child"),
+			AbsModuleCall{
+				mustParseModuleInstanceStr(`module.kinder["a"]`),
+				ModuleCall{Name: "kinder"},
+			},
+			false,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(fmt.Sprintf("%q.IsCallInstance(%q)", test.instance, test.call.String()), func(t *testing.T) {
+			got := test.instance.IsDeclaredByCall(test.call)
+			if got != test.want {
+				t.Fatal("wrong result")
+			}
+		})
+	}
+}
+
+func mustParseModuleInstanceStr(str string) ModuleInstance {
+	mi, diags := ParseModuleInstanceStr(str)
+	if diags.HasErrors() {
+		panic(diags.ErrWithWarnings())
+	}
+	return mi
+}

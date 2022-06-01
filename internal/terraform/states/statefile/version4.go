@@ -11,6 +11,7 @@ import (
 	ctyjson "github.com/zclconf/go-cty/cty/json"
 
 	"github.com/camptocamp/terraboard/internal/terraform/addrs"
+	"github.com/camptocamp/terraboard/internal/terraform/lang/marks"
 	"github.com/camptocamp/terraboard/internal/terraform/states"
 	"github.com/camptocamp/terraboard/internal/terraform/tfdiags"
 )
@@ -164,7 +165,7 @@ func prepareStateV4(sV4 *stateV4) (*File, tfdiags.Diagnostics) {
 				for _, path := range paths {
 					pvm = append(pvm, cty.PathValueMarks{
 						Path:  path,
-						Marks: cty.NewValueMarks("sensitive"),
+						Marks: cty.NewValueMarks(marks.Sensitive),
 					})
 				}
 				obj.AttrSensitivePaths = pvm
@@ -538,7 +539,7 @@ type instanceObjectStateV4 struct {
 	SchemaVersion           uint64            `json:"schema_version"`
 	AttributesRaw           json.RawMessage   `json:"attributes,omitempty"`
 	AttributesFlat          map[string]string `json:"attributes_flat,omitempty"`
-	AttributeSensitivePaths json.RawMessage   `json:"sensitive_attributes,omitempty,"`
+	AttributeSensitivePaths json.RawMessage   `json:"sensitive_attributes,omitempty"`
 
 	PrivateRaw []byte `json:"private,omitempty"`
 
