@@ -71,7 +71,7 @@ func (t *TFE) GetLocks() (locks map[string]LockInfo, err error) {
 	}
 
 	for {
-		resp, err := t.Workspaces.List(*t.ctx, t.org, options)
+		resp, err := t.Workspaces.List(*t.ctx, t.org, &options)
 		if err != nil {
 			return locks, err
 		}
@@ -111,7 +111,7 @@ func (t *TFE) GetStates() (states []string, err error) {
 	}
 
 	for {
-		resp, err := t.Workspaces.List(*t.ctx, t.org, options)
+		resp, err := t.Workspaces.List(*t.ctx, t.org, &options)
 		if err != nil {
 			return states, err
 		}
@@ -137,12 +137,12 @@ func (t *TFE) GetVersions(state string) (versions []Version, err error) {
 			PageNumber: 1,
 			PageSize:   50,
 		},
-		Organization: &t.org,
-		Workspace:    &state,
+		Organization: t.org,
+		Workspace:    state,
 	}
 
 	for {
-		resp, err := t.StateVersions.List(*t.ctx, options)
+		resp, err := t.StateVersions.List(*t.ctx, &options)
 		if err != nil {
 			return versions, err
 		}
