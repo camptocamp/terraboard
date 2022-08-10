@@ -61,7 +61,6 @@ func (s ModuleRegistryPackage) String() string {
 	// use for internal processing, and so the "display" representation
 	// is actually what users would write in their configurations.
 	return s.Host.ForDisplay() + "/" + s.ForRegistryProtocol()
-	return buf.String()
 }
 
 func (s ModuleRegistryPackage) ForDisplay() string {
