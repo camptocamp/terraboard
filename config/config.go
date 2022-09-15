@@ -32,6 +32,8 @@ type configFlags struct {
 
 	GCP GCPConfig `group:"Google Cloud Platform Options" yaml:"gcp"`
 
+	COS COSConfig `group:"Tencent Cloud COS Options" yaml:"cos"`
+
 	Gitlab GitlabConfig `group:"GitLab Options" yaml:"gitlab"`
 
 	Web WebConfig `group:"Web" yaml:"web"`
@@ -90,6 +92,18 @@ type GCPConfig struct {
 	GCPSAKey   string   `long:"gcp-sa-key-path" env:"GCP_SA_KEY_PATH" yaml:"gcp-sa-key-path" description:"The path to the service account to use to connect to Google Cloud Platform"`
 }
 
+// COSConfig stores the Tencent Cloud configuration
+type COSConfig struct {
+	HTTPClient *http.Client
+	// Buckets     []string `long:"cos-bucket" yaml:"cos-bucket" description:"Tencent Cloud COS bucket to search"`
+	Buckets     string `long:"cos-bucket" env:"COS_BUCKET" yaml:"cos-bucket" description:"Tencent Cloud COS bucket to search"`
+	Region      string `long:"cos-region" env:"COS_REGION" yaml:"region" description:"COS region."`
+	KeyPrefix   string `long:"key-prefix" env:"COS_KEY_PREFIX" yaml:"key-prefix" description:"COS Key Prefix."`
+	SecretId    string `long:"cos-secret-id" env:"COS_SECRET_ID" yaml:"secret-id" description:"COS secret id."`
+	SecretKey   string `long:"cos-secret-key" env:"COS_SECRET_KEY" yaml:"secret-key" description:"COS secret key."`
+	SecretToken string `long:"cos-secret-token" env:"COS_SECRET_TOKEN" yaml:"secret-token" description:"COS secret session token."`
+}
+
 // GitlabConfig stores the GitLab configuration
 type GitlabConfig struct {
 	Address string `long:"gitlab-address" env:"GITLAB_ADDRESS" yaml:"address" description:"GitLab address (root)" default:"https://gitlab.com"`
@@ -127,6 +141,8 @@ type Config struct {
 	TFE []TFEConfig `group:"Terraform Enterprise Options" yaml:"tfe"`
 
 	GCP []GCPConfig `group:"Google Cloud Platform Options" yaml:"gcp"`
+
+	COS []COSConfig `group:"Tencent Cloud COS Options" yaml:"cos"`
 
 	Gitlab []GitlabConfig `group:"GitLab Options" yaml:"gitlab"`
 

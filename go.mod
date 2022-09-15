@@ -40,6 +40,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/swaggo/http-swagger v1.2.8
 	github.com/swaggo/swag v1.8.2
+	github.com/tencentyun/cos-go-sdk-v5 v0.7.29
 	github.com/zclconf/go-cty v1.10.0
 	github.com/zclconf/go-cty-yaml v1.0.2
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
@@ -97,6 +98,7 @@ require (
 	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
+	github.com/mozillazg/go-httpheader v0.3.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2 // indirect
 	github.com/ulikunitz/xz v0.5.10 // indirect

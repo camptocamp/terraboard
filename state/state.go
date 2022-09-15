@@ -88,5 +88,18 @@ func Configure(c *config.Config) ([]Provider, error) {
 		}
 	}
 
+	if len(c.COS) > 0 {
+		objs, err := NewCOSCollection(c)
+		if err != nil {
+			return []Provider{}, err
+		}
+		if len(objs) > 0 {
+			log.Info("Using Tencent Cloud Object Storage as state/locks provider")
+			for _, cosObj := range objs {
+				providers = append(providers, cosObj)
+			}
+		}
+	}
+
 	return providers, nil
 }
