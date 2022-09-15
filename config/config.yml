@@ -1,0 +1,16 @@
+log:
+  level: debug
+  format: json
+
+database:
+  host: db
+  port: 5432
+  user: gorm
+  password: Tic@12345678
+  name: gorm
+  sslmode: disable
+
+cos:
+  - secret-id: root
+    secret-key: mypassword
+

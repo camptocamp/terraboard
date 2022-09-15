@@ -21,7 +21,7 @@ type COS struct {
 	svc *cos.Client
 	// cosConn *s3.S3
 	// buckets []string
-	buckets string
+	buckets string /////////////////////////TEST////////////////////////////////////
 	Ext     cosExts
 }
 
@@ -34,8 +34,6 @@ type cosExts struct {
 type CosExt interface {
 	apply(*cosExts)
 }
-
-// type tempFunc func(*cosExts)
 
 type funcCosExt struct {
 	f func(*cosExts)
@@ -78,6 +76,14 @@ func NewCOS(cosCfg config.COSConfig, exts ...CosExt) (cosInstance *COS, err erro
 	if len(cosCfg.Buckets) == 0 {
 		return nil, nil
 	}
+
+	log.WithFields(log.Fields{
+		"SecretId":  cosCfg.SecretId,
+		"SecretKey": cosCfg.SecretKey,
+		"Buckets":   cosCfg.Buckets,
+		"Region":    cosCfg.Region,
+		"KeyPrefix": cosCfg.KeyPrefix,
+	}).Info("#########################  NewCOS:")
 
 	client, err := UseTencentCosClient(&cosCfg)
 	if err != nil {
@@ -165,68 +171,66 @@ func (a *COS) GetLocks() (locks map[string]LockInfo, err error) {
 
 	var lockFiles []string
 	opt := &cos.BucketGetOptions{
-		// Prefix:  "terraform/state",
 		Prefix:  a.Ext.keyPrefix,
 		MaxKeys: 100,
 	}
 
-	for _, bucketName := range a.buckets {
-		ret, _, err := a.svc.Bucket.Get(context.Background(), opt)
-		if err != nil {
+	// for _, bucketName := range a.buckets {
+	bucketName := a.buckets /////////////////////////TEST////////////////////////////////////
+	ret, _, err := a.svc.Bucket.Get(context.Background(), opt)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"bucket": bucketName,
+		}).Error("Error retrieving lockfile key from COS bucket!")
+		return nil, err
+	}
+
+	for _, c := range ret.Contents {
+		if strings.HasSuffix(c.Key, ".tflock") {
+			lockFiles = append(lockFiles, c.Key)
 			log.WithFields(log.Fields{
-				"bucket": bucketName,
-			}).Error("Error retrieving lockfile key from COS bucket!")
+				"key":  c.Key,
+				"size": c.Size,
+			}).Debug("Got one lockfile key from COS.")
+		}
+	}
+
+	locks = make(map[string]LockInfo)
+	for _, lockFile := range lockFiles {
+		ctx, cancel := context.WithTimeout(ctx, time.Second*50)
+		defer cancel()
+
+		resp, err := a.svc.Object.Get(ctx, lockFile, nil)
+		if err != nil {
+			if err != nil {
+				log.WithFields(log.Fields{
+					"key": lockFile,
+				}).Error("Error retrieving lockfile from COS!")
+				return nil, err
+			}
+		}
+		defer resp.Body.Close()
+
+		log.WithFields(log.Fields{
+			"key":  lockFile,
+			"body": resp.Body,
+		}).Debug("Got one lockfile from COS.")
+
+		bs, err := io.ReadAll(resp.Body)
+		if err != nil {
 			return nil, err
 		}
 
-		for _, c := range ret.Contents {
-			if strings.HasSuffix(c.Key, ".tflock") {
-				lockFiles = append(lockFiles, c.Key)
-				log.WithFields(log.Fields{
-					"key":  c.Key,
-					"size": c.Size,
-				}).Debug("Got one lockfile key from COS.")
-			}
+		var info LockInfo
+		err = json.Unmarshal(bs, &info)
+		if err != nil {
+			return nil, err
 		}
 
-		locks = make(map[string]LockInfo)
-		for _, lockFile := range lockFiles {
-			ctx, cancel := context.WithTimeout(ctx, time.Second*50)
-			defer cancel()
-
-			resp, err := a.svc.Object.Get(ctx, lockFile, nil)
-			if err != nil {
-				if err != nil {
-					log.WithFields(log.Fields{
-						"key": lockFile,
-					}).Error("Error retrieving lockfile from COS!")
-					return nil, err
-				}
-			}
-			defer resp.Body.Close()
-
-			log.WithFields(log.Fields{
-				"key":  lockFile,
-				"body": resp.Body,
-			}).Debug("Got one lockfile from COS.")
-
-			bs, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return nil, err
-			}
-
-			var info LockInfo
-			err = json.Unmarshal(bs, &info)
-			if err != nil {
-				return nil, err
-			}
-
-			// key:[bucketName/lockFileName]
-			// locks[strings.Join([]string{bucketName, lockFile}, "/")] = info
-			// key:lockFileName
-			locks[lockFile] = info
-		}
+		// key:lockFileName
+		locks[lockFile] = info
 	}
+	// }
 	return locks, nil
 }
 
@@ -239,39 +243,45 @@ func (a *COS) GetStates() (states []string, err error) {
 	var stateFiles []string
 	truncatedListing := true
 	opt := &cos.BucketGetOptions{
-		// Prefix:  "terraform/state",
 		Prefix:  a.Ext.keyPrefix,
 		MaxKeys: 100,
 	}
 
-	for _, bucketName := range a.buckets {
-		for truncatedListing {
-			ret, _, err := a.svc.Bucket.Get(context.Background(), opt)
-			if err != nil {
+	// for _, bucketName := range a.buckets {
+	bucketName := a.buckets /////////////////////////TEST////////////////////////////////////
+	for truncatedListing {
+		ret, _, err := a.svc.Bucket.Get(context.Background(), opt)
+
+		log.WithFields(log.Fields{
+			"bucket":  ret.Name,
+			"content": ret.Contents,
+			"ALL":     ret,
+		}).Debug("######################### GetStates,")
+
+		if err != nil {
+			log.WithFields(log.Fields{
+				"bucket": bucketName,
+			}).Error("Error retrieving statefiles from COS bucket!")
+			return nil, err
+		}
+
+		for _, c := range ret.Contents {
+			if strings.HasSuffix(c.Key, ".tfstate") {
+				// item:stateFileName
+				stateFiles = append(stateFiles, c.Key)
 				log.WithFields(log.Fields{
 					"bucket": bucketName,
-				}).Error("Error retrieving statefile name from COS bucket!")
-				return nil, err
+					"key":    c.Key,
+				}).Debug("Got one statefile from COS.")
 			}
-
-			if strings.HasSuffix(ret.Name, ".tfstate") {
-				// item:[bucketName/stateFileName]
-				// stateFiles = append(stateFiles, strings.Join([]string{bucketName, ret.Name}, "/"))
-
-				// item:stateFileName
-				stateFiles = append(stateFiles, ret.Name)
-
-				log.WithFields(log.Fields{
-					"bucket":    bucketName,
-					"stateFile": ret.Name,
-				}).Debug("Got one statefile name from COS.")
-			}
-			truncatedListing = ret.IsTruncated
 		}
+
+		truncatedListing = ret.IsTruncated
 	}
+	// }
 
 	log.WithFields(log.Fields{
-		"statefileCnt": len(stateFiles),
+		"count": len(stateFiles),
 	}).Debug("Found statefiles from COS.")
 	return stateFiles, nil
 }
@@ -319,6 +329,12 @@ func (a *COS) GetState(st, versionID string) (sf *statefile.File, err error) {
 
 // GetVersions returns a slice of Version objects from COS bucket
 func (a *COS) GetVersions(state string) (versions []Version, err error) {
+	log.WithFields(log.Fields{
+		"noVersioning": a.Ext.noVersioning,
+		"noLocks":      a.Ext.noLocks,
+		"state":        state,
+	}).Debug("############ Begin to GetVersions,")
+
 	versions = []Version{}
 	if a.Ext.noVersioning {
 		versions = append(versions, Version{
@@ -341,6 +357,11 @@ func (a *COS) GetVersions(state string) (versions []Version, err error) {
 		return
 	}
 
+	log.WithFields(log.Fields{
+		"count":  len(ret.Version),
+		"Prefix": ret.Prefix,
+	}).Debug("############ GetVersions,")
+
 	for _, v := range ret.Version {
 		modified, _ := time.Parse(time.RFC3339, v.LastModified)
 		versions = append(versions, Version{
@@ -348,5 +369,10 @@ func (a *COS) GetVersions(state string) (versions []Version, err error) {
 			LastModified: modified,
 		})
 	}
+
+	log.WithFields(log.Fields{
+		"key":   state,
+		"count": len(versions),
+	}).Debug("Read versions from COS.")
 	return
 }
