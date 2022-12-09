@@ -18,11 +18,9 @@ import (
 
 // COS is a state provider type, leveraging Tencent Cloud COS
 type COS struct {
-	svc *cos.Client
-	// cosConn *s3.S3
-	// buckets []string
-	buckets string /////////////////////////TEST////////////////////////////////////
-	Ext     cosExts
+	svc    *cos.Client
+	bucket string // one svc one bucket
+	Ext    cosExts
 }
 
 type cosExts struct {
@@ -73,17 +71,17 @@ var defaultExt = cosExts{
 
 // NewCOS creates an COS object
 func NewCOS(cosCfg config.COSConfig, exts ...CosExt) (cosInstance *COS, err error) {
-	if len(cosCfg.Buckets) == 0 {
+	if len(cosCfg.Bucket) == 0 {
 		return nil, nil
 	}
 
 	log.WithFields(log.Fields{
 		"SecretId":  cosCfg.SecretId,
 		"SecretKey": cosCfg.SecretKey,
-		"Buckets":   cosCfg.Buckets,
+		"Bucket":    cosCfg.Bucket,
 		"Region":    cosCfg.Region,
 		"KeyPrefix": cosCfg.KeyPrefix,
-	}).Info("#########################  NewCOS:")
+	}).Info("Begin to NewCOS:")
 
 	client, err := UseTencentCosClient(&cosCfg)
 	if err != nil {
@@ -91,26 +89,27 @@ func NewCOS(cosCfg config.COSConfig, exts ...CosExt) (cosInstance *COS, err erro
 	}
 
 	cosInstance = &COS{
-		svc:     client,
-		buckets: cosCfg.Buckets,
-		Ext:     defaultExt,
+		svc:    client,
+		bucket: cosCfg.Bucket,
+		// default extension
+		Ext:    defaultExt,
 	}
 
+	// the specified extension
 	for _, ext := range exts {
 		ext.apply(&cosInstance.Ext)
 	}
 
 	log.WithFields(log.Fields{
-		"buckets": cosCfg.Buckets,
-		"exts":    cosInstance.Ext,
+		"bucket": cosCfg.Bucket,
+		"exts":   cosInstance.Ext,
 	}).Info("Client successfully created")
 
 	return
 }
 
 func UseTencentCosClient(cosCfg *config.COSConfig) (client *cos.Client, err error) {
-	u, err := url.Parse(fmt.Sprintf("https://%s.cos.%s.myqcloud.com", cosCfg.Buckets, cosCfg.Region)) // only support one bucket temporarily.
-
+	u, err := url.Parse(fmt.Sprintf("https://%s.cos.%s.myqcloud.com", cosCfg.Bucket, cosCfg.Region))
 	if err != nil {
 		return
 	}
@@ -147,7 +146,6 @@ func NewCOSCollection(cfg *config.Config) ([]*COS, error) {
 		}
 
 		cosIns, err := NewCOS(cos, exts...)
-
 		if err != nil || cosIns == nil {
 			return nil, err
 		}
@@ -175,12 +173,10 @@ func (a *COS) GetLocks() (locks map[string]LockInfo, err error) {
 		MaxKeys: 100,
 	}
 
-	// for _, bucketName := range a.buckets {
-	bucketName := a.buckets /////////////////////////TEST////////////////////////////////////
 	ret, _, err := a.svc.Bucket.Get(context.Background(), opt)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"bucket": bucketName,
+			"bucket": a.bucket,
 		}).Error("Error retrieving lockfile key from COS bucket!")
 		return nil, err
 	}
@@ -230,7 +226,6 @@ func (a *COS) GetLocks() (locks map[string]LockInfo, err error) {
 		// key:lockFileName
 		locks[lockFile] = info
 	}
-	// }
 	return locks, nil
 }
 
@@ -247,8 +242,6 @@ func (a *COS) GetStates() (states []string, err error) {
 		MaxKeys: 100,
 	}
 
-	// for _, bucketName := range a.buckets {
-	bucketName := a.buckets /////////////////////////TEST////////////////////////////////////
 	for truncatedListing {
 		ret, _, err := a.svc.Bucket.Get(context.Background(), opt)
 
@@ -256,11 +249,11 @@ func (a *COS) GetStates() (states []string, err error) {
 			"bucket":  ret.Name,
 			"content": ret.Contents,
 			"ALL":     ret,
-		}).Debug("######################### GetStates,")
+		}).Info("begin to GetStates,")
 
 		if err != nil {
 			log.WithFields(log.Fields{
-				"bucket": bucketName,
+				"bucket": a.bucket,
 			}).Error("Error retrieving statefiles from COS bucket!")
 			return nil, err
 		}
@@ -270,19 +263,17 @@ func (a *COS) GetStates() (states []string, err error) {
 				// item:stateFileName
 				stateFiles = append(stateFiles, c.Key)
 				log.WithFields(log.Fields{
-					"bucket": bucketName,
+					"bucket": a.bucket,
 					"key":    c.Key,
 				}).Debug("Got one statefile from COS.")
 			}
 		}
-
 		truncatedListing = ret.IsTruncated
 	}
-	// }
 
 	log.WithFields(log.Fields{
 		"count": len(stateFiles),
-	}).Debug("Found statefiles from COS.")
+	}).Info("Found statefiles from COS.")
 	return stateFiles, nil
 }
 
@@ -299,11 +290,10 @@ func (a *COS) GetState(st, versionID string) (sf *statefile.File, err error) {
 	}
 
 	ret, err := a.svc.Object.Get(ctx, st, nil, verId)
-
 	if err != nil {
 		log.WithFields(log.Fields{
 			"path":       st,
-			"version_id": versionID,
+			"version_id": verId,
 			"error":      err,
 		}).Error("Error retrieving state from COS")
 
@@ -323,7 +313,7 @@ func (a *COS) GetState(st, versionID string) (sf *statefile.File, err error) {
 	log.WithFields(log.Fields{
 		"path":       st,
 		"version_id": versionID,
-	}).Debug("Read state from COS.")
+	}).Info("Read state from COS.")
 	return
 }
 
@@ -333,7 +323,7 @@ func (a *COS) GetVersions(state string) (versions []Version, err error) {
 		"noVersioning": a.Ext.noVersioning,
 		"noLocks":      a.Ext.noLocks,
 		"state":        state,
-	}).Debug("############ Begin to GetVersions,")
+	}).Info("Begin to GetVersions,")
 
 	versions = []Version{}
 	if a.Ext.noVersioning {
@@ -357,11 +347,6 @@ func (a *COS) GetVersions(state string) (versions []Version, err error) {
 		return
 	}
 
-	log.WithFields(log.Fields{
-		"count":  len(ret.Version),
-		"Prefix": ret.Prefix,
-	}).Debug("############ GetVersions,")
-
 	for _, v := range ret.Version {
 		modified, _ := time.Parse(time.RFC3339, v.LastModified)
 		versions = append(versions, Version{
@@ -373,6 +358,6 @@ func (a *COS) GetVersions(state string) (versions []Version, err error) {
 	log.WithFields(log.Fields{
 		"key":   state,
 		"count": len(versions),
-	}).Debug("Read versions from COS.")
+	}).Info("Read versions from COS.")
 	return
 }

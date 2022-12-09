@@ -94,9 +94,7 @@ type GCPConfig struct {
 
 // COSConfig stores the Tencent Cloud configuration
 type COSConfig struct {
-	HTTPClient *http.Client
-	// Buckets     []string `long:"cos-bucket" yaml:"cos-bucket" description:"Tencent Cloud COS bucket to search"`
-	Buckets     string `long:"cos-bucket" env:"COS_BUCKET" yaml:"bucket" description:"Tencent Cloud COS bucket to search"`
+	Bucket      string `long:"cos-bucket" env:"COS_BUCKET" yaml:"bucket" description:"Tencent Cloud COS bucket to search"`
 	Region      string `long:"cos-region" env:"COS_REGION" yaml:"region" description:"COS region."`
 	KeyPrefix   string `long:"cos-key-prefix" env:"COS_KEY_PREFIX" yaml:"key-prefix" description:"COS Key Prefix."`
 	SecretId    string `long:"cos-secret-id" env:"COS_SECRET_ID" yaml:"secret-id" description:"COS secret id."`
