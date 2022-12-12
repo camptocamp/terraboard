@@ -215,6 +215,7 @@ paths:
         name: plan
         schema:
           $ref: '#/definitions/api.planPayload'
+      responses: {}
       summary: Submit a new plan
   /plans/summary:
     get:

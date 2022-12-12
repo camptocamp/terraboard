@@ -3,6 +3,7 @@ package state
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -71,10 +72,6 @@ var defaultExt = cosExts{
 
 // NewCOS creates an COS object
 func NewCOS(cosCfg config.COSConfig, exts ...CosExt) (cosInstance *COS, err error) {
-	if len(cosCfg.Bucket) == 0 {
-		return nil, nil
-	}
-
 	log.WithFields(log.Fields{
 		"SecretId":  cosCfg.SecretId,
 		"SecretKey": cosCfg.SecretKey,
@@ -82,6 +79,18 @@ func NewCOS(cosCfg config.COSConfig, exts ...CosExt) (cosInstance *COS, err erro
 		"Region":    cosCfg.Region,
 		"KeyPrefix": cosCfg.KeyPrefix,
 	}).Info("Begin to NewCOS:")
+
+	if len(cosCfg.Bucket) == 0 {
+		err = errors.New("missing Bucket for COS provider. Please check your configuration and retry")
+		return
+	}
+
+	if cosCfg.SecretToken == "" {
+		if cosCfg.SecretId == "" || cosCfg.SecretKey == "" {
+			err = errors.New("missing SecretId or SecretKey for COS provider. Please check your configuration and retry")
+			return
+		}
+	}
 
 	client, err := UseTencentCosClient(&cosCfg)
 	if err != nil {
@@ -92,7 +101,7 @@ func NewCOS(cosCfg config.COSConfig, exts ...CosExt) (cosInstance *COS, err erro
 		svc:    client,
 		bucket: cosCfg.Bucket,
 		// default extension
-		Ext:    defaultExt,
+		Ext: defaultExt,
 	}
 
 	// the specified extension
@@ -108,6 +117,7 @@ func NewCOS(cosCfg config.COSConfig, exts ...CosExt) (cosInstance *COS, err erro
 	return
 }
 
+// NewCOS creates an Tencent COS client
 func UseTencentCosClient(cosCfg *config.COSConfig) (client *cos.Client, err error) {
 	u, err := url.Parse(fmt.Sprintf("https://%s.cos.%s.myqcloud.com", cosCfg.Bucket, cosCfg.Region))
 	if err != nil {

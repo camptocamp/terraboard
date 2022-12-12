@@ -51,6 +51,7 @@
     - [S3 Options](#s3-options)
     - [Terraform Enterprise Options](#terraform-enterprise-options)
     - [Google Cloud Platform Options](#google-cloud-platform-options)
+    - [Tencent Cloud Platform Options](#tencent-cloud-platform-options)
     - [GitLab Options](#gitlab-options)
     - [Web](#web)
     - [Help Options](#help-options)
@@ -89,6 +90,7 @@ It currently supports several remote state backend providers:
 - [AWS S3 (state) + DynamoDB (lock)](https://www.terraform.io/docs/backends/types/s3.html)
 - [S3 compatible backends (ex: MinIO)](https://min.io/)
 - [Google Cloud Storage](https://www.terraform.io/docs/backends/types/gcs.html)
+- [Tencent Cloud Object Storage (COS)](https://www.terraform.io/docs/backends/types/cos.html)
 - [Terraform Cloud (remote)](https://www.terraform.io/docs/backends/types/remote.html)
 - [GitLab](https://docs.gitlab.com/ee/user/infrastructure/terraform_state.html)
 
@@ -304,6 +306,32 @@ You can find a ready-to-use Docker example with two *MinIO* buckets in the `test
 - `--gcp-sa-key-path` <default: *$GCP_SA_KEY_PATH*> The path to the service account to use to connect to Google Cloud Platform
   - Env: *GCP_SA_KEY_PATH*
   - Yaml: *gcp.gcp-sa-key-path*
+
+#### Tencent Cloud Platform Options
+
+- `--cos-bucket` <default: *$COS_BUCKET*> Tencent Cloud COS bucket to search.
+  - Env: *COS_BUCKET*
+  - Yaml: *cos.bucket*
+
+- `--cos-region` <default: *$COS_REGION*> COS region
+  - Env: *COS_REGION*
+  - Yaml: *cos.region*
+
+- `--cos-key-prefix` <default: *""*> COS Key prefix
+  - Env: *COS_KEY_PREFIX*
+  - Yaml: *cos.key-prefix*
+
+- `--cos-secret-id` <default: *$COS_SECRET_ID*> COS secret id
+  - Env: *COS_SECRET_ID*
+  - Yaml: *cos.secret-id*
+
+- `--cos-secret-key` <default: *$COS_SECRET_KEY*> COS secret key
+  - Env: *COS_SECRET_KEY*
+  - Yaml: *cos.secret-key*
+
+- `--cos-secret-token` <default: *$COS_SECRET_TOKEN*> COS secret session token
+  - Env: *COS_SECRET_TOKEN*
+  - Yaml: *cos.secret-token*
 
 #### GitLab Options
 

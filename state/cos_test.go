@@ -1,10 +1,9 @@
 package state
 
 import (
-	"bytes"
 	"fmt"
-	"log"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/camptocamp/terraboard/config"
@@ -14,25 +13,19 @@ var (
 	bucketName string
 	accessKey  string
 	secretKey  string
-	buf        bytes.Buffer
 )
 
 func TestMain(m *testing.M) {
-	bucketName = "keep-terraboard-1308919341"
+	bucketName = "BucketName-APPID"
 	accessKey = os.Getenv("COS_SECRET_ID")
 	secretKey = os.Getenv("COS_SECRET_KEY")
-
-	log.SetOutput(&buf)
-	defer func() {
-		log.SetOutput(os.Stderr)
-	}()
 
 	fmt.Println("Test begin...")
 	m.Run()
 	fmt.Println("Test end.")
 }
 
-func TestCosNewCOS(t *testing.T) {
+func TestCosNewCOSOk(t *testing.T) {
 	cosConfig := config.COSConfig{
 		Bucket:    bucketName,
 		Region:    "ap-guangzhou",
@@ -42,7 +35,7 @@ func TestCosNewCOS(t *testing.T) {
 	}
 
 	exts := []CosExt{}
-	t.Logf("cosConfig:[%v], exts:[%v]", cosConfig, exts)
+	t.Logf("[TEST]: cosConfig:[%v], exts:[%v]", cosConfig, exts)
 	cosInstance, err := NewCOS(cosConfig, exts...)
 	if err != nil {
 		t.Error("NewCOS failed, reason:", err)
@@ -54,7 +47,7 @@ func TestCosNewCOS(t *testing.T) {
 }
 
 func TestCosNewCOSWithOutBucket(t *testing.T) {
-	cosInstance, _ := NewCOS(
+	cosInstance, err := NewCOS(
 		config.COSConfig{
 			Bucket:    "",
 			Region:    "ap-guangzhou",
@@ -68,41 +61,48 @@ func TestCosNewCOSWithOutBucket(t *testing.T) {
 	if cosInstance != nil {
 		t.Error("COS instance should be nil")
 	}
+	if err == nil {
+		t.Error("An error is expected to output.")
+	}
 }
 
 func TestCosNewCOSWithOutAKSK(t *testing.T) {
+	exts := []CosExt{}
+	cosConfig := config.COSConfig{
+		Bucket:    "test",
+		Region:    "ap-guangzhou",
+		KeyPrefix: "terraform/state/",
+		SecretId:  "",
+		SecretKey: "",
+	}
+	_, err := NewCOS(cosConfig, exts...)
+
+	if err == nil {
+		t.Error("An error is expected to output.")
+		return
+	}
+	if !strings.Contains(err.Error(), "missing SecretId or SecretKey") {
+		t.Error("Missing the expected log output")
+	}
+}
+
+func TestCosNewCOSWithOutToken(t *testing.T) {
 	_, err := NewCOS(
 		config.COSConfig{
-			Bucket:    "",
-			Region:    "ap-guangzhou",
-			KeyPrefix: "terraform/state/",
-			SecretId:  "",
-			SecretKey: "",
+			Bucket:      bucketName,
+			Region:      "ap-guangzhou",
+			KeyPrefix:   "terraform/state/",
+			SecretToken: "",
 		},
 		nil,
 	)
 
 	if err == nil {
-		t.Error("Expected error log output.")
+		t.Error("An error is expected to output.")
+		return
 	}
-}
-
-func TestCosNewCOSWithToken(t *testing.T) {
-	cosInstance, err := NewCOS(
-		config.COSConfig{
-			Bucket:      bucketName,
-			Region:      "ap-guangzhou",
-			KeyPrefix:   "terraform/state/",
-			SecretToken: "TENCENTCLOUD_TOKEN_EXAMPLE",
-		},
-		nil,
-	)
-	if err != nil {
-		t.Error("NewCOS failed, reason:", err)
-	}
-
-	if cosInstance == nil {
-		t.Error("COS instance is nil")
+	if !strings.Contains(err.Error(), "missing SecretId or SecretKey") {
+		t.Error("Missing the expected log output")
 	}
 }
 
@@ -162,20 +162,9 @@ func TestCosGetVersionWithNoVersioning(t *testing.T) {
 	}
 
 	versions, _ := cosInstances[0].GetVersions("test")
-	if len(versions) != 0 {
-		t.Error("Versions should be empty due to NoVersioning option")
-	}
-}
 
-func TestCosGetLocks(t *testing.T) {
-	cosInstance := genCOSInstance(t)
-
-	locks, err := cosInstance.GetLocks()
-	if err != nil {
-		t.Error("GetLocks failed, reason:", err)
-	}
-	if len(locks) == 0 {
-		t.Error("Locks was expected but was empty actually!")
+	if len(versions) != 1 {
+		t.Error("Expected one versions")
 	}
 }
 
