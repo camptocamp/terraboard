@@ -16,9 +16,16 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	bucketName = "BucketName-APPID"
-	accessKey = os.Getenv("COS_SECRET_ID")
-	secretKey = os.Getenv("COS_SECRET_KEY")
+	bucketName = "keep-terraboard-1308919341"
+	accessKey = "COS_SECRET_ID_EXAMPLE"
+	secretKey = "COS_SECRET_KEY_EXAMPLE"
+
+	if id := os.Getenv("COS_SECRET_ID"); id != "" {
+		accessKey = id
+	}
+	if key := os.Getenv("COS_SECRET_KEY"); key != "" {
+		secretKey = key
+	}
 
 	fmt.Println("Test begin...")
 	m.Run()
@@ -30,7 +37,7 @@ func TestCosNewCOSOk(t *testing.T) {
 		Bucket:    bucketName,
 		Region:    "ap-guangzhou",
 		KeyPrefix: "terraform/state/",
-		SecretId:  accessKey,
+		SecretID:  accessKey,
 		SecretKey: secretKey,
 	}
 
@@ -52,7 +59,7 @@ func TestCosNewCOSWithOutBucket(t *testing.T) {
 			Bucket:    "",
 			Region:    "ap-guangzhou",
 			KeyPrefix: "terraform/state/",
-			SecretId:  accessKey,
+			SecretID:  accessKey,
 			SecretKey: secretKey,
 		},
 		nil,
@@ -72,7 +79,7 @@ func TestCosNewCOSWithOutAKSK(t *testing.T) {
 		Bucket:    "test",
 		Region:    "ap-guangzhou",
 		KeyPrefix: "terraform/state/",
-		SecretId:  "",
+		SecretID:  "",
 		SecretKey: "",
 	}
 	_, err := NewCOS(cosConfig, exts...)
@@ -137,6 +144,7 @@ func TestCosGetLocksWithNoLocks(t *testing.T) {
 
 	if cosInstances == nil || len(cosInstances) != 1 {
 		t.Error("COS instances are nil or not the expected number")
+		return
 	}
 
 	locks, _ := cosInstances[0].GetLocks()
@@ -159,6 +167,7 @@ func TestCosGetVersionWithNoVersioning(t *testing.T) {
 
 	if cosInstances == nil || len(cosInstances) != 1 {
 		t.Error("COS instances are nil or not the expected number")
+		return
 	}
 
 	versions, _ := cosInstances[0].GetVersions("test")
@@ -169,7 +178,11 @@ func TestCosGetVersionWithNoVersioning(t *testing.T) {
 }
 
 func TestCosGetStates(t *testing.T) {
-	cosInstance := genCOSInstance(t)
+	var cosInstance *COS
+	if cosInstance = genCOSInstance(t); cosInstance == nil {
+		t.Error("cosInstance is nil!")
+		return
+	}
 
 	states, err := cosInstance.GetStates()
 	if err != nil {
@@ -181,7 +194,11 @@ func TestCosGetStates(t *testing.T) {
 }
 
 func TestCosGetVersions(t *testing.T) {
-	cosInstance := genCOSInstance(t)
+	var cosInstance *COS
+	if cosInstance = genCOSInstance(t); cosInstance == nil {
+		t.Error("cosInstance is nil!")
+		return
+	}
 
 	states, err := cosInstance.GetStates()
 	if err != nil {
@@ -189,11 +206,13 @@ func TestCosGetVersions(t *testing.T) {
 	}
 	if len(states) == 0 {
 		t.Error("States was expected but was empty actually!")
+		return
 	}
 
 	versions, err := cosInstance.GetVersions(states[0])
 	if err != nil {
 		t.Error("GetVersions failed, reason:", err)
+		return
 	}
 	if len(versions) == 0 {
 		t.Error("Versions was expected but was empty actually!")
@@ -201,10 +220,23 @@ func TestCosGetVersions(t *testing.T) {
 }
 
 func TestCosGetState(t *testing.T) {
-	cosInstance := genCOSInstance(t)
+	var cosInstance *COS
+	if cosInstance = genCOSInstance(t); cosInstance == nil {
+		t.Error("cosInstance is nil!")
+		return
+	}
 
 	states, _ := cosInstance.GetStates()
+	if len(states) == 0 {
+		t.Error("The states was expected but was nil actually!")
+		return
+	}
+
 	vers, _ := cosInstance.GetVersions(states[0])
+	if len(vers) == 0 {
+		t.Error("The versions was expected but was nil actually!")
+		return
+	}
 
 	state, err := cosInstance.GetState(states[0], vers[0].ID)
 	if err != nil {
@@ -220,7 +252,7 @@ func genConfig4COS(provider config.ProviderConfig) config.Config {
 		Bucket:    bucketName,
 		Region:    "ap-guangzhou",
 		KeyPrefix: "terraform/state/",
-		SecretId:  accessKey,
+		SecretID:  accessKey,
 		SecretKey: secretKey,
 	}
 
@@ -244,7 +276,7 @@ func genCOSInstance(t *testing.T) *COS {
 		Bucket:    bucketName,
 		Region:    "ap-guangzhou",
 		KeyPrefix: "terraform/state/",
-		SecretId:  accessKey,
+		SecretID:  accessKey,
 		SecretKey: secretKey,
 	}
 
@@ -252,10 +284,12 @@ func genCOSInstance(t *testing.T) *COS {
 	cosInstance, err := NewCOS(cosConfig, exts...)
 	if err != nil {
 		t.Error("NewCOS failed, reason:", err)
+		return nil
 	}
 
 	if cosInstance == nil {
 		t.Error("COS instances are nil.")
+		return nil
 	}
 	return cosInstance
 }

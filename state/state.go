@@ -41,7 +41,32 @@ type Provider interface {
 
 // Configure the state provider
 func Configure(c *config.Config) ([]Provider, error) {
+	var err error
 	var providers []Provider
+
+	providers, err = handleTFE(c, providers)
+	if err != nil {
+		return []Provider{}, err
+	}
+
+	providers, err = handleGCP(c, providers)
+	if err != nil {
+		return []Provider{}, err
+	}
+
+	providers = handleGitLab(c, providers)
+
+	providers = handleAWS(c, providers)
+
+	providers, err = handleCOS(c, providers)
+	if err != nil {
+		return []Provider{}, err
+	}
+
+	return providers, nil
+}
+
+func handleTFE(c *config.Config, providers []Provider) ([]Provider, error) {
 	if len(c.TFE) > 0 {
 		objs, err := NewTFECollection(c)
 		if err != nil {
@@ -54,7 +79,10 @@ func Configure(c *config.Config) ([]Provider, error) {
 			}
 		}
 	}
+	return providers, nil
+}
 
+func handleGCP(c *config.Config, providers []Provider) ([]Provider, error) {
 	if len(c.GCP) > 0 {
 		objs, err := NewGCPCollection(c)
 		if err != nil {
@@ -67,7 +95,10 @@ func Configure(c *config.Config) ([]Provider, error) {
 			}
 		}
 	}
+	return providers, nil
+}
 
+func handleGitLab(c *config.Config, providers []Provider) []Provider {
 	if len(c.Gitlab) > 0 {
 		objs := NewGitlabCollection(c)
 		if len(objs) > 0 {
@@ -77,7 +108,10 @@ func Configure(c *config.Config) ([]Provider, error) {
 			}
 		}
 	}
+	return providers
+}
 
+func handleAWS(c *config.Config, providers []Provider) []Provider {
 	if len(c.AWS) > 0 {
 		objs := NewAWSCollection(c)
 		if len(objs) > 0 {
@@ -87,11 +121,14 @@ func Configure(c *config.Config) ([]Provider, error) {
 			}
 		}
 	}
+	return providers
+}
 
+func handleCOS(c *config.Config, providers []Provider) ([]Provider, error) {
 	if len(c.COS) > 0 {
 		objs, err := NewCOSCollection(c)
 		if err != nil {
-			return []Provider{}, err
+			return nil, err
 		}
 		if len(objs) > 0 {
 			log.Info("Using Tencent Cloud Object Storage as state/locks provider")
@@ -100,6 +137,5 @@ func Configure(c *config.Config) ([]Provider, error) {
 			}
 		}
 	}
-
 	return providers, nil
 }

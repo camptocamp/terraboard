@@ -73,7 +73,7 @@ var defaultExt = cosExts{
 // NewCOS creates an COS object
 func NewCOS(cosCfg config.COSConfig, exts ...CosExt) (cosInstance *COS, err error) {
 	log.WithFields(log.Fields{
-		"SecretId":  cosCfg.SecretId,
+		"SecretId":  cosCfg.SecretID,
 		"SecretKey": cosCfg.SecretKey,
 		"Bucket":    cosCfg.Bucket,
 		"Region":    cosCfg.Region,
@@ -86,7 +86,7 @@ func NewCOS(cosCfg config.COSConfig, exts ...CosExt) (cosInstance *COS, err erro
 	}
 
 	if cosCfg.SecretToken == "" {
-		if cosCfg.SecretId == "" || cosCfg.SecretKey == "" {
+		if cosCfg.SecretID == "" || cosCfg.SecretKey == "" {
 			err = errors.New("missing SecretId or SecretKey for COS provider. Please check your configuration and retry")
 			return
 		}
@@ -124,14 +124,14 @@ func UseTencentCosClient(cosCfg *config.COSConfig) (client *cos.Client, err erro
 		return
 	}
 
-	baseUrl := &cos.BaseURL{
+	baseURL := &cos.BaseURL{
 		BucketURL: u,
 	}
 
-	client = cos.NewClient(baseUrl, &http.Client{
+	client = cos.NewClient(baseURL, &http.Client{
 		Timeout: 100 * time.Second,
 		Transport: &cos.AuthorizationTransport{
-			SecretID:     cosCfg.SecretId,
+			SecretID:     cosCfg.SecretID,
 			SecretKey:    cosCfg.SecretKey,
 			SessionToken: cosCfg.SecretToken,
 		},
@@ -293,17 +293,17 @@ func (a *COS) GetState(st, versionID string) (sf *statefile.File, err error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Second*60)
 	defer cancel()
 
-	var verId string
+	var verID string
 	if versionID != "" && !a.Ext.noVersioning {
 		log.WithField("versionID", versionID).Debug("Set the versionID in GetState.")
-		verId = versionID
+		verID = versionID
 	}
 
-	ret, err := a.svc.Object.Get(ctx, st, nil, verId)
+	ret, err := a.svc.Object.Get(ctx, st, nil, verID)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"path":       st,
-			"version_id": verId,
+			"version_id": verID,
 			"error":      err,
 		}).Error("Error retrieving state from COS")
 

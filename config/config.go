@@ -97,7 +97,7 @@ type COSConfig struct {
 	Bucket      string `long:"cos-bucket" env:"COS_BUCKET" yaml:"bucket" description:"Tencent Cloud COS bucket to search"`
 	Region      string `long:"cos-region" env:"COS_REGION" yaml:"region" description:"COS region."`
 	KeyPrefix   string `long:"cos-key-prefix" env:"COS_KEY_PREFIX" yaml:"key-prefix" description:"COS Key Prefix."`
-	SecretId    string `long:"cos-secret-id" env:"COS_SECRET_ID" yaml:"secret-id" description:"COS secret id."`
+	SecretID    string `long:"cos-secret-id" env:"COS_SECRET_ID" yaml:"secret-id" description:"COS secret id."`
 	SecretKey   string `long:"cos-secret-key" env:"COS_SECRET_KEY" yaml:"secret-key" description:"COS secret key."`
 	SecretToken string `long:"cos-secret-token" env:"COS_SECRET_TOKEN" yaml:"secret-token" description:"COS secret session token."`
 }
