@@ -17,11 +17,21 @@ import (
 	cos "github.com/tencentyun/cos-go-sdk-v5"
 )
 
+type ICosBucketService interface {
+	Get(_ context.Context, _ *cos.BucketGetOptions) (*cos.BucketGetResult, *cos.Response, error)
+	GetObjectVersions(_ context.Context, _ *cos.BucketGetObjectVersionsOptions) (*cos.BucketGetObjectVersionsResult, *cos.Response, error)
+}
+
+type ICosObjectService interface {
+	Get(_ context.Context, _ string, _ *cos.ObjectGetOptions, _ ...string) (*cos.Response, error)
+}
+
 // COS is a state provider type, leveraging Tencent Cloud COS
 type COS struct {
-	svc    *cos.Client
-	bucket string // one svc one bucket
-	Ext    cosExts
+	bucket     ICosBucketService // svc.Bucket
+	object     ICosObjectService // svc.Object
+	bucketName string            // one svc one bucket
+	Ext        cosExts
 }
 
 type cosExts struct {
@@ -98,8 +108,10 @@ func NewCOS(cosCfg config.COSConfig, exts ...CosExt) (cosInstance *COS, err erro
 	}
 
 	cosInstance = &COS{
-		svc:    client,
-		bucket: cosCfg.Bucket,
+		// svc:    client,
+		bucket:     client.Bucket,
+		object:     client.Object,
+		bucketName: cosCfg.Bucket,
 		// default extension
 		Ext: defaultExt,
 	}
@@ -183,10 +195,10 @@ func (a *COS) GetLocks() (locks map[string]LockInfo, err error) {
 		MaxKeys: 100,
 	}
 
-	ret, _, err := a.svc.Bucket.Get(context.Background(), opt)
+	ret, _, err := a.bucket.Get(context.Background(), opt)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"bucket": a.bucket,
+			"bucket": a.bucketName,
 		}).Error("Error retrieving lockfile key from COS bucket!")
 		return nil, err
 	}
@@ -206,7 +218,7 @@ func (a *COS) GetLocks() (locks map[string]LockInfo, err error) {
 		ctx, cancel := context.WithTimeout(ctx, time.Second*50)
 		defer cancel()
 
-		resp, err := a.svc.Object.Get(ctx, lockFile, nil)
+		resp, err := a.object.Get(ctx, lockFile, nil)
 		if err != nil {
 			if err != nil {
 				log.WithFields(log.Fields{
@@ -253,7 +265,7 @@ func (a *COS) GetStates() (states []string, err error) {
 	}
 
 	for truncatedListing {
-		ret, _, err := a.svc.Bucket.Get(context.Background(), opt)
+		ret, _, err := a.bucket.Get(context.Background(), opt)
 
 		log.WithFields(log.Fields{
 			"bucket":  ret.Name,
@@ -263,7 +275,7 @@ func (a *COS) GetStates() (states []string, err error) {
 
 		if err != nil {
 			log.WithFields(log.Fields{
-				"bucket": a.bucket,
+				"bucket": a.bucketName,
 			}).Error("Error retrieving statefiles from COS bucket!")
 			return nil, err
 		}
@@ -273,7 +285,7 @@ func (a *COS) GetStates() (states []string, err error) {
 				// item:stateFileName
 				stateFiles = append(stateFiles, c.Key)
 				log.WithFields(log.Fields{
-					"bucket": a.bucket,
+					"bucket": a.bucketName,
 					"key":    c.Key,
 				}).Debug("Got one statefile from COS.")
 			}
@@ -299,7 +311,7 @@ func (a *COS) GetState(st, versionID string) (sf *statefile.File, err error) {
 		verId = versionID
 	}
 
-	ret, err := a.svc.Object.Get(ctx, st, nil, verId)
+	ret, err := a.object.Get(ctx, st, nil, verId)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"path":       st,
@@ -352,7 +364,7 @@ func (a *COS) GetVersions(state string) (versions []Version, err error) {
 		Prefix: state,
 	}
 
-	ret, _, err := a.svc.Bucket.GetObjectVersions(ctx, opt)
+	ret, _, err := a.bucket.GetObjectVersions(ctx, opt)
 	if err != nil {
 		return
 	}

@@ -1,12 +1,18 @@
 package state
 
 import (
+	"bytes"
+	"context"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/camptocamp/terraboard/config"
+	"github.com/tencentyun/cos-go-sdk-v5"
 )
 
 var (
@@ -19,6 +25,16 @@ func TestMain(m *testing.M) {
 	bucketName = "BucketName-APPID"
 	accessKey = os.Getenv("COS_SECRET_ID")
 	secretKey = os.Getenv("COS_SECRET_KEY")
+
+	if accessKey == "" {
+		fmt.Println("AccessKey is empty, use the example AK...")
+		accessKey = "ACCESSKEYEXAMPLE"
+	}
+
+	if secretKey == "" {
+		fmt.Println("SecretKey is empty, use the example SK...")
+		secretKey = "SECRETKEYEXAMPLE/XXXXX/SECRETKEYEXAMPLE"
+	}
 
 	fmt.Println("Test begin...")
 	m.Run()
@@ -169,7 +185,9 @@ func TestCosGetVersionWithNoVersioning(t *testing.T) {
 }
 
 func TestCosGetStates(t *testing.T) {
-	cosInstance := genCOSInstance(t)
+	cosInstance := &COS{
+		bucket: BucketServiceMock{},
+	}
 
 	states, err := cosInstance.GetStates()
 	if err != nil {
@@ -181,7 +199,9 @@ func TestCosGetStates(t *testing.T) {
 }
 
 func TestCosGetVersions(t *testing.T) {
-	cosInstance := genCOSInstance(t)
+	cosInstance := &COS{
+		bucket: BucketServiceMock{},
+	}
 
 	states, err := cosInstance.GetStates()
 	if err != nil {
@@ -201,7 +221,10 @@ func TestCosGetVersions(t *testing.T) {
 }
 
 func TestCosGetState(t *testing.T) {
-	cosInstance := genCOSInstance(t)
+	cosInstance := &COS{
+		bucket: BucketServiceMock{},
+		object: ObjectServiceMock{},
+	}
 
 	states, _ := cosInstance.GetStates()
 	vers, _ := cosInstance.GetVersions(states[0])
@@ -239,23 +262,38 @@ func genConfig4COS(provider config.ProviderConfig) config.Config {
 	return config
 }
 
-func genCOSInstance(t *testing.T) *COS {
-	cosConfig := config.COSConfig{
-		Bucket:    bucketName,
-		Region:    "ap-guangzhou",
-		KeyPrefix: "terraform/state/",
-		SecretId:  accessKey,
-		SecretKey: secretKey,
-	}
+type BucketServiceMock struct {
+	*cos.BucketService
+}
 
-	exts := []CosExt{}
-	cosInstance, err := NewCOS(cosConfig, exts...)
-	if err != nil {
-		t.Error("NewCOS failed, reason:", err)
-	}
+type ObjectServiceMock struct {
+	*cos.ObjectService
+}
 
-	if cosInstance == nil {
-		t.Error("COS instances are nil.")
-	}
-	return cosInstance
+func (b BucketServiceMock) Get(_ context.Context, _ *cos.BucketGetOptions) (*cos.BucketGetResult, *cos.Response, error) {
+	return &cos.BucketGetResult{
+		Contents: []cos.Object{
+			{Key: "test.tfstate"},
+			{Key: "test2.tfstate"},
+			{Key: "test3.tfstate"},
+		},
+		IsTruncated: func() bool { b := false; return b }(),
+	}, nil, nil
+}
+
+func (b BucketServiceMock) GetObjectVersions(_ context.Context, _ *cos.BucketGetObjectVersionsOptions) (*cos.BucketGetObjectVersionsResult, *cos.Response, error) {
+	return &cos.BucketGetObjectVersionsResult{
+		Version: []cos.ListVersionsResultVersion{
+			{Key: "testId", VersionId: "v1", LastModified: time.Now().AddDate(0, 0, -2).Format("2006-01-02 15:04:05")},
+			{Key: "testId2", VersionId: "v2", LastModified: time.Now().AddDate(0, 0, -1).Format("2006-01-02 15:04:05")},
+		},
+	}, nil, nil
+}
+
+func (o ObjectServiceMock) Get(_ context.Context, _ string, _ *cos.ObjectGetOptions, _ ...string) (*cos.Response, error) {
+	return &cos.Response{
+		Response: &http.Response{
+			Body: ioutil.NopCloser(bytes.NewReader([]byte(`{"version": 4, "terraform_version": "1.4.5", "serial": 7}`))),
+		},
+	}, nil
 }
