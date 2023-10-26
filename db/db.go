@@ -477,7 +477,6 @@ func (db *Database) ListStateStats(query url.Values) (states []types.StateStat, 
 
 	var paginationQuery string
 	var params []interface{}
-	page = 1
 	if v := string(query.Get("page")); v != "" {
 		page, _ = strconv.Atoi(v) // TODO: err
 		offset := (page - 1) * pageSize

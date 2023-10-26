@@ -222,14 +222,27 @@ func main() {
 	// Add CORS Middleware to mux router
 	r.Use(corsMiddleware)
 
+	// Create server
+	server := &http.Server{
+		Addr:              fmt.Sprintf(":%v", c.Web.Port),
+		Handler:           r,
+		ReadHeaderTimeout: 3 * time.Second,
+	}
+
 	// Start server
 	log.Debugf("Listening on port %d\n", c.Web.Port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", c.Web.Port), r))
+	log.Fatal(server.ListenAndServe())
 }
 
 func serveSwagger(port int, router *mux.Router) {
+	server := &http.Server{
+		Addr:              fmt.Sprintf(":%v", port),
+		Handler:           router,
+		ReadHeaderTimeout: 3 * time.Second,
+	}
+
 	log.Infof("Serving swagger on port %d", port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", port), router))
+	log.Fatal(server.ListenAndServe())
 }
 
 // spaHandler implements the http.Handler interface, so we can use it
