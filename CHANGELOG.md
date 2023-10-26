@@ -5,7 +5,7 @@
 
 ### Features
 
-* **go:** upgrade Terraboard's Go version to v1.17 ([e457ebc](https://www.github.com/camptocamp/terraboard/commit/e457ebc154730baea6fbbf1723e52e417c67f55c))
+* **go:** upgrade Terraboard's Go version to v1.21
 * **internal:** update Terraform's internal packages ([e457ebc](https://www.github.com/camptocamp/terraboard/commit/e457ebc154730baea6fbbf1723e52e417c67f55c))
 
 

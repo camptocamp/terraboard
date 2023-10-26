@@ -30,6 +30,8 @@
 
 ---
 
+<p align="center"><strong>Caution: Terraboard's Docker registry was migrated from Dockerhub to GHCR! All new tags will be now pushed <a href="https://github.com/camptocamp/terraboard/pkgs/container/terraboard">here</a>. You can still access to old tags on the legacy Dockerhub repository.</strong></p>
+
 <details><summary>Table of content</summary>
 
 - [What is it?](#what-is-it)
@@ -93,7 +95,7 @@ It currently supports several remote state backend providers:
 - [GitLab](https://docs.gitlab.com/ee/user/infrastructure/terraform_state.html)
 
 Terraboard is now able to handle multiple buckets/providers configuration! 🥳
-Check *configuration* section for more details. 
+Check *configuration* section for more details.
 
 ### Overview
 
@@ -175,7 +177,7 @@ aws:
     s3:
       - bucket: test-bucket
         force-path-style: true
-        file-extension: 
+        file-extension:
           - .tfstate
 
   - endpoint: http://minio:9000/
@@ -183,14 +185,14 @@ aws:
     s3:
       - bucket: test-bucket2
         force-path-style: true
-        file-extension: 
+        file-extension:
           - .tfstate
 ```
 
 In the case of AWS, don't forget to set the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables.
 
 That's it! Terraboard will now fetch these two buckets on DB refresh. You can also mix providers like AWS and Gitlab or anything else.
-You can find a ready-to-use Docker example with two *MinIO* buckets in the `test/multiple-minio-buckets/` sub-folder. 
+You can find a ready-to-use Docker example with two *MinIO* buckets in the `test/multiple-minio-buckets/` sub-folder.
 
 ### Available parameters
 
@@ -199,7 +201,7 @@ You can find a ready-to-use Docker example with two *MinIO* buckets in the `test
 - `-V`, `--version` Display version.
 - `-c`, `--config-file` <default: *$CONFIG_FILE*> Config File path
   - Env: *CONFIG_FILE*
-  
+
 #### General Provider Options
 
 - `--no-versioning` <default: *$TERRABOARD_NO_VERSIONING*> Disable versioning support from Terraboard (useful for S3 compatible providers like MinIO)
@@ -401,7 +403,7 @@ docker run -p 8080:8080 \
   -e DB_PASSWORD="<mypassword>" \
   -e DB_SSLMODE="disable" \
   --net terraboard \
-  camptocamp/terraboard:latest
+  ghcr.io/camptocamp/terraboard:latest
 ```
 
 Then point your browser to http://localhost:8080.
