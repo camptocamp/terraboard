@@ -39,7 +39,10 @@ func NewAWS(aws config.AWSConfig, bucket config.S3BucketConfig, noLocks, noVersi
 		return nil
 	}
 
-	sess := session.Must(session.NewSession())
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		SharedConfigState: session.SharedConfigEnable,
+	}))
+
 	awsConfig := aws_sdk.NewConfig()
 	var creds *credentials.Credentials
 	if len(aws.APPRoleArn) > 0 {
@@ -49,13 +52,8 @@ func NewAWS(aws config.AWSConfig, bucket config.S3BucketConfig, noLocks, noVersi
 				p.ExternalID = aws_sdk.String(aws.ExternalID)
 			}
 		})
-	} else {
-		if aws.AccessKey == "" || aws.SecretAccessKey == "" {
-			log.Fatal("Missing AccessKey or SecretAccessKey for AWS provider. Please check your configuration and retry")
-		}
-		creds = credentials.NewStaticCredentials(aws.AccessKey, aws.SecretAccessKey, aws.SessionToken)
+		awsConfig.WithCredentials(creds)
 	}
-	awsConfig.WithCredentials(creds)
 
 	if e := aws.Endpoint; e != "" {
 		awsConfig.WithEndpoint(e)
