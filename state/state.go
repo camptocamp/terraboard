@@ -88,5 +88,15 @@ func Configure(c *config.Config) ([]Provider, error) {
 		}
 	}
 
+	if len(c.Azure) > 0 {
+		objs := NewAzureCollection(c)
+		if len(objs) > 0 {
+			log.Info("Using Azure (storage account) as state/locks provider")
+			for _, azObj := range objs {
+				providers = append(providers, azObj)
+			}
+		}
+	}
+
 	return providers, nil
 }

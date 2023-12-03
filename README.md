@@ -54,6 +54,7 @@
     - [Terraform Enterprise Options](#terraform-enterprise-options)
     - [Google Cloud Platform Options](#google-cloud-platform-options)
     - [GitLab Options](#gitlab-options)
+    - [Azure Storage Account Options](#azure-storage-account-options)
     - [Web](#web)
     - [Help Options](#help-options)
 - [Push plans to Terraboard](#push-plans-to-terraboard)
@@ -315,6 +316,18 @@ You can find a ready-to-use Docker example with two *MinIO* buckets in the `test
 - `--gitlab-token` <default: *$GITLAB_TOKEN*> Token to authenticate upon GitLab
   - Env: *GITLAB_TOKEN*
   - Yaml: *gitlab.token*
+
+#### Azure Storage Account Options
+
+- `azure-storage-account` Storage Account name
+  - Env: *AZURE_STORAGE_ACCOUNT*
+  - Yaml: *storage-account*
+- `azure-container` Container name where states are stored
+  - Env: *AZURE_CONTAINER*
+  - Yaml: *container*
+- `azure-account-key` Primary or secondary Storage Account key. If not set, use environment variables for DefaultAzureCredential as described [here](https://learn.microsoft.com/en-us/azure/developer/go/azure-sdk-authentication?tabs=bash#environment-variables).
+  - Env: *AZURE_KEY*
+  - Yaml: *account-key*
 
 #### Web
 
