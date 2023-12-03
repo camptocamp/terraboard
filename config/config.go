@@ -34,6 +34,8 @@ type configFlags struct {
 
 	Gitlab GitlabConfig `group:"GitLab Options" yaml:"gitlab"`
 
+	Azure AzureConfig `group:"Azure Options" yaml:"azure"`
+
 	Web WebConfig `group:"Web" yaml:"web"`
 }
 
@@ -96,6 +98,13 @@ type GitlabConfig struct {
 	Token   string `long:"gitlab-token" env:"GITLAB_TOKEN" yaml:"token" description:"Token to authenticate upon GitLab"`
 }
 
+// AzureConfig stores the Azure Storage Account configuration
+type AzureConfig struct {
+	StorageAccount string `long:"azure-storage-account" env:"AZURE_STORAGE_ACCOUNT" yaml:"storage-account" description:"Azure Storage Account name where states are stored"`
+	Container      string `long:"azure-container" env:"AZURE_CONTAINER" yaml:"container" description:"Container name"`
+	AccountKey     string `long:"azure-account-key" env:"AZURE_KEY" yaml:"account-key" description:"Primary or secondary Storage Account key. If not set, use environment variables for DefaultAzureCredential"`
+}
+
 // WebConfig stores the UI interface parameters
 type WebConfig struct {
 	Port        uint16 `short:"p" long:"port" env:"TERRABOARD_PORT" yaml:"port" description:"Port to listen on." default:"8080"`
@@ -129,6 +138,8 @@ type Config struct {
 	GCP []GCPConfig `group:"Google Cloud Platform Options" yaml:"gcp"`
 
 	Gitlab []GitlabConfig `group:"GitLab Options" yaml:"gitlab"`
+
+	Azure []AzureConfig `group:"Azure Options" yaml:"azure"`
 
 	Web WebConfig `group:"Web" yaml:"web"`
 }
@@ -186,6 +197,7 @@ func LoadConfig(version string) *Config {
 		TFE:            []TFEConfig{parsedConfig.TFE},
 		GCP:            []GCPConfig{parsedConfig.GCP},
 		Gitlab:         []GitlabConfig{parsedConfig.Gitlab},
+		Azure:          []AzureConfig{parsedConfig.Azure},
 		Web:            parsedConfig.Web,
 	}
 	c.AWS[0].S3 = append(c.AWS[0].S3, parsedConfig.S3)
