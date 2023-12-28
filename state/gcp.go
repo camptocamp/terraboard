@@ -19,12 +19,14 @@ import (
 
 // GCP is a state provider type, leveraging GCS
 type GCP struct {
-	svc     *storage.Client
-	buckets []string
+	svc          *storage.Client
+	buckets      []string
+	noLocks      bool
+	noVersioning bool
 }
 
 // NewGCP creates an GCP object
-func NewGCP(gcp config.GCPConfig) (*GCP, error) {
+func NewGCP(gcp config.GCPConfig, noLocks, noVersioning bool) (*GCP, error) {
 	ctx := context.Background()
 
 	var client *storage.Client
@@ -52,8 +54,10 @@ func NewGCP(gcp config.GCPConfig) (*GCP, error) {
 	}
 
 	gcpInstance = &GCP{
-		svc:     client,
-		buckets: gcp.GCSBuckets,
+		svc:          client,
+		buckets:      gcp.GCSBuckets,
+		noLocks:      noLocks,
+		noVersioning: noVersioning,
 	}
 
 	log.WithFields(log.Fields{
@@ -67,7 +71,7 @@ func NewGCP(gcp config.GCPConfig) (*GCP, error) {
 func NewGCPCollection(c *config.Config) ([]*GCP, error) {
 	var gcpInstances []*GCP
 	for _, gcp := range c.GCP {
-		gcpInstance, err := NewGCP(gcp)
+		gcpInstance, err := NewGCP(gcp, c.Provider.NoLocks, c.Provider.NoVersioning)
 		if err != nil || gcpInstance == nil {
 			return nil, err
 		}
@@ -79,6 +83,11 @@ func NewGCPCollection(c *config.Config) ([]*GCP, error) {
 
 // GetLocks returns a map of locks by State path
 func (a *GCP) GetLocks() (locks map[string]LockInfo, err error) {
+	if a.noLocks {
+		locks = make(map[string]LockInfo)
+		return
+	}
+
 	ctx := context.Background()
 	ctx, cancel := context.WithTimeout(ctx, time.Second*60)
 	defer cancel()
@@ -167,7 +176,7 @@ func (a *GCP) GetState(st, versionID string) (sf *statefile.File, err error) {
 	fileName := st[bucketSplit+1:]
 
 	obj := a.svc.Bucket(bucketName).Object(fileName)
-	if versionID != "" {
+	if versionID != "" && !a.noVersioning {
 		version, err := strconv.ParseInt(versionID, 10, 64)
 		if err != nil {
 			return nil, err
@@ -205,6 +214,14 @@ func (a *GCP) GetState(st, versionID string) (sf *statefile.File, err error) {
 
 // GetVersions returns a slice of Version objects
 func (a *GCP) GetVersions(state string) (versions []Version, err error) {
+	if a.noVersioning {
+		versions = append(versions, Version{
+			ID:           state,
+			LastModified: time.Now(),
+		})
+		return
+	}
+
 	versions = []Version{}
 	ctx := context.Background()
 	ctx, cancel := context.WithTimeout(ctx, time.Second*60)

@@ -14,12 +14,14 @@ import (
 // TFE is a state provider type, leveraging Terraform Enterprise
 type TFE struct {
 	*tfe.Client
-	org string
-	ctx *context.Context
+	org          string
+	ctx          *context.Context
+	noLocks      bool
+	noVersioning bool
 }
 
 // NewTFE creates a new TFE object
-func NewTFE(tfeObj config.TFEConfig) (*TFE, error) {
+func NewTFE(tfeObj config.TFEConfig, noLocks, noVersioning bool) (*TFE, error) {
 	var tfeInstance *TFE
 	if tfeObj.Token == "" {
 		return nil, nil
@@ -37,9 +39,11 @@ func NewTFE(tfeObj config.TFEConfig) (*TFE, error) {
 
 	ctx := context.Background()
 	tfeInstance = &TFE{
-		Client: client,
-		org:    tfeObj.Organization,
-		ctx:    &ctx,
+		Client:       client,
+		org:          tfeObj.Organization,
+		ctx:          &ctx,
+		noLocks:      noLocks,
+		noVersioning: noVersioning,
 	}
 
 	return tfeInstance, nil
@@ -49,7 +53,7 @@ func NewTFE(tfeObj config.TFEConfig) (*TFE, error) {
 func NewTFECollection(c *config.Config) ([]*TFE, error) {
 	var tfeInstances []*TFE
 	for _, tfe := range c.TFE {
-		tfeInstance, err := NewTFE(tfe)
+		tfeInstance, err := NewTFE(tfe, c.Provider.NoLocks, c.Provider.NoVersioning)
 		if err != nil || tfeInstance == nil {
 			return nil, err
 		}
@@ -61,6 +65,11 @@ func NewTFECollection(c *config.Config) ([]*TFE, error) {
 
 // GetLocks returns a map of locks by State path
 func (t *TFE) GetLocks() (locks map[string]LockInfo, err error) {
+	if t.noLocks {
+		locks = make(map[string]LockInfo)
+		return
+	}
+
 	locks = make(map[string]LockInfo)
 
 	options := tfe.WorkspaceListOptions{
@@ -132,6 +141,14 @@ func (t *TFE) GetStates() (states []string, err error) {
 
 // GetVersions returns a slice of Version objects
 func (t *TFE) GetVersions(state string) (versions []Version, err error) {
+	if t.noVersioning {
+		versions = append(versions, Version{
+			ID:           state,
+			LastModified: time.Now(),
+		})
+		return
+	}
+
 	options := tfe.StateVersionListOptions{
 		ListOptions: tfe.ListOptions{
 			PageNumber: 1,

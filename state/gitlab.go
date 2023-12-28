@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"regexp"
 	"strconv"
+	"time"
 
 	"github.com/camptocamp/terraboard/config"
 	"github.com/camptocamp/terraboard/internal/terraform/states/statefile"
@@ -14,18 +15,22 @@ import (
 
 // Gitlab is a state provider type, leveraging GitLab
 type Gitlab struct {
-	Client gitlab.Client
+	Client       gitlab.Client
+	noLocks      bool
+	noVersioning bool
 }
 
 // NewGitlab creates a new Gitlab object
-func NewGitlab(gl config.GitlabConfig) *Gitlab {
+func NewGitlab(gl config.GitlabConfig, noLocks, noVersioning bool) *Gitlab {
 	var instance *Gitlab
 	if gl.Token == "" {
 		return nil
 	}
 
 	instance = &Gitlab{
-		Client: gitlab.NewClient(gl.Address, gl.Token),
+		Client:       gitlab.NewClient(gl.Address, gl.Token),
+		noLocks:      noLocks,
+		noVersioning: noVersioning,
 	}
 	return instance
 }
@@ -34,7 +39,7 @@ func NewGitlab(gl config.GitlabConfig) *Gitlab {
 func NewGitlabCollection(c *config.Config) []*Gitlab {
 	var gitlabInstances []*Gitlab
 	for _, gitlab := range c.Gitlab {
-		if glInstance := NewGitlab(gitlab); glInstance != nil {
+		if glInstance := NewGitlab(gitlab, c.Provider.NoLocks, c.Provider.NoVersioning); glInstance != nil {
 			gitlabInstances = append(gitlabInstances, glInstance)
 		}
 	}
@@ -44,6 +49,11 @@ func NewGitlabCollection(c *config.Config) []*Gitlab {
 
 // GetLocks returns a map of locks by State path
 func (g *Gitlab) GetLocks() (locks map[string]LockInfo, err error) {
+	if g.noLocks {
+		locks = make(map[string]LockInfo)
+		return
+	}
+
 	locks = make(map[string]LockInfo)
 	var projects gitlab.Projects
 	projects, err = g.Client.GetProjectsWithTerraformStates()
@@ -89,6 +99,14 @@ func (g *Gitlab) GetStates() (states []string, err error) {
 
 // GetVersions returns a slice of Version objects
 func (g *Gitlab) GetVersions(state string) (versions []Version, err error) {
+	if g.noVersioning {
+		versions = append(versions, Version{
+			ID:           state,
+			LastModified: time.Now(),
+		})
+		return
+	}
+
 	var projects gitlab.Projects
 	projects, err = g.Client.GetProjectsWithTerraformStates()
 	if err != nil {
