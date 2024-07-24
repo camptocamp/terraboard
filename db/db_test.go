@@ -179,7 +179,7 @@ func TestInsertState(t *testing.T) {
 		DB: gormDB,
 	}
 
-	version, err := version.NewSemver("v1.0.0")
+	version, _ := version.NewSemver("v1.0.0")
 	err = db.InsertState("path", "foo", &statefile.File{
 		TerraformVersion: version,
 		Serial:           2,
