@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.0](https://www.github.com/camptocamp/terraboard/compare/v2.3.0...v2.4.0) (2024-07-24)
+
+
+### Features
+
+* support noLocks and noVersioning with all state providers ([f59bb70](https://www.github.com/camptocamp/terraboard/commit/f59bb70577b7af1347ef6b2cbcbe18d4d1f9f3b0))
+
 ## [2.3.0](https://www.github.com/camptocamp/terraboard/compare/v2.2.0...v2.3.0) (2023-10-26)
 
 
