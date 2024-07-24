@@ -8,11 +8,10 @@ run:
   # Disable tests to avoid redundancy with test workflow
   tests: false
 
-  # Dirs to ignore
-  skip-dirs:
-    - internal/terraform
-
 issues:
+  # Dirs to ignore
+  exclude-dirs:
+    - internal/terraform
   # Maximum issues count per one linter
   max-issues-per-linter: 0
   # Maximum count of issues with the same text
@@ -32,8 +31,6 @@ linters-settings:
     ignore-generated-header: false
     severity: warning
     confidence: 0.8
-    errorCode: 1
-    warningCode: 1
     rules:
       - name: blank-imports
         severity: warning
@@ -85,10 +82,10 @@ linters-settings:
         severity: warning
       - name: redefines-builtin-id
         severity: warning
-      
+
   misspell:
     locale: US
-  
+
 # Activated linters by default:
 # - deadcode
 # - errcheck
