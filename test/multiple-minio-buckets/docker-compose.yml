@@ -51,7 +51,7 @@ services:
     command: server /data
 
   db:
-    image: postgres:9.5
+    image: postgres:17
     environment:
       POSTGRES_USER: gorm
       POSTGRES_PASSWORD: mypassword

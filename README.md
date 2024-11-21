@@ -392,7 +392,7 @@ docker run --name db \
   --net terraboard \
   --detach \
   --restart=always \
-  postgres:9.5
+  postgres:17
 
 docker run -p 8080:8080 \
   -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" \
