@@ -1,8 +1,7 @@
 module github.com/camptocamp/terraboard
 
 go 1.21.5
-
-toolchain go1.22.5
+toolchain go1.24.1
 
 require (
 	cloud.google.com/go/storage v1.41.0
@@ -44,11 +43,11 @@ require (
 	github.com/swaggo/swag v1.16.3
 	github.com/zclconf/go-cty v1.14.4
 	github.com/zclconf/go-cty-yaml v1.0.3
-	golang.org/x/crypto v0.25.0
+	golang.org/x/crypto v0.35.0
 	golang.org/x/mod v0.17.0
 	golang.org/x/net v0.27.0
-	golang.org/x/sys v0.22.0
-	golang.org/x/text v0.16.0
+	golang.org/x/sys v0.30.0
+	golang.org/x/text v0.22.0
 	google.golang.org/api v0.188.0
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/datatypes v1.2.0
@@ -111,7 +110,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.24.0 // indirect
 	go.opentelemetry.io/otel/trace v1.24.0 // indirect
 	golang.org/x/oauth2 v0.21.0 // indirect
-	golang.org/x/sync v0.7.0 // indirect
+	golang.org/x/sync v0.11.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
 	golang.org/x/xerrors v0.0.0-20240716161551-93cc26a95ae9 // indirect
