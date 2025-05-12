@@ -201,7 +201,7 @@ func (a *GCP) GetState(st, versionID string) (sf *statefile.File, err error) {
 	sf, err = statefile.Read(rc)
 
 	if sf == nil {
-		return sf, fmt.Errorf("Failed to find state")
+		return sf, fmt.Errorf("failed to find state")
 	}
 
 	log.WithFields(log.Fields{

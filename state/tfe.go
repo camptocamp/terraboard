@@ -198,7 +198,7 @@ func (t *TFE) GetState(st, versionID string) (sf *statefile.File, err error) {
 	// Parse the statefile
 	sf, err = statefile.Read(bytes.NewReader(state))
 	if sf == nil {
-		return nil, fmt.Errorf("Unable to parse the statefile for workspace %s version %s", st, versionID)
+		return nil, fmt.Errorf("unable to parse the statefile for workspace %s version %s", st, versionID)
 	}
 
 	return

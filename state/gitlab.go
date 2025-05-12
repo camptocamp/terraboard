@@ -152,7 +152,7 @@ func (g *Gitlab) GetState(path, version string) (sf *statefile.File, err error) 
 	// Parse the statefile
 	sf, err = statefile.Read(bytes.NewReader(state))
 	if sf == nil {
-		return nil, fmt.Errorf("Unable to parse the statefile for workspace %s version %s", path, version)
+		return nil, fmt.Errorf("unable to parse the statefile for workspace %s version %s", path, version)
 	}
 
 	return
