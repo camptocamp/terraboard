@@ -3,7 +3,7 @@ package gitlab
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
@@ -254,7 +254,7 @@ func (c *Client) GetState(projectID, stateName, version string) (state []byte, e
 		return
 	}
 
-	state, err = ioutil.ReadAll(resp.Body)
+	state, err = io.ReadAll(resp.Body)
 	return
 }
 

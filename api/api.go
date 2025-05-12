@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/camptocamp/terraboard/auth"
@@ -375,7 +374,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 // @Param   plan      body   api.planPayload     false  "Wrapped plan"
 // @Router /plans [post]
 func SubmitPlan(w http.ResponseWriter, r *http.Request, db *db.Database) {
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Errorf("Failed to read body: %v", err)
 		JSONError(w, "Failed to read body during plan submit", err)

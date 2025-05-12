@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"strconv"
 	"strings"
 	"time"
@@ -32,7 +32,7 @@ func NewGCP(gcp config.GCPConfig, noLocks, noVersioning bool) (*GCP, error) {
 	var client *storage.Client
 	var gcpInstance *GCP
 	var err error
-	if gcp.GCSBuckets == nil || len(gcp.GCSBuckets) == 0 {
+	if len(gcp.GCSBuckets) == 0 {
 		return nil, nil
 	}
 
@@ -119,7 +119,7 @@ func (a *GCP) GetLocks() (locks map[string]LockInfo, err error) {
 			}
 			defer rc.Close()
 
-			data, err := ioutil.ReadAll(rc)
+			data, err := io.ReadAll(rc)
 			if err != nil {
 				return nil, err
 			}

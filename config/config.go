@@ -3,7 +3,6 @@ package config
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 
@@ -136,7 +135,7 @@ type Config struct {
 // LoadConfigFromYaml loads the config from config file
 func (c *Config) LoadConfigFromYaml(filename string) *Config {
 	fmt.Printf("Loading config from %s\n", filename)
-	yamlFile, err := ioutil.ReadFile(filename)
+	yamlFile, err := os.ReadFile(filename)
 	if err != nil {
 		log.Printf("yamlFile.Get err #%v ", err)
 	}

@@ -2,7 +2,7 @@ package state
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"strings"
 	"testing"
 	"time"
@@ -293,7 +293,7 @@ func (s *s3Mock) ListObjectVersions(_ *s3.ListObjectVersionsInput) (*s3.ListObje
 }
 func (s *s3Mock) GetObjectWithContext(_ aws.Context, _ *s3.GetObjectInput, _ ...request.Option) (*s3.GetObjectOutput, error) {
 	return &s3.GetObjectOutput{
-		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{"Version": 4, "Serial": 3, "TerraformVersion": "0.12.0"}`))),
+		Body: io.NopCloser(bytes.NewReader([]byte(`{"Version": 4, "Serial": 3, "TerraformVersion": "0.12.0"}`))),
 	}, nil
 }
 

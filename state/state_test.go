@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -28,7 +27,7 @@ func TestConfigure(t *testing.T) {
 
 	gotURL := make(chan *url.URL, 1)
 	hClient, close := newTestServer(func(w http.ResponseWriter, r *http.Request) {
-		io.Copy(ioutil.Discard, r.Body)
+		io.Copy(io.Discard, r.Body)
 		gotURL <- r.URL
 		if strings.Contains(r.URL.String(), "/rewriteTo/") {
 			res := &raw.RewriteResponse{Done: true}
