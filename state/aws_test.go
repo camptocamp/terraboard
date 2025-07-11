@@ -84,11 +84,8 @@ func TestNewAWSNoCredentials(t *testing.T) {
 
 	// Test output
 	t.Log(buf)
-	if buf.Len() == 0 || !strings.Contains(buf.String(), "Missing AccessKey or SecretAccessKey for AWS provider") {
-		t.Error("Missing or bad log output")
-	}
-	if strings.Count(buf.String(), "\n") > 1 {
-		t.Error("Expected only a single line of log output")
+	if strings.Count(buf.String(), "\n") > 0 {
+		t.Error("Expected no log output")
 	}
 }
 
