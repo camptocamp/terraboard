@@ -321,6 +321,10 @@ func (fs snapshotFS) Name() string {
 	return "ConfigSnapshotFS"
 }
 
+func (fs snapshotFS) Chown(name string, uid, gid int) error {
+    return fmt.Errorf("cannot change ownership inside configuaration snapshot")
+}
+
 func (fs snapshotFS) Chmod(name string, mode os.FileMode) error {
 	return fmt.Errorf("cannot set file mode inside configuration snapshot")
 }

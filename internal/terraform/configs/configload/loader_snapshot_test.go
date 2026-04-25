@@ -140,3 +140,10 @@ func TestSnapshotRoundtrip(t *testing.T) {
 		t.Errorf("wrong number of module calls in child_a %d; want %d", got, want)
 	}
 }
+
+func testSnapshotFSChownUnsupported(t *testing.T) { 
+    err := snapshotFS{}.chown("test", 1,1)
+    if err == nil {
+       t.Fatal("expected Chown to return an error")
+    }
+}

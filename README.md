@@ -382,7 +382,7 @@ export AWS_DEFAULT_REGION=<AWS default region>
 export AWS_BUCKET=<S3 Bucket name>
 export AWS_DYNAMODB_TABLE=<AWS_DYNAMODB_TABLE>
 
-# Spin up the two containers and a network for them to communciate on:
+# Spin up the two containers and a network for them to communicate on:
 docker network create terraboard
 docker run --name db \
   -e POSTGRES_USER=gorm \
