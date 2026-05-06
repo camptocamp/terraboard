@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@vueform/multiselect": "^2.0.0",
-    "axios": "^1.7.2",
+    "axios": "^1.15.2",
     "chart.js": "^3.0.0",
     "core-js": "^3.0.0",
     "highlight.js": "^10.0.0",
