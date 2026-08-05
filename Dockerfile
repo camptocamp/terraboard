@@ -3,7 +3,7 @@ WORKDIR /opt/build
 COPY . .
 RUN make build
 
-FROM node:lts as node-builder
+FROM node:20 as node-builder
 WORKDIR /opt/build
 COPY static/terraboard-vuejs ./terraboard-vuejs
 WORKDIR /opt/build/terraboard-vuejs
