@@ -14,8 +14,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      minio:
-        condition: service_started
+      minio-init:
+        condition: service_completed_successfully
     volumes:
       - ./config.yml:/config/config.yml:ro
     ports:
@@ -27,28 +27,61 @@ services:
     environment:
       MINIO_ROOT_USER: root
       MINIO_ROOT_PASSWORD: mypassword
-    user: "${UID}:${GID}"
-    expose: 
+    expose:
       - "9000"
     ports:
       - "9200:9000"
     volumes:
-      - ../data/minio-1:/data
+      - minio-data-1:/data
     command: server /data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   minio-2:
     image: minio/minio:latest
     environment:
       MINIO_ROOT_USER: admin
       MINIO_ROOT_PASSWORD: password
-    user: "${UID}:${GID}"
-    expose: 
+    expose:
       - "9000"
     ports:
       - "9300:9000"
     volumes:
-      - ../data/minio-2:/data
+      - minio-data-2:/data
     command: server /data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # MinIO's erasure-coded storage format requires objects to be written
+  # through the S3 API (they need xl.meta sidecar files), so the .tfstate
+  # fixtures can't just be bind-mounted into /data anymore. This uploads
+  # them via `mc` once both MinIO instances are up.
+  minio-init:
+    image: minio/minio:latest
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local1 http://minio:9000 root mypassword &&
+      (mc mb -p local1/test-bucket || true) &&
+      (mc mb -p local1/test-bucket2 || true) &&
+      mc cp --recursive /seed/minio-1/test-bucket/ local1/test-bucket/ &&
+      mc alias set local2 http://minio-2:9000 admin password &&
+      (mc mb -p local2/test-bucket || true) &&
+      mc cp --recursive /seed/minio-2/test-bucket/ local2/test-bucket/
+      "
+    volumes:
+      - ../data/minio-1:/seed/minio-1:ro
+      - ../data/minio-2:/seed/minio-2:ro
+    depends_on:
+      minio:
+        condition: service_healthy
+      minio-2:
+        condition: service_healthy
 
   db:
     image: postgres:9.5
@@ -76,3 +109,5 @@ services:
 
 volumes:
   tb-data: {}
+  minio-data-1: {}
+  minio-data-2: {}
